@@ -10,7 +10,7 @@
                 <li><a href="{{ route('web.bookparcel') }}">Book Parcel</a></li>
                 <li><a href="{{ route('web.trackOrder') }}">Track Order</a></li>
                 <li>
-                    {{-- <a href="{{ route('web.services') }}">Services</a> --}}
+                    <a href="{{ route('web.services') }}">Services</a>
                     <div class="sub-dropdown">
                         <ul>
                             <li><a href="{{ route('web.services') }}"><span>All Services</span></a></li>
