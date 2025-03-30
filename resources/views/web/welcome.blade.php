@@ -218,9 +218,7 @@
             <div class="row justify-content-center pt-5">
                 <div class="col-lg-8 col-md-8">
                     <div class="sec-title">
-                        <h4 class="text-center"><span class="divhead"><span class="text-success">W</span><span
-                                    class="text-danger">hy </span> <span class="text-danger">C</span><span
-                                    class="text-success">hoose</span></span></h4>
+                        <h4 class="text-center"><span class="divhead"><span class="text-success">W</span><span class="text-danger">hy </span> <span class="text-danger">C</span><span class="text-success">hoose US</span></span></h4>
                     </div>
                 </div>
             </div>
