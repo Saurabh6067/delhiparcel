@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\DlyBoy;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,8 @@ class DeliveryBoyMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->session()->has('dlyId')) {
+            $deliveryPerson = DlyBoy::find($request->session()->get('dlyId'));
+            view()->share('deliveryPerson', $deliveryPerson);
             return $next($request);
         } else {
             return redirect('/DeliveryPanel')->with('error', 'Enter Email & Password');

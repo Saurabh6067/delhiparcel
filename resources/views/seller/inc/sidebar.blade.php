@@ -8,7 +8,8 @@
             <img src="{{ asset('admin/dist/img/AdminLTELogo.png') }}" alt="parcel logo"
                 class="brand-image img-circle elevation-3" style="opacity: .8">
         @endif
-        <span class="brand-text font-weight-light">Seller | Delhi Parcel</span>
+        {{-- <span class="brand-text font-weight-light">Seller | Delhi Parcel</span> --}}
+        <span class="brand-text font-weight-light">{{ $deliveryPerson->fullname ?? 'Delhi Parcel' }}</span>
     </a>
 
     <!-- Sidebar -->
