@@ -11,12 +11,10 @@
             font-family: Arial, sans-serif;
             padding: 50px;
         }
-
         h1 {
             font-size: 50px;
             color: #e74c3c;
         }
-
         p {
             font-size: 20px;
         }
