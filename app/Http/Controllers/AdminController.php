@@ -406,8 +406,8 @@ class AdminController extends Controller
             $brn->gst_panno_img = $brn->gst_panno_img;
         }
 
-        // $brn->pincode = $request->pinCode;
-        $brn->pincode = implode(',', $request->pinCode);
+        $brn->pincode = $request->pinCode;
+        // $brn->pincode = implode(',', $request->pinCode);
         $brn->type = $request->branchType;
 
         // Handle Seller Logo
