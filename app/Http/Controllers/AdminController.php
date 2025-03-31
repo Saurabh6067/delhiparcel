@@ -420,7 +420,7 @@ class AdminController extends Controller
         // $brn->password = $request->fullName . '@' . $request->pinCode;
         $brn->password = $request->branchType . '@' . $request->phone;
         $brn->branch_cm = empty($request->branch_cm) ? null : $request->branch_cm;
-        dd($brn->toArray());
+        // dd($brn->toArray());
         $brn->save();
 
         if ($request->ajax()) {
