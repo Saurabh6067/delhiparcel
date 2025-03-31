@@ -97,18 +97,17 @@ class DeliveryBoyController extends Controller
         $dateTime = now('Asia/Kolkata')->format('d-m-Y');
         $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('receiver_pincode', $pinCodes);
-            });
-        // ->where('receiver_pincode', $delivery->pincode);
-
-        $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
-            ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('sender_pincode', $pinCodes);
+                $query->whereIn('receiver_pincode', $pinCodes)
+                ->orWhere('receiver_pincode', $delivery->pincode);
             });
 
-        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
+        // $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
+        //     ->where(function ($query) use ($pinCodes) {
+        //         $query->whereIn('sender_pincode', $pinCodes);
+        //     });
+
+        $toDayOrder = $ordersQuery->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
         $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', ['Delivered', 'Delivered to branch'])->where('assign_to', $id)->count();
-        dd($toDayCompleteOrder);
         // totalOrder details
         $totalOrder = Order::count();
         $PendingOrder = Order::where(['order_status' => 'Booked', 'assign_to' => $id])->count();
