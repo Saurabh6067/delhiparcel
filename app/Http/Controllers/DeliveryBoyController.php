@@ -94,17 +94,19 @@ class DeliveryBoyController extends Controller
         $pinCodes = explode(',', $delivery->pincode);
 
         // toDayOrder details
-        $dateTime = now('Asia/Kolkata')->format('d-m-Y');
+        $dateTime = now('Asia/Kolkata')->format('Y-m-d');
+
         $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
                 $query->whereIn('receiver_pincode', $pinCodes)
-                    ->orWhere('sender_pincode', $pinCodes);
+                    ->orWhereIn('sender_pincode', $pinCodes);
             });
 
         $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
                 $query->whereIn('sender_pincode', $pinCodes);
             });
+
 
         $toDayOrder = $ordersQuery->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
         $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', ['Delivered', 'Delivered to branch'])->where('assign_to', $id)->count();
