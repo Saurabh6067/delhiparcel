@@ -95,25 +95,26 @@ class DeliveryBoyController extends Controller
 
         // toDayOrder details
         $dateTime = now('Asia/Kolkata')->format('d-m-Y');
-        $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
-            ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('receiver_pincode', $pinCodes);
-            });
-        // ->where('receiver_pincode', $delivery->pincode);
-
-        $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
-            ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('sender_pincode', $pinCodes);
-            });
-
-        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
-        $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', 'Delivered')->count();
+        // $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
+        //     ->where(function ($query) use ($pinCodes) {
+        //         $query->whereIn('receiver_pincode', $pinCodes)
+        //             ->orWhere('sender_pincode', $pinCodes);
+        //     });
+        // $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
+        //     ->where(function ($query) use ($pinCodes) {
+        //         $query->whereIn('sender_pincode', $pinCodes);
+        //     });
+        // dd($ordersQuery1->get()->toArray());
+        // $toDayOrder = $ordersQuery1->where(['assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
+        // $toDayCompleteOrder = (clone $ordersQuery1)->where(['order_status' => 'Delivered', 'assign_to' => $id])->count();
+        $toDayOrder = Order::where('datetime', 'like', $dateTime . '%')->where('assign_to', $id)->count();
+        $toDayCompleteOrder = Order::where('datetime', 'like', $dateTime . '%')->where(['order_status' => 'Delivered', 'assign_to' => $id])->count();
 
         // totalOrder details
         $totalOrder = Order::count();
         $PendingOrder = Order::where(['order_status' => 'Booked', 'assign_to' => $id])->count();
         $totalCompleteOrder = Order::where(['order_status' => 'Delivered', 'assign_to' => $id])->count();
-        $PendingDeliveryOrder = Order::whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
+        $PendingDeliveryOrder = Order::whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->where('assign_to', $id)->count();
 
         $PendingSuperExpressOrder = Order::where('service_type', 'SuperExpress')->count();
         $DirectOrders = WebOrder::where('assign_to', $id)->count();
@@ -215,7 +216,7 @@ class DeliveryBoyController extends Controller
             if ($action == 'toDayOrder') {
                 $data = $ordersQuery->where('assign_to', $id)->orderBy('id', 'desc')->get();
             } elseif ($action == 'toDayCompleteOrder') {
-                $data = $ordersQuery->where('order_status', 'Delivered')->where('assign_to', $id)->orderBy('id', 'desc')->get();
+                $data = $ordersQuery->where(['order_status' => 'Delivered', 'assign_to' => $id])->orderBy('id', 'desc')->get();
             } else {
                 $data = $ordersQuery->orderBy('id', 'desc')->get();
             }
@@ -231,7 +232,7 @@ class DeliveryBoyController extends Controller
             } elseif ($action == 'PendingSuperExpressOrder') {
                 $data = $ordersQuery->where('service_type', 'SuperExpress')->where('assign_to', $id)->orderBy('id', 'desc')->get();
             } elseif ($action == 'PendingDeliveryOrder') {
-                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->where('assign_to', $id)->orderBy('id', 'desc')->get();
+                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->where('assign_to', $id)->orderBy('id', 'desc')->get();
             } elseif ($action == 'DirectOrders') {
                 $data = WebOrder::where('assign_to', $id)->orderBy('id', 'desc')->get();
             } else {

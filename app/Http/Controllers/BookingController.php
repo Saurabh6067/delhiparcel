@@ -299,6 +299,7 @@ class BookingController extends Controller
 
             $order->price = $request->price;
             $order->payment_mode = $request->payment_methods;
+            $order->codAmount = $request->codAmount;
             $order->insurance = $request->insurance;
             $order->order_status = 'Booked';
             $order->parcel_type = $request->parcel_type;

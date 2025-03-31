@@ -37,7 +37,7 @@
             <span><b>Number: </b>{{ $item->receiver_cnumber }}</span> <br>
             <span><b>Address: </b>{{ $item->receiver_add }}</span> <br>
         </td>
-        <td>{{ $item->price }}</td>
+        <td>{{ $item->codAmount ?? $item->price }}</td>
         <td>{{ $item->payment_mode }}</td>
         @if ($item->parcel_type == 'Direct')
             <td>{{ $item->sender_pincode }}</td>

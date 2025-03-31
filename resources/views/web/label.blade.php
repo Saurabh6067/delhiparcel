@@ -136,7 +136,8 @@
                             <strong>PIN: </strong> {{ $data->receiver_pincode ?? $data->receiverPinCode }}
                         </td>
                         @php
-                            $price = preg_replace('/[^0-9.]/', '', $data->price);
+                            // $price = preg_replace('/[^0-9.]/', '', $data->price);
+                            $price = preg_replace('/[^0-9.]/', '', $data->codAmount);
                             $roundedPrice = round($price);
                         @endphp
                         <td class="center bold">

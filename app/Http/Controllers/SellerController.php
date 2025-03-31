@@ -58,7 +58,7 @@ class SellerController extends Controller
         $totalCompleteOrder = Order::where('seller_id', $id)->where('order_status', 'Delivered')->count();
         $totalCanceledOrder = Order::where('seller_id', $id)->where('order_status', 'Cancelled')->count();
 
-        return view('seller.dashboard', compact('branch','toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder'));
+        return view('seller.dashboard', compact('branch', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder'));
     }
 
 
@@ -302,6 +302,7 @@ class SellerController extends Controller
 
             $order->price = $request->price;
             $order->payment_mode = $request->payment_methods;
+            $order->codAmount = $request->codAmount;
             $order->insurance = $request->insurance;
             $order->order_status = 'Booked';
             $order->parcel_type = $request->parcel_type;

@@ -45,7 +45,18 @@
                             <form id="deliveryForm">
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label for="userid" id="optionId">Select Branch</label>
+                                                <select class="custom-select rounded-0" id="userid" name="userid">
+                                                    <option selected disabled>Select</option>
+                                                    @foreach ($branch as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->fullname }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="fullName">Full Name</label>
                                                 <input type="text" class="form-control" id="fullName" name="fullName"
@@ -53,7 +64,7 @@
                                                 <input type="hidden" name="id" value="{{ $data->id ?? '' }}">
                                             </div>
                                         </div>
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-4">
                                             <div class="form-group">
                                                 <label for="email">Login-Id / Email</label>
                                                 <input type="email" class="form-control" id="email" name="email"
@@ -120,7 +131,8 @@
                                 <!-- /.card-body -->
 
                                 <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary float-right" id="addBtn">Delivery Boy</button>
+                                    <button type="submit" class="btn btn-primary float-right" id="addBtn">Delivery
+                                        Boy</button>
                                 </div>
                             </form>
                         </div>

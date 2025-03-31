@@ -530,7 +530,8 @@ class AdminController extends Controller
         $id = Session::get('uid');
         $delivery = PinCode::where('status', 'active')->get();
 
-        return view('admin.addDeliveryBoy', compact('delivery', 'data'));
+        $branch = Branch::where('type', 'Delivery')->get();
+        return view('admin.addDeliveryBoy', compact('delivery', 'data', 'branch'));
     }
 
     public function checkPinCode(Request $request)
@@ -561,6 +562,7 @@ class AdminController extends Controller
         } else {
             $dboy = new DlyBoy();
         }
+
         $dboy->name = $request->fullName;
         $dboy->email = $request->email;
         $dboy->phone = $request->phone;
@@ -569,7 +571,7 @@ class AdminController extends Controller
         $dboy->pincode = implode(',', $request->pinCode);
         $dboy->password = $request->password;
         $dboy->orderRate = $request->orderRate;
-        $dboy->userid = Session::get('uid');
+        $dboy->userid = $request->userid;
         $dboy->save();
         if ($request->ajax()) {
             return response()->json([

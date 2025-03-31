@@ -117,7 +117,7 @@ class DeliveryController extends Controller
         $toDayOrder = $ordersQuery->count();
 
         $toDayPendingOrder = (clone $ordersQuery)->where('order_status', 'Booked')->count();
-        $toDayOrderPicUp = (clone $ordersQuery)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
+        $toDayOrderPicUp = (clone $ordersQuery)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->count();
         $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', 'Delivered')->count();
         $toDayCancelledOrder = (clone $ordersQuery)->where('order_status', 'Cancelled')->count();
 
@@ -140,7 +140,7 @@ class DeliveryController extends Controller
 
         $totalOrder         = (clone $query)->count();
         $totalPendingOrder  = (clone $query)->where('order_status', 'Booked')->count();
-        $totalOrderPicUp    = (clone $query)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
+        $totalOrderPicUp    = (clone $query)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->count();
         $totalCompleteOrder = (clone $query)->where('order_status', 'Delivered')->count();
         $totalCanceledOrder = (clone $query)->where('order_status', 'Cancelled')->count();
 
@@ -173,7 +173,7 @@ class DeliveryController extends Controller
             } elseif ($action == 'toDayPendingOrder') {
                 $data = $ordersQuery->where('order_status', 'Booked')->get();
             } elseif ($action == 'toDayOrderPicUp') {
-                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->get();
+                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->get();
             } elseif ($action == 'toDayCompleteOrder') {
                 $data = $ordersQuery->where('order_status', 'Delivered')->get();
             } elseif ($action == 'toDayCancelledOrder') {
@@ -195,7 +195,7 @@ class DeliveryController extends Controller
             } elseif ($action == 'totalPendingOrder') {
                 $data = $ordersQuery->where('order_status', 'Booked')->get();
             } elseif ($action == 'totalOrderPicUp') {
-                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->get();
+                $data = $ordersQuery->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->get();
             } elseif ($action == 'totalCompleteOrder') {
                 $data = $ordersQuery->where('order_status', 'Delivered')->get();
             } elseif ($action == 'totalCancelledOrder') {
@@ -222,9 +222,21 @@ class DeliveryController extends Controller
 
     public function deliveryAssignGet(Request $request)
     {
+        $id = Session::get('dyid');
+        $delivery = Branch::find($id);
+        $pinCodes = explode(',', $delivery->pincode);
+        $data = DlyBoy::where(function ($query) use ($pinCodes) {
+            foreach ($pinCodes as $pincode) {
+                $query->orWhere('pincode', 'LIKE', "%$pincode%");
+            }
+        })->where('status', 'active')->get();
+
+        // dd($data->toArray());
+
+
         $order = Order::find($request->id);
         $orderId = $order->order_id;
-        $data = DlyBoy::where('status', 'active')->get();
+        // $data = DlyBoy::where('status', 'active')->get();
 
         if ($request->ajax()) {
             return response()->json([
@@ -566,8 +578,19 @@ class DeliveryController extends Controller
 
     public function deliveryTransferBoyGet()
     {
-        $data = DlyBoy::where('status', 'active')->get();
+        // $data = DlyBoy::where('status', 'active')->get();
+
+        $id = Session::get('dyid');
+        $delivery = Branch::find($id);
+        $pinCodes = explode(',', $delivery->pincode);
+        $data = DlyBoy::where(function ($query) use ($pinCodes) {
+            foreach ($pinCodes as $pincode) {
+                $query->orWhere('pincode', 'LIKE', "%$pincode%");
+            }
+        })->where('status', 'active')->get();
+
         $pinCode = PinCode::where('status', 'active')->get();
+
         return response()->json([
             'success' => true,
             'data' => $data,
@@ -605,7 +628,8 @@ class DeliveryController extends Controller
     public function otherBranchOrderStatus()
     {
         $id = Session::get('dyid');
-        $data = Order::where('assign_by', $id)->whereNot('sender_order_status', null)->get();
+        // dd($id);
+        $data = Order::whereNot('sender_order_status', null)->get();
         return view('delivery.otherBranchOrderStatus', compact('data'));
     }
 
@@ -613,7 +637,7 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
-        $data = Order::where(['sender_order_status' => 'Delivered', 'sender_order_pin' => $delivery->pincode])->get();
+        $data = Order::where(['sender_order_status' => 'Delivered'])->get();
         return view('delivery.otherTransferOrderDetails', compact('data'));
     }
 

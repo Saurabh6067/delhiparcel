@@ -327,6 +327,7 @@
                             $('#transferOrderId').val(selectedOrders);
                             $('#transferOrderOptionId').html('Select Delivery Boy');
                             $('#transferOrderBtn').html('Assign Now');
+                            $('#transferDeliverBoyData').empty();
                             if (response.data.length > 0) {
                                 response.data.forEach(function(boy) {
                                     $('#transferDeliverBoyData').append(
