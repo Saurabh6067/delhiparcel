@@ -605,6 +605,7 @@ class DeliveryController extends Controller
     public function otherBranchOrderStatus()
     {
         $id = Session::get('dyid');
+        dd($id);
         $data = Order::where('assign_by', $id)->whereNot('sender_order_status', null)->get();
         return view('delivery.otherBranchOrderStatus', compact('data'));
     }
@@ -613,7 +614,6 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
-        dd($id);
         $data = Order::where(['sender_order_status' => 'Delivered', 'sender_order_pin' => $delivery->pincode])->get();
         return view('delivery.otherTransferOrderDetails', compact('data'));
     }
