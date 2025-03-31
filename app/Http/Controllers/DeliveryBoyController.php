@@ -98,7 +98,7 @@ class DeliveryBoyController extends Controller
         $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
                 $query->whereIn('receiver_pincode', $pinCodes)
-                ->orWhere('receiver_pincode', $pincode);
+                ->orWhere('receiver_pincode', $pinCodes);
             });
 
         // $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
