@@ -114,7 +114,7 @@ class DeliveryController extends Controller
                 $query->whereIn('sender_pincode', $pinCodes);
             });
 
-        $toDayOrder = $ordersQuery->whereNotIn('order_status', 'Delivered to branch')->count();
+        $toDayOrder = $ordersQuery->count();
 
         $toDayPendingOrder = (clone $ordersQuery)->where('order_status', 'Booked')->count();
         $toDayOrderPicUp = (clone $ordersQuery)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
