@@ -94,28 +94,26 @@ class DeliveryBoyController extends Controller
         $pinCodes = explode(',', $delivery->pincode);
 
         // toDayOrder details
-        $dateTime = now('Asia/Kolkata')->format('Y-m-d');
-
+        $dateTime = now('Asia/Kolkata')->format('d-m-Y');
         $ordersQuery = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('receiver_pincode', $pinCodes)
-                    ->orWhereIn('sender_pincode', $pinCodes);
+                $query->whereIn('receiver_pincode', $pinCodes);
             });
+        // ->where('receiver_pincode', $delivery->pincode);
 
         $ordersQuery1 = Order::where('datetime', 'like', $dateTime . '%')
             ->where(function ($query) use ($pinCodes) {
                 $query->whereIn('sender_pincode', $pinCodes);
             });
 
-
-        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->where('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
-        $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', ['Delivered', 'Delivered to branch'])->count();
+        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
+        $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', 'Delivered')->count();
 
         // totalOrder details
         $totalOrder = Order::count();
         $PendingOrder = Order::where(['order_status' => 'Booked', 'assign_to' => $id])->count();
         $totalCompleteOrder = Order::where(['order_status' => 'Delivered', 'assign_to' => $id])->count();
-        $PendingDeliveryOrder = Order::whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->where('assign_to', $id)->count();
+        $PendingDeliveryOrder = Order::whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
 
         $PendingSuperExpressOrder = Order::where('service_type', 'SuperExpress')->count();
         $DirectOrders = WebOrder::where('assign_to', $id)->count();
