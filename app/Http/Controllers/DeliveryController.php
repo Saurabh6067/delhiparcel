@@ -606,6 +606,7 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $data = Order::where('assign_by', $id)->whereNot('sender_order_status', null)->get();
+        dd($data);
         return view('delivery.otherBranchOrderStatus', compact('data'));
     }
 
