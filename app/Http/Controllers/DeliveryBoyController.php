@@ -106,8 +106,8 @@ class DeliveryBoyController extends Controller
                 $query->whereIn('sender_pincode', $pinCodes);
             });
 
-        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->whereNotIn('order_status', 'Delivered to branch')->count();
-        
+        $toDayOrder = $ordersQuery1->where(['order_status' => 'Booked', 'assign_to' => $id])->orWhere('parcel_type', ['delivery', 'Pickup', 'Direct'])->count();
+
         $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', 'Delivered')->count();
 
         // totalOrder details
