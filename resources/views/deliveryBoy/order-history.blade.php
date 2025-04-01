@@ -69,7 +69,8 @@
                                                 <td>{{ $codHistory->order->price }}</td>
                                             </tr>
                                             @php
-                                                $totalAmount += $codHistory->order->price;
+                                                // $totalAmount += $codHistory->order->price;
+                                                $totalAmount += $codHistory->order->codAmount;
                                             @endphp
                                         @endforeach
                                     </tbody>
