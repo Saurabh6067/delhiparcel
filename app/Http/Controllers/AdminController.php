@@ -382,7 +382,7 @@ class AdminController extends Controller
 
     public function addBranch(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         if (!empty($request->id)) {
             $brn = Branch::find($request->id);
             $message = 'Branch update successfully!';
