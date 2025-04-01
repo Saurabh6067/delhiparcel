@@ -253,12 +253,6 @@ class DeliveryBoyController extends Controller
         $delivery = DlyBoy::find($id);
         $pinCodes = explode(',', $delivery->pincode);
 
-        $order = Order::find($request->id);
-        $receiverPinCode = $order->receiver_pincode;
-
-        $id = Session::get('dlyId');
-        $delivery = DlyBoy::find($id);
-        $pinCodes = explode(',', $delivery->pincode);
 
         // Check if receiver pin code is in delivery boy's pin codes
         if (in_array($receiverPinCode, $pinCodes)) {
