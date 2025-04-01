@@ -560,15 +560,6 @@ class DeliveryController extends Controller
 
     public function otherBranchOrder()
     {
-        // $id = Session::get('dyid');
-        // $delivery = Branch::find($id);
-        // $pinCodes = explode(',', $delivery->pincode);
-        // $receiverPinCodes = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
-        //     ->where(function ($query) use ($pinCodes) {
-        //         $query->where('sender_pincode', $pinCodes)
-        //             ->orWhere('receiver_pincode', $pinCodes);
-        //     })->whereNull('sender_order_status')->select('receiver_pincode')->distinct()->pluck('receiver_pincode');
-
         // $receiverPinCodes = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
         //     ->whereNull('sender_order_status')
         //     ->where(function ($query) use ($pinCodes) {
