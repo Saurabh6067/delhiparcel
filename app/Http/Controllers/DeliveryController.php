@@ -578,16 +578,17 @@ class DeliveryController extends Controller
 
     public function deliveryTransferBoyGet()
     {
-        // $data = DlyBoy::where('status', 'active')->get();
-
         $id = Session::get('dyid');
-        $delivery = Branch::find($id);
-        $pinCodes = explode(',', $delivery->pincode);
-        $data = DlyBoy::where(function ($query) use ($pinCodes) {
-            foreach ($pinCodes as $pincode) {
-                $query->orWhere('pincode', 'LIKE', "%$pincode%");
-            }
-        })->where('status', 'active')->get();
+        // $delivery = Branch::find($id);
+        // $pinCodes = explode(',', $delivery->pincode);
+        // $data = DlyBoy::where(function ($query) use ($pinCodes) {
+        //     foreach ($pinCodes as $pincode) {
+        //         $query->orWhere('pincode', 'LIKE', "%$pincode%");
+        //     }
+        // })->where('status', 'active')->get();
+
+        $data = DlyBoy::where('status', 'active')->where('userid', $id)->get();
+
 
         $pinCode = PinCode::where('status', 'active')->get();
 
