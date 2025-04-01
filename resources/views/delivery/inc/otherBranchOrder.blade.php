@@ -79,8 +79,8 @@
         @endif
 
 
-        <td>{{ $item->price }}</td>
-        <td>{{ $item->codAmount }}</td>
+        <td>{{ $item->price ?? 0.0 }}</td>
+        <td>{{ '₹ ' . $item->codAmount ?? 0.0 }}</td>
         <td>{{ $item->payment_mode }}</td>
         {{-- <td>{{ $item->order->pincode ?? $item->sender_pincode }}</td> --}}
         @if ($item->parcel_type == 'Direct')
