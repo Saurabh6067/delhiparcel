@@ -130,8 +130,7 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <strong>Receiver: </strong>{{ $data->receiver_name }} |
-                            {{ $data->receiver_cnumber ?? $data->receiver_number }} <br>
+                            <strong>Receiver: </strong>{{ $data->receiver_name }} | {{ $data->receiver_cnumber ?? $data->receiver_number }} <br>
                             <strong>Address: </strong>{{ $data->receiver_add ?? $data->receiver_address }} <br>
                             <strong>PIN: </strong> {{ $data->receiver_pincode ?? $data->receiverPinCode }}
                         </td>

@@ -130,8 +130,8 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <strong>Receiver: </strong>{{ $data->receiver_name }} | {{ $data->receiver_cnumber }} <br>
-                            <strong>Address: </strong>{{ $data->receiver_add }} <br>
+                            <strong>Receiver: </strong>{{ $data->receiver_name }} | {{$data->receiver_cnumber ?? $data->receiver_number }} <br>
+                            <strong>Address: </strong>{{ $data->receiver_add ?? $data->receiver_address }} <br>
                             {{-- <strong>PIN: </strong> {{ $data->receiver_pincode }} --}}
                             <strong>PIN: </strong> {{ $data->receiver_pincode ?? $data->receiverPinCode }}
                         </td>
@@ -148,8 +148,9 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <strong>Sender:</strong> {{ $data->sender_name }} | {{ $data->sender_number }} ??
-                            {{ $data->order->fullname }} | {{ $data->order->phoneno }} <br>
+                            <strong>Sender:</strong> {{ $data->sender_name ?: $data->order->fullname }} |
+                            {{ $data->sender_number ?: $data->order->phoneno }}
+                            <br>
                             <strong>Address:</strong> {{ $data->sender_address ?? $data->order->fulladdress }} <br>
                             {{-- <strong>PIN:</strong> {{  $data->order->pincode }} --}}
                             <strong>PIN:</strong> {{ $data->sender_pincode ?? $data->order->pincode }}
