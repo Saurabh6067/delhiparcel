@@ -148,8 +148,9 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            <strong>Sender:</strong> {{ $data->order->fullname }} | {{ $data->order->phoneno }} <br>
-                            <strong>Address:</strong> {{ $data->order->fulladdress }} <br>
+                            <strong>Sender:</strong> {{ $data->sender_name }} | {{ $data->sender_number }} ??
+                            {{ $data->order->fullname }} | {{ $data->order->phoneno }} <br>
+                            <strong>Address:</strong> {{ $data->sender_address ?? $data->order->fulladdress }} <br>
                             {{-- <strong>PIN:</strong> {{  $data->order->pincode }} --}}
                             <strong>PIN:</strong> {{ $data->sender_pincode ?? $data->order->pincode }}
                         </td>
