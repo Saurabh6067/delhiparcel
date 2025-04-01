@@ -50,6 +50,7 @@
         @endif
 
         <td>{{ $item->price }}</td>
+        <td>{{ $item->codAmount }}</td>
         <td>{{ $item->payment_mode }}</td>
         @if ($item->parcel_type == 'Direct')
             <td>{{ $item->sender_pincode ?? '-' }}</td>

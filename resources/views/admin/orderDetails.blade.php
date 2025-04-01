@@ -59,7 +59,8 @@
                                             <th>Order Date</th>
                                             <th>Sender Name</th>
                                             <th>Receiver Name</th>
-                                            <th>Amount</th>
+                                            <th>Shipping Charge</th>
+                                            <th>COD Amount</th>
                                             <th>Payment Status</th>
                                             <th>Pickup PinCode</th>
                                             <th>Delivery PinCode</th>
