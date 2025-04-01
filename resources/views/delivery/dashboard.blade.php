@@ -139,6 +139,32 @@
                         </a>
                     </div>
                 </div>
+                {{-- branch orders --}}
+                <h5 class="mt-3 font-weight-bold">Branch Order Details</h5>
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <a href="{{ url('/delivery-order-details/' . 'totalOrder') }}" class="text-dark">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><strong>All Order</strong></span>
+                                    <span class="info-box-number">{{ $totalOrder ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <a href="{{ url('/delivery-order-details/' . 'totalOrder') }}" class="text-dark">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><strong>My Order</strong></span>
+                                    <span class="info-box-number">{{ $totalOrder ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
