@@ -153,9 +153,10 @@
                             $('#optionId').html('Select Order Status');
                             $('#btn').html('Update Order Status');
                             $('#deliverBoy').empty();
-                            $('#deliverBoy').append(
-                                "<option value='Booked'>Booked</option> <option value='Item Picked Up'>Item Picked Up</option> <option value='Returned'>Returned</option> <option value='In Transit'>In Transit</option> <option value='Arrived at Destination'>Arrived at Destination</option> <option value='Out for Delivery'>Out for Delivery</option> <option value='Delivered'>Delivered</option> <option value='Not Delivered'>Not Delivered</option> <option value='Returning to Origin'>Returning to Origin</option> <option value='Out for Delivery to Origin'>Out for Delivery to Origin</option>"
-                            );
+                            // $('#deliverBoy').append(
+                            //     "<option value='Booked'>Booked</option> <option value='Item Picked Up'>Item Picked Up</option> <option value='Returned'>Returned</option> <option value='In Transit'>In Transit</option> <option value='Arrived at Destination'>Arrived at Destination</option> <option value='Out for Delivery'>Out for Delivery</option> <option value='Delivered'>Delivered</option> <option value='Not Delivered'>Not Delivered</option> <option value='Returning to Origin'>Returning to Origin</option> <option value='Out for Delivery to Origin'>Out for Delivery to Origin</option>"
+                            // );
+                            $('#deliverBoy').append(response.status);
                         } else {
                             Toast("error", response.message);
                         }
@@ -293,6 +294,29 @@
                         }
                     }
                 });
+            });
+
+            $('#deliverBoy').change(function() {
+                const value = $(this).val();
+                if (value == 'Not Delivered' || value == 'Item Not Picked Up') {
+                    $('#reason').removeClass('d-none');
+                    $('#message').addClass('d-none');
+                    $('#reason_msg').empty();
+
+                    if (value == 'Not Delivered') {
+                        $('#reason_msg').append(
+                            '<option selected disabled>Select</option><option value="Incorrect Address">Incorrect Address</option><option value="Call Not Pickup">Call Not Pickup</option><option value="Incorrect Mobile No">Incorrect Mobile No</option><option value="Re Schedule">Re Schedule</option><option value="Cancel">Cancel</option><option value="Customer want open delivery">Customer want open delivery</option><option value="Mismatch in COD Amount">Mismatch in COD Amount</option>'
+                        );
+                    } else {
+                        $('#reason_msg').append(
+                            '<option selected disabled>Select</option> <option value="Parcel not ready">Parcel not ready</option> <option value="Address not found">Address not found</option>  <option value="Call not picked">Call not picked</option>  <option value="Incorrect mobile no">Incorrect mobile no</option>'
+                        );
+                    }
+                } else {
+                    $('#reason').addClass('d-none');
+                    $('#message').removeClass('d-none');
+                }
+
             });
         });
     </script>

@@ -222,11 +222,57 @@ class DeliveryController extends Controller
 
     public function deliveryStatusGet(Request $request)
     {
+        // $order = Order::find($request->id);
+        // if ($request->ajax()) {
+        //     return response()->json([
+        //         'success' => true,
+        //         'orderId' => $order->order_id
+        //     ]);
+        // }
+
         $order = Order::find($request->id);
+        $receiverPinCode = $order->receiver_pincode;
+
+        $id = Session::get('dlyId');
+        $delivery = DlyBoy::find($id);
+        $pinCodes = explode(',', $delivery->pincode);
+
+        $order = Order::find($request->id);
+        $receiverPinCode = $order->receiver_pincode;
+
+        $id = Session::get('dlyId');
+        $delivery = DlyBoy::find($id);
+        $pinCodes = explode(',', $delivery->pincode);
+
+        // Check if receiver pin code is in delivery boy's pin codes
+        if (in_array($receiverPinCode, $pinCodes)) {
+            $orderStatus = "
+        <option value='Booked'>Booked</option> 
+        <option value='Item Picked Up'>Item Picked Up</option>
+        <option value='Item Not Picked Up'>Item Not Picked Up</option> 
+        <option value='Returned'>Returned</option> 
+        <option value='In Transit'>In Transit</option> 
+        <option value='Arrived at Destination'>Arrived at Destination</option> 
+        <option value='Out for Delivery'>Out for Delivery</option> 
+        <option value='Delivered'>Delivered</option> 
+        <option value='Not Delivered'>Not Delivered</option> 
+        <option value='Returning to Origin'>Returning to Origin</option> 
+        <option value='Out for Delivery to Origin'>Out for Delivery to Origin</option>
+    ";
+        } else {
+            $orderStatus = "
+        <option value='Booked'>Booked</option> 
+        <option value='Item Picked Up'>Item Picked Up</option> 
+        <option value='Item Not Picked Up'>Item Not Picked Up</option> 
+        <option value='Delivered to branch'>Delivered To Branch</option>
+    ";
+        }
+
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
-                'orderId' => $order->order_id
+                'orderId' => $order->order_id,
+                'status' => $orderStatus,
             ]);
         }
     }
