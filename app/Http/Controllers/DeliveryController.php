@@ -260,7 +260,8 @@ class DeliveryController extends Controller
 
     public function deliveryBoyGet()
     {
-        $data = DlyBoy::where('status', 'active')->get();
+        $id = Session::get('dyid');
+        $data = DlyBoy::where('status', 'active')->where('userid', $id)->get();
         return response()->json([
             'success' => true,
             'data' => $data,

@@ -143,7 +143,7 @@
                 <h5 class="mt-3 font-weight-bold">Branch Order Details</h5>
                 <div class="row">
                     <div class="col-md-3 col-sm-6 col-12">
-                        <a href="{{ url('/delivery-order-details/' . 'totalOrder') }}" class="text-dark">
+                        <a href="{{ route('delivery.other.branch.order') }}" class="text-dark">
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
                                 <div class="info-box-content">
@@ -154,7 +154,7 @@
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6 col-12">
-                        <a href="{{ url('/delivery-order-details/' . 'totalOrder') }}" class="text-dark">
+                        <a href="{{ route('delivery.order-pin-code-orders') }}" class="text-dark">
                             <div class="info-box">
                                 <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
                                 <div class="info-box-content">
