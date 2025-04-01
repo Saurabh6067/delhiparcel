@@ -68,25 +68,16 @@
                                                 <td>{{ $codHistory->pyment_method }}</td>
                                                 <td>{{ $codHistory->order->price }}</td>
                                             </tr>
-                                            {{-- @php
-                                                $totalAmount += $codHistory->order->price;
-                                            @endphp --}}
                                             @php
-                                                $totalAmount = 0;
+                                                $totalAmount += $codHistory->order->price;
                                             @endphp
-
-                                            @foreach ($codHistory as $codHistories)
-                                                @php
-                                                    $totalAmount += floatval($codHistories->order->price ?? 0);
-                                                @endphp
-                                            @endforeach
                                         @endforeach
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <th colspan="6" class="text-center">Total Amount</th>
                                             {{-- <th>{{ $totalAmount . ' ₹' }}</th> --}}
-                                            <th>{{ number_format($totalAmount, 2) . ' ₹' }}</th> 
+                                            <th>{{ number_format($totalAmount, 2) . ' ₹' }}</th>
                                         </tr>
                                     </tfoot>
                                 </table>
