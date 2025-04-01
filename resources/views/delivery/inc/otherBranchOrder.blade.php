@@ -80,6 +80,7 @@
 
 
         <td>{{ $item->price }}</td>
+        <td>{{ $item->codAmount }}</td>
         <td>{{ $item->payment_mode }}</td>
         {{-- <td>{{ $item->order->pincode ?? $item->sender_pincode }}</td> --}}
         @if ($item->parcel_type == 'Direct')
