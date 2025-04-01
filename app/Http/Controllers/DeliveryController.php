@@ -159,7 +159,7 @@ class DeliveryController extends Controller
         $delivery = Branch::find($id);
         $myOrderDetail = Order::where(['sender_order_status' => 'Delivered'])->count();
 
-        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail' ,'myOrderDetail'));
+        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail', 'myOrderDetail'));
     }
 
     public function orderDetails($action)
@@ -560,24 +560,36 @@ class DeliveryController extends Controller
 
     public function otherBranchOrder()
     {
-        $id = Session::get('dyid');
-        $delivery = Branch::find($id);
-        $pinCodes = explode(',', $delivery->pincode);
+        // $id = Session::get('dyid');
+        // $delivery = Branch::find($id);
+        // $pinCodes = explode(',', $delivery->pincode);
         // $receiverPinCodes = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
         //     ->where(function ($query) use ($pinCodes) {
         //         $query->where('sender_pincode', $pinCodes)
         //             ->orWhere('receiver_pincode', $pinCodes);
         //     })->whereNull('sender_order_status')->select('receiver_pincode')->distinct()->pluck('receiver_pincode');
 
-        $receiverPinCodes = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
-            ->whereNull('sender_order_status')
-            ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('sender_pincode', $pinCodes)
-                    ->orWhereIn('receiver_pincode', $pinCodes);
-            })
+        // $receiverPinCodes = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
+        //     ->whereNull('sender_order_status')
+        //     ->where(function ($query) use ($pinCodes) {
+        //         $query->whereIn('sender_pincode', $pinCodes)
+        //             ->orWhereIn('receiver_pincode', $pinCodes);
+        //     })
+        //     ->select('receiver_pincode')
+        //     ->distinct()
+        //     ->pluck('receiver_pincode');
+
+        $id = Session::get('dyid');
+        $delivery = Branch::find($id);
+        $pinCodes = explode(',', $delivery->pincode);
+
+        $receiverPinCodes = Order::whereNull('sender_order_status')
+            ->whereIn('sender_pincode', $pinCodes)
+            ->whereNotIn('receiver_pincode', $pinCodes)
             ->select('receiver_pincode')
             ->distinct()
             ->pluck('receiver_pincode');
+
 
 
         // dd($receiverPinCodes->toArray());
