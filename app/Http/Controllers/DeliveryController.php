@@ -145,12 +145,9 @@ class DeliveryController extends Controller
         $totalCanceledOrder = (clone $query)->where('order_status', 'Cancelled')->count();
 
 
-        $allOrderDetail = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
-            ->whereNull('sender_order_status')
-            ->where(function ($query) use ($pinCodes) {
-                $query->whereIn('sender_pincode', $pinCodes)
-                    ->orWhereIn('receiver_pincode', $pinCodes);
-            })
+        $allOrderDetail = Order::whereNull('sender_order_status')
+            ->whereIn('sender_pincode', $pinCodes)
+            ->whereNotIn('receiver_pincode', $pinCodes)
             ->select('receiver_pincode')
             ->distinct()
             ->pluck('receiver_pincode')
