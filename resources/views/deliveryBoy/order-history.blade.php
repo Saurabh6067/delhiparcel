@@ -66,7 +66,7 @@
                                                 <td>{{ $codHistory->order->order_status }}</td>
                                                 <td>{{ $codHistory->deliveryBoy->name }}</td>
                                                 <td>{{ $codHistory->pyment_method }}</td>
-                                                <td>{{ $codHistory->order->price . ' ₹' }}</td>
+                                                <td>{{ $codHistory->order->price }}</td>
                                             </tr>
                                             {{-- @php
                                                 $totalAmount += $codHistory->order->price;
