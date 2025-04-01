@@ -148,7 +148,7 @@
                                 <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text"><strong>All Order</strong></span>
-                                    <span class="info-box-number">{{ $totalOrder ?? 0 }}</span>
+                                    <span class="info-box-number">{{ $allOrderDetail ?? 0 }}</span>
                                 </div>
                             </div>
                         </a>

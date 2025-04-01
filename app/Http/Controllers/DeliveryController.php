@@ -145,7 +145,18 @@ class DeliveryController extends Controller
         $totalCanceledOrder = (clone $query)->where('order_status', 'Cancelled')->count();
 
 
-        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder'));
+        $allOrderDetail = Order::whereColumn('sender_pincode', '!=', 'receiver_pincode')
+            ->whereNull('sender_order_status')
+            ->where(function ($query) use ($pinCodes) {
+                $query->whereIn('sender_pincode', $pinCodes)
+                    ->orWhereIn('receiver_pincode', $pinCodes);
+            })
+            ->select('receiver_pincode')
+            ->distinct()
+            ->pluck('receiver_pincode')
+            ->count();
+
+        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail'));
     }
 
     public function orderDetails($action)
@@ -564,6 +575,7 @@ class DeliveryController extends Controller
             ->select('receiver_pincode')
             ->distinct()
             ->pluck('receiver_pincode');
+
 
         // dd($receiverPinCodes->toArray());
 
