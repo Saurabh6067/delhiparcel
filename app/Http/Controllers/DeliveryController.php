@@ -156,7 +156,10 @@ class DeliveryController extends Controller
             ->pluck('receiver_pincode')
             ->count();
 
-        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail'));
+        $delivery = Branch::find($id);
+        $myOrderDetail = Order::where(['sender_order_status' => 'Delivered'])->count();
+
+        return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail' ,'myOrderDetail'));
     }
 
     public function orderDetails($action)
