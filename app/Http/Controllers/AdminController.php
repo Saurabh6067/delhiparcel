@@ -382,7 +382,7 @@ class AdminController extends Controller
 
     public function addBranch(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         if (!empty($request->id)) {
             $brn = Branch::find($request->id);
             $message = 'Branch update successfully!';
@@ -406,8 +406,7 @@ class AdminController extends Controller
             $brn->gst_panno_img = $brn->gst_panno_img;
         }
 
-        $brn->pincode = $request->pinCode;
-        // $brn->pincode = implode(',', $request->pinCode);
+        $brn->pincode = is_array($request->pinCode) ? implode(',', $request->pinCode) : $request->pinCode;
         $brn->type = $request->branchType;
 
         // Handle Seller Logo
@@ -420,7 +419,7 @@ class AdminController extends Controller
         // $brn->password = $request->fullName . '@' . $request->pinCode;
         $brn->password = $request->branchType . '@' . $request->phone;
         $brn->branch_cm = empty($request->branch_cm) ? null : $request->branch_cm;
-        // dd($brn->toArray());
+        dd($brn->toArray());
         $brn->save();
 
         if ($request->ajax()) {
