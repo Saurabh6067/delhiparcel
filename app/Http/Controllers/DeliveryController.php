@@ -233,14 +233,7 @@ class DeliveryController extends Controller
         $order = Order::find($request->id);
         $receiverPinCode = $order->receiver_pincode;
 
-        $id = Session::get('dlyId');
-        $delivery = DlyBoy::find($id);
-        $pinCodes = explode(',', $delivery->pincode);
-
-        $order = Order::find($request->id);
-        $receiverPinCode = $order->receiver_pincode;
-
-        $id = Session::get('dlyId');
+        $id = Session::get('dyid');
         $delivery = DlyBoy::find($id);
         $pinCodes = explode(',', $delivery->pincode);
 
