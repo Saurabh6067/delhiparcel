@@ -16,6 +16,21 @@
         </td>
         <td>{{ $item->order_id }}</td>
         <td>{{ $item->datetime }}</td>
+        <td>
+            @if ($item->service_type == 'ex')
+                Express
+            @else
+                @if ($item->service_type == 'ss')
+                    Standard
+                @else
+                    @if ($item->service_type == 'SuperExpress')
+                        SuperExpress
+                    @else
+                        -
+                    @endif
+                @endif
+            @endif
+        </td>
         @if ($item->parcel_type == 'Direct')
             <td>
                 <span><b>Name: </b>{{ $item->sender_name }}</span> <br>
