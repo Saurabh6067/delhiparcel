@@ -250,7 +250,7 @@ class DeliveryBoyController extends Controller
         $receiverPinCode = $order->receiver_pincode;
         $id = Session::get('dlyId');
         $delivery = DlyBoy::find($id);
-        dd($order->toArray());
+        dd($delivery->toArray());
 
         dd();
         if ($request->action == 'DirectOrders') {
