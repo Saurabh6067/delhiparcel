@@ -69,6 +69,7 @@
                                             </th>
                                             <th>Order Id</th>
                                             <th>Order Date</th>
+                                            <th>Service Type</th>
                                             <th>Sender Name</th>
                                             <th>Receiver Name</th>
                                             <th>Shipping Charge</th>
