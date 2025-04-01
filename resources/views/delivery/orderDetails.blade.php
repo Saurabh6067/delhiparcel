@@ -312,6 +312,7 @@
                 <div class="modal-body">
                     <form id="assignForm">
                         <input type="hidden" id="type" name="type" value="">
+                        <input type="hidden" id="action" name="action" value="{{ request()->segment(2) }}">
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="orderIdedit">Order Id</label>
@@ -324,7 +325,13 @@
 
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group d-none" id="reason">
+                                <label for="reason_msg">Reason</label>
+                                <select class="custom-select rounded-0" id="reason_msg" name="Reason_message">
+
+                                </select>
+                            </div>
+                            <div class="form-group" id="message">
                                 <label for="status_message">Message</label>
                                 <textarea class="form-control" id="status_message" name="status_message" placeholder="Enter Message"></textarea>
                             </div>
@@ -338,6 +345,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="assignOrderData" tabindex="-1" role="dialog" aria-labelledby="assignOrderLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
