@@ -247,7 +247,11 @@ class DeliveryBoyController extends Controller
     public function deliveryStatusGet(Request $request)
     {
         $order = Order::find($request->id);
+        $receiverPinCode = $order->receiver_pincode;
+        $id = Session::get('dlyId');
+        $delivery = DlyBoy::find($id);
         dd($order->toArray());
+
         dd();
         if ($request->action == 'DirectOrders') {
             $order = WebOrder::where('id', $request->id)->first();
