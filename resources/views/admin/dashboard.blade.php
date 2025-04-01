@@ -122,7 +122,7 @@
                                 @endphp
                                 @foreach ($data as $codHistory)
                                     @php
-                                        $totalAmount += $codHistory->order->price ?? 0;
+                                        $totalAmount += $codHistory->order->codAmount ?? 0;
                                     @endphp
                                 @endforeach
                                 <h3>{{ '₹ ' . $totalAmount ?? 0.0 }}</h3>
