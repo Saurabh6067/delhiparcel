@@ -20,7 +20,21 @@
         </td>
         <td>{{ $item->order_id }}</td>
         <td>{{ $item->datetime }}</td>
-        <td>{{ $item->service_type }}</td>
+        <td>
+            @if ($item->service_type == 'ex')
+                Express
+            @else
+                @if ($item->service_type == 'ss')
+                    Standard
+                @else
+                    @if ($item->service_type == 'SuperExpress')
+                        SuperExpress
+                    @else
+                        -
+                    @endif
+                @endif
+            @endif
+        </td>
 
         {{-- <td>
             <span><b>Name: </b>{{ $item->order->fullname ?? $item->sender_name }}</span> <br>
