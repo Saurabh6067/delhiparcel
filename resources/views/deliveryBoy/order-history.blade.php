@@ -68,8 +68,11 @@
                                                 <td>{{ $codHistory->pyment_method }}</td>
                                                 <td>{{ $codHistory->order->price . ' ₹' }}</td>
                                             </tr>
-                                            @php
+                                            {{-- @php
                                                 $totalAmount += $codHistory->order->price;
+                                            @endphp --}}
+                                            @php
+                                                $totalAmount += floatval($codHistory->order->price ?? 0);
                                             @endphp
                                         @endforeach
                                     </tbody>
