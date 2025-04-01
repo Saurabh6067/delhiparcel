@@ -132,7 +132,8 @@
                         <td colspan="2">
                             <strong>Receiver: </strong>{{ $data->receiver_name }} | {{ $data->receiver_cnumber }} <br>
                             <strong>Address: </strong>{{ $data->receiver_add }} <br>
-                            <strong>PIN: </strong> {{ $data->receiver_pincode }}
+                            {{-- <strong>PIN: </strong> {{ $data->receiver_pincode }} --}}
+                            <strong>PIN: </strong> {{ $data->receiver_pincode ?? $data->receiverPinCode }}
                         </td>
                         @php
                             $price = preg_replace('/[^0-9.]/', '', $data->price);
@@ -149,7 +150,8 @@
                         <td colspan="2">
                             <strong>Sender:</strong> {{ $data->order->fullname }} | {{ $data->order->phoneno }} <br>
                             <strong>Address:</strong> {{ $data->order->fulladdress }} <br>
-                            <strong>PIN:</strong> {{ $data->order->pincode }}
+                            {{-- <strong>PIN:</strong> {{  $data->order->pincode }} --}}
+                            <strong>PIN:</strong> {{ $data->sender_pincode ?? $data->order->pincode }}
                         </td>
                         <td>
                             <strong>Date:</strong> <span style="display: none"
