@@ -284,20 +284,6 @@ class DeliveryBoyController extends Controller
     ";
         }
 
-
-
-        // if ($request->action == 'DirectOrders') {
-        //     $order = WebOrder::where('id', $request->id)->first();
-        // } else {
-        //     $order = Order::find($request->id);
-        //     // dd($order->toArray());
-        //     if ($order->receiver_pincode == $order->sender_pincode) {
-        //         $orderStatus = "<option value='Booked'>Booked</option> <option value='Item Picked Up'>Item Picked Up</option><option value='Item Not Picked Up'>Item Not Picked Up</option> <option value='Returned'>Returned</option> <option value='In Transit'>In Transit</option> <option value='Arrived at Destination'>Arrived at Destination</option> <option value='Out for Delivery'>Out for Delivery</option> <option value='Delivered'>Delivered</option> <option value='Not Delivered'>Not Delivered</option> <option value='Returning to Origin'>Returning to Origin</option> <option value='Out for Delivery to Origin'>Out for Delivery to Origin</option>";
-        //     } else {
-        //         $orderStatus = "<option value='Booked'>Booked</option> <option value='Item Picked Up'>Item Picked Up</option> <option value='Item Not Picked Up'>Item Not Picked Up</option> <option value='Delivered to branch'>Delivered To Branch</option>";
-        //     }
-        // }
-
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
