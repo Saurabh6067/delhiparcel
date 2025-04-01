@@ -246,6 +246,9 @@ class DeliveryBoyController extends Controller
 
     public function deliveryStatusGet(Request $request)
     {
+        $order = Order::find($request->id);
+        dd($order->toArray());
+        dd();
         if ($request->action == 'DirectOrders') {
             $order = WebOrder::where('id', $request->id)->first();
         } else {
