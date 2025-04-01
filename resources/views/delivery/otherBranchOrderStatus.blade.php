@@ -161,7 +161,7 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    {{ $item->dlyBoy->name ?? '-' }} |
+                                                    {{ $item->dlyBoy1->name ?? '-' }} |
                                                     {{ $item->sender_order_status ?? '-' }}
                                                 </td>
                                             </tr>
