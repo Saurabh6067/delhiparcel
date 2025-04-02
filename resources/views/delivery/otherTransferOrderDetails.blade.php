@@ -68,6 +68,7 @@
                                                     onclick="toggleCheckboxes(this, 'row-checkbox2', 'btn-transfer')">
                                             </th> --}}
                                             <th>Order Id</th>
+                                            <th>Service Type</th>
                                             <th>Order Date</th>
                                             <th>Sender Name</th>
                                             <th>Receiver Name</th>

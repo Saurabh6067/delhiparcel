@@ -19,6 +19,21 @@
             @endif
         </td> --}}
         <td>{{ $item->order_id }}</td>
+        <td>
+            @if ($item->service_type == 'ex')
+                Express
+            @else
+                @if ($item->service_type == 'ss')
+                    Standard
+                @else
+                    @if ($item->service_type == 'SuperExpress')
+                        SuperExpress
+                    @else
+                        -
+                    @endif
+                @endif
+            @endif
+        </td>
         <td>{{ $item->datetime }}</td>
         @if ($item->parcel_type == 'Direct')
             <td>
