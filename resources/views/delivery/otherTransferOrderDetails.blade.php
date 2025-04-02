@@ -37,15 +37,19 @@
                                         <h3 class="card-title">All Orders</h3>
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
-                                        <div class="form-group">
-                                            <label for="exampleFormControlSelect1"> Filter Orders</label>
-                                            <select class="form-control" id="exampleFormControlSelect1">
-                                                <option value="ex">Express</option>
-                                                <option value="ss">Standard</option>
-                                                <option value="SuperExpress">Super Express</option>
-                                            </select>
+                                        <div class="form-group row">
+                                            <label for="exampleFormControlSelect1" class="col-sm-2 col-form-label"> Filter
+                                                Orders</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-control" id="exampleFormControlSelect1">
+                                                    <option selected disabled>Select</option>
+                                                    <option value="ex">Express</option>
+                                                    <option value="ss">Standard</option>
+                                                    <option value="SuperExpress">Super Express</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                        
+
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
