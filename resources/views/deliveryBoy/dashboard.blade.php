@@ -43,7 +43,7 @@
                                 <div class="info-box-content">
                                     <span class="info-box-text"><strong>Pending Super Express</strong></span>
                                     <span class="info-box-number"
-                                        id="SuperExpressOrder">{{ $PendingSuperExpressOrder }} / Time: <span class="info-box-number text-danger" id="SuperExpressOrderTime">00:00:00</span></span>
+                                        id="SuperExpressOrder">{{ $PendingSuperExpressOrder }}<span class="info-box-number text-danger" id="SuperExpressOrderTime">00:00:00</span></span>
                                     <script>
                                         document.addEventListener("DOMContentLoaded", function() {
                                             let superExpressOrder = parseInt(document.getElementById("SuperExpressOrder").innerText.trim(), 10);
