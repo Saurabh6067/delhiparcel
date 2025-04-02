@@ -37,18 +37,15 @@
                                         <h3 class="card-title">All Orders</h3>
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
-                                        <div class="dropdown">
-                                            <button class="btn btn-light dropdown-toggle" type="button"
-                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="false">
-                                                Filter Orders
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item text-dark" href="ex">Express</a>
-                                                <a class="dropdown-item text-dark" href="ss">Standard</a>
-                                                <a class="dropdown-item text-dark" href="SuperExpress">Super Express</a>
-                                            </div>
+                                        <div class="form-group">
+                                            <label for="exampleFormControlSelect1"> Filter Orders</label>
+                                            <select class="form-control" id="exampleFormControlSelect1">
+                                                <option value="ex">Express</option>
+                                                <option value="ss">Standard</option>
+                                                <option value="SuperExpress">Super Express</option>
+                                            </select>
                                         </div>
+                                        
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
