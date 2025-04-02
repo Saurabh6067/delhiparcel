@@ -418,8 +418,7 @@
                         }
                     },
                     error: function(err) {
-                        Toast("error",
-                            "An unexpected error occurred. Please try again.");
+                        Toast("error", "Error. Please try again.");
                     }
                 });
             });
