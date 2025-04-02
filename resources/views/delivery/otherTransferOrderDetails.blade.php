@@ -38,9 +38,9 @@
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
                                         <div class="form-group row">
-                                            <label for="exampleFormControlSelect1" class="col-sm-2 col-form-label"> Filter
+                                            <label for="exampleFormControlSelect1" class="col-sm-6 col-form-label"> Filter
                                                 Orders</label>
-                                            <div class="col-sm-10">
+                                            <div class="col-sm-6">
                                                 <select class="form-control" id="exampleFormControlSelect1">
                                                     <option selected disabled>Select</option>
                                                     <option value="ex">Express</option>
