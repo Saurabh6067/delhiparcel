@@ -693,7 +693,8 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
-        $data = Order::where(['sender_order_status' => 'Delivered'])->get();
+        dd($delivery);
+        $data = Order::where(['sender_order_status' => 'Delivered'])->where('sender_order_pin_by', )->get();
         return view('delivery.otherTransferOrderDetails', compact('data'));
     }
 
