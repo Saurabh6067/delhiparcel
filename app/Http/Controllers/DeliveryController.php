@@ -154,7 +154,8 @@ class DeliveryController extends Controller
             ->count();
 
         $delivery = Branch::find($id);
-        $myOrderDetail = Order::where(['sender_order_status' => 'Delivered'])->count();
+        $pinCodes = explode(',', $delivery->pincode);
+        $myOrderDetail = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->count();
 
         return view('delivery.dashboard', compact('delivery', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'allOrderDetail', 'myOrderDetail'));
     }
@@ -694,7 +695,6 @@ class DeliveryController extends Controller
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
         $pinCodes = explode(',', $delivery->pincode);
-        
         $data = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->get();
         return view('delivery.otherTransferOrderDetails', compact('data'));
     }
