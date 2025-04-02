@@ -694,20 +694,19 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
-        $pinCodes = explode(',', $delivery->pincode);
 
-        if ($request->filter) {
-            $filterType = $request->filter;
-            $data = Order::where(['sender_order_status' => 'Delivered', 'service_type' => $filterType])->whereIn('sender_order_pin', $pinCodes)->get();
-            dd($data->toArray());
-            return response()->json([
-                'success' => true,
-                'html' => view('delivery.inc.otherTransferOrderDetails', compact('data'))->render(),
-            ]);
-        } else {
-            $data = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->get();
-            return view('delivery.otherTransferOrderDetails', compact('data'));
-        }
+        if (!$delivery) return response()->json(['success' => false, 'message' => 'Branch not found.'], 404);
+
+        $pinCodes = explode(',', $delivery->pincode ?? '');
+        $query = Order::where('sender_order_status', 'Delivered')->whereIn('sender_order_pin', $pinCodes);
+
+        if ($request->filter) $query->where('service_type', $request->filter);
+
+        $data = $query->get();
+
+        return $request->ajax()
+            ? response()->json(['success' => true, 'html' => view('delivery.inc.otherTransferOrderDetails', compact('data'))->render()])
+            : view('delivery.otherTransferOrderDetails', compact('data'));
     }
 
     public function webDirectOrders()
