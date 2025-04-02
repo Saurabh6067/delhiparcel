@@ -165,7 +165,6 @@ class WebController extends Controller
     public function storeParcelDetails(Request $request)
     {
         // dd($request->all());
-        $request->service_id;
         $service = Service::where('id', $request->service_id)->first();
         $branch = Branch::where('pincode', 'LIKE', "%{$request->senderPinCode}%")->where('type', 'Delivery')->first();
 
@@ -188,7 +187,7 @@ class WebController extends Controller
         $order->sender_pincode = $request->senderPinCode;
 
         $order->service_type = $request->service_type;
-        $order->service_title = $service->title;
+        $order->service_title = $service->title ?? $request->service_id;
         $order->service_price = $request->price;
         $order->order_id = 'DL' . $this->generateRandomCode();
         $order->seller_id = $branch->id ?? null;
