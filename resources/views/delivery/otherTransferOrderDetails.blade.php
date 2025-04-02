@@ -38,7 +38,7 @@
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
                                         <div class="dropdown">
-                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                            <button class="btn btn-light dropdown-toggle" type="button"
                                                 id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
                                                 Filter Orders
