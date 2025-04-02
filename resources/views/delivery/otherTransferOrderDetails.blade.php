@@ -44,9 +44,9 @@
                                                 Filter Orders
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                <a class="dropdown-item" href="#">Express</a>
-                                                <a class="dropdown-item" href="#">Standard</a>
-                                                <a class="dropdown-item" href="#">Super Express</a>
+                                                <a class="dropdown-item text-dark" href="ex">Express</a>
+                                                <a class="dropdown-item text-dark" href="ss">Standard</a>
+                                                <a class="dropdown-item text-dark" href="SuperExpress">Super Express</a>
                                             </div>
                                         </div>
                                         @foreach ($data as $value)
