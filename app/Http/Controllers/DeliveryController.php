@@ -690,13 +690,23 @@ class DeliveryController extends Controller
         return view('delivery.otherBranchOrderStatus', compact('data'));
     }
 
-    public function otherTransferOrderDetails()
+    public function otherTransferOrderDetails(Request $request)
     {
         $id = Session::get('dyid');
         $delivery = Branch::find($id);
         $pinCodes = explode(',', $delivery->pincode);
-        $data = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->get();
-        return view('delivery.otherTransferOrderDetails', compact('data'));
+
+        if ($request->filter) {
+            $filterType = $request->filter;
+            $data = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->where('service_type', $filterType)->get();
+            return response()->json([
+                'success' => true,
+                'html' => view('delivery.inc.otherTransferOrderDetails', compact('data'))->render(),
+            ]);
+        } else {
+            $data = Order::where(['sender_order_status' => 'Delivered'])->whereIn('sender_order_pin', $pinCodes)->get();
+            return view('delivery.otherTransferOrderDetails', compact('data'));
+        }
     }
 
     public function webDirectOrders()

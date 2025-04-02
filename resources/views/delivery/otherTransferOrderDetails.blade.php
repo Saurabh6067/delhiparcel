@@ -38,10 +38,9 @@
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
                                         <div class="form-group row">
-                                            <label for="exampleFormControlSelect1" class="col-sm-6 col-form-label"> Filter
-                                                Orders</label>
+                                            <label for="filterOrder" class="col-sm-6 col-form-label"> Filter Orders</label>
                                             <div class="col-sm-6">
-                                                <select class="form-control" id="exampleFormControlSelect1">
+                                                <select class="form-control" id="filterOrder">
                                                     <option selected disabled>Select</option>
                                                     <option value="ex">Express</option>
                                                     <option value="ss">Standard</option>
@@ -398,6 +397,29 @@
                         } else {
                             Toast("error", response.message);
                         }
+                    }
+                });
+            });
+
+            $(document).on("change", "#filterOrder", function() {
+                let filter = $(this).val();
+                $.ajax({
+                    url: "{{ route('delivery.order-pin-code-orders') }}",
+                    type: "POST",
+                    data: {
+                        filter: filter
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            $("#tbody").html(response.html);
+                        } else {
+                            Toast("error", response.message);
+                        }
+                    },
+                    error: function(err) {
+                        Toast("error",
+                            "An unexpected error occurred. Please try again.");
                     }
                 });
             });
