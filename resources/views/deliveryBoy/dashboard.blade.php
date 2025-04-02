@@ -42,7 +42,37 @@
                                 <span class="info-box-icon bg-danger"><i class="fas fa-hourglass"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text"><strong>Pending Super Express</strong></span>
-                                    <span class="info-box-number">{{ $PendingSuperExpressOrder ?? 0.0 }}</span>
+                                    <span class="info-box-number"
+                                        id="SuperExpressOrder">{{ $PendingSuperExpressOrder }}</span>
+                                    <span class="info-box-number" id="SuperExpressOrderTime">00:00:00</span>
+                                    <script>
+                                        document.addEventListener("DOMContentLoaded", function() {
+                                            let superExpressOrder = parseInt(document.getElementById("SuperExpressOrder").innerText.trim(), 10);
+                                            let superExpressOrderTimeEl = document.getElementById("SuperExpressOrderTime");
+
+                                            if (superExpressOrder > 0) {
+                                                let remainingTime = 3 * 60 * 60; // 3 hours in seconds
+
+                                                function updateTimer() {
+                                                    let hours = Math.floor(remainingTime / 3600);
+                                                    let minutes = Math.floor((remainingTime % 3600) / 60);
+                                                    let seconds = remainingTime % 60;
+
+                                                    superExpressOrderTimeEl.innerText =
+                                                        String(hours).padStart(2, '0') + ":" +
+                                                        String(minutes).padStart(2, '0') + ":" +
+                                                        String(seconds).padStart(2, '0');
+
+                                                    if (remainingTime > 0) {
+                                                        remainingTime--;
+                                                        setTimeout(updateTimer, 1000);
+                                                    }
+                                                }
+
+                                                updateTimer();
+                                            }
+                                        });
+                                    </script>
                                 </div>
                             </div>
                         </a>
