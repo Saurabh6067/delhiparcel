@@ -58,7 +58,7 @@
         </td>
         <td>{{ $item->price }}</td>
         <td>{{ $item->payment_mode }}</td>
-        <td>{{ $item->order->pincode }}</td>
+        <td>{{ $item->sender_pincode ?? $item->order->pincode }}</td>
         <td>{{ $item->receiver_pincode }}</td>
         <td class="text-capitalize">{{ $item->parcel_type }}</td>
         <td>
