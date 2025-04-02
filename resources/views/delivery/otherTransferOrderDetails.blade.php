@@ -37,6 +37,18 @@
                                         <h3 class="card-title">All Orders</h3>
                                     </div>
                                     <div class="col-lg-6 text-lg-right">
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                Filter Orders
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a class="dropdown-item" href="#">Express</a>
+                                                <a class="dropdown-item" href="#">Standard</a>
+                                                <a class="dropdown-item" href="#">Super Express</a>
+                                            </div>
+                                        </div>
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
