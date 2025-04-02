@@ -64,7 +64,7 @@
                                 <span class="info-box-icon bg-warning"><i class="fas fa-hourglass"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text"><strong>Pending Delivery Order</strong></span>
-                                    <span class="info-box-number">{{ $PendingDeliveryOrder ?? 0.0 }}</span>
+                                    <span class="info-box-number">{{ $PendingDeliveryOrder }}</span>
                                 </div>
                             </div>
                         </a>
