@@ -204,7 +204,7 @@
                             <div class="form-group">
                                 <label for="inputOTP" class="form-label">Enter OTP</label>
                                 <input type="text" class="form-control" id="inputOTP" name="inputOTP"
-                                    placeholder="Enter OTP" required>
+                                    placeholder="Enter OTP">
                             </div>
                         </div>
                         <div class="card-footer">
