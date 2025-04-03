@@ -356,18 +356,16 @@ class DeliveryController extends Controller
             return response()->json(['success' => false, 'message' => 'Delivery boy not found.'], 404);
         }
 
-        $deliveryBoyPinCodes = explode(',', $deliveryBoy->pincode ?? ''); // Convert to array
+        $deliveryBoyPinCodes = explode(',', $deliveryBoy->pincode ?? '');
         $orderIds = explode(',', $request->orderId);
         $orders = Order::whereIn('id', $orderIds)->get();
-        $senderPincodes = $orders->pluck('receiver_pincode')->toArray();
+        $senderPinCodes = $orders->pluck('receiver_pincode')->toArray();
 
-        // Check if any sender pincode matches the delivery boy's pincodes
-        $matchingPincodes = array_intersect($senderPincodes, $deliveryBoyPinCodes);
+        $matchingPinCodes = array_intersect($senderPinCodes, $deliveryBoyPinCodes);
 
-        if (!empty($matchingPincodes)) {
-            // Update only matching orders
+        if (!empty($matchingPinCodes)) {
             foreach ($orders as $order) {
-                if (in_array($order->receiver_pincode, $matchingPincodes)) {
+                if (in_array($order->receiver_pincode, $matchingPinCodes)) {
                     $order->assign_to = $deliverBoyId;
                     $order->status_message = $request->status_message;
                     $order->assign_by = $id;
@@ -399,12 +397,12 @@ class DeliveryController extends Controller
         //     }
         // }
 
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true,
-                'message' => $msg,
-            ]);
-        }
+        // if ($request->ajax()) {
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => $msg,
+        //     ]);
+        // }
     }
 
     public function addDeliveryBoy($id = null)

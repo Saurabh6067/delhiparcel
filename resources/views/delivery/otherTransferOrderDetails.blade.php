@@ -311,7 +311,11 @@
                         if (response.success) {
                             Toast("success", response.message);
                             $('#assignOrderData').modal('hide');
-                            // location.reload();
+
+                            function reloadPage() {
+                                location.reload();
+                            }
+                            setTimeout(reloadPage, 1500);
                         } else {
                             Toast("error", response.message);
                         }
