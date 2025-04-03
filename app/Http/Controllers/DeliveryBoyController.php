@@ -357,12 +357,10 @@ class DeliveryBoyController extends Controller
         if ($order_status == 'Processing') {
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $branch = Branch::whereIn('id', $orderId)->first();
-
             if ($branch) {
                 $branch->branch_otp = $otp;
                 $branch->save();
             }
-
             $orders = Order::whereIn('id', $orderId)->get();
             if ($orders->isNotEmpty()) {
                 foreach ($orders as $order) {
@@ -377,7 +375,6 @@ class DeliveryBoyController extends Controller
             }
         } elseif ($order_status == 'Delivered') {
             $otp = $request->inputOTP;
-
             if (!$otp) {
                 $msg = 'Error! OTP not provided.';
             } else {
@@ -387,7 +384,6 @@ class DeliveryBoyController extends Controller
                 } else {
                     $branch->branch_otp = null;
                     $branch->save();
-
                     $orders = Order::whereIn('id', $orderId)->get();
                     if ($orders->isNotEmpty()) {
                         foreach ($orders as $order) {
@@ -404,7 +400,6 @@ class DeliveryBoyController extends Controller
             }
         }
 
-
         if ($request->ajax()) {
             return response()->json([
                 'success' => true,
@@ -412,4 +407,7 @@ class DeliveryBoyController extends Controller
             ]);
         }
     }
+
+
+    
 }
