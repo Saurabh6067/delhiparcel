@@ -349,7 +349,7 @@ class DeliveryBoyController extends Controller
 
     public function transferOrderStatus(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $orderId = explode(',', $request->orderId);
         sort($orderId);
         $order_status = $request->order_status;
@@ -366,6 +366,12 @@ class DeliveryBoyController extends Controller
                 $msg = 'Error! Status not update.';
             }
         }
+
+        // if($order_status == 'Delivered') {
+        //     $order = Order::whereIn('id', $idValue)->first();
+        //     $order->sender_order_pin_by = null;
+        //     $order->save();
+        // }
 
         if ($request->ajax()) {
             return response()->json([
