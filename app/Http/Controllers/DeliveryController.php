@@ -349,14 +349,25 @@ class DeliveryController extends Controller
     public function deliveryAssignOrder(Request $request)
     {
         $id = Session::get('dyid');
-        $deliveryBoy = DlyBoy::find($request->deliverBoyData);
+        $deliverBoyId = $request->deliverBoyData;
+        $deliveryBoy = DlyBoy::find($deliverBoyId);
         $deliveryBoyPinCode = $deliveryBoy->pincode;
-       
+
         $orderId = explode(',', $request->orderId);
         $order = Order::whereIn('id', $orderId)->get();
         $sender_pincode = $order->pluck('receiver_pincode')->toArray();
-        dd($sender_pincode);
 
+        $arrayPinCode = in_array($sender_pincode, $deliveryBoyPinCode);
+        dd($arrayPinCode);
+        if ($arrayPinCode) {
+            $order->assign_to = $deliverBoyId;
+            $order->status_message = $request->status_message;
+            $order->assign_by = $id;
+            $order->save();
+            $msg = 'Order assign successfully!';
+        } else {
+            $msg = 'Error! Order not assign.';
+        }
 
         // $orderId = explode(',', $request->orderId);
         // sort($orderId);
