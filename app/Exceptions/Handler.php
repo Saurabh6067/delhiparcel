@@ -58,12 +58,6 @@ class Handler extends ExceptionHandler
                     'path' => $request->path()
                 ], 404);
             }
-
-            // For non-API requests, you can render a custom view
-            return response()->view('errors.404', [
-                'path' => $request->path(),
-                'message' => 'The requested resource was not found'
-            ], 404);
         });
     }
 }

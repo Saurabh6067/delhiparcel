@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::fallback(function () {
-    abort(404);
+    view('404');
 });
 
 
