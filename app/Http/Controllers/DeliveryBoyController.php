@@ -355,7 +355,8 @@ class DeliveryBoyController extends Controller
         $order_status = $request->order_status;
 
         if ($order_status == 'Processing') {
-            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            // $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $otp = 123456;
             $branch = Branch::whereIn('id', $orderId)->first();
             if ($branch) {
                 $branch->branch_otp = $otp;

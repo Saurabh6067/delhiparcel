@@ -213,7 +213,7 @@
                             <div class="form-group d-none" id="enterOTP">
                                 <label for="inputOTP" class="form-label">Enter OTP</label>
                                 <input type="text" class="form-control" id="inputOTP" name="inputOTP"
-                                    placeholder="Enter OTP">
+                                    placeholder="Enter OTP" value="123456">
                             </div>
                         </div>
                         <div class="card-footer">
