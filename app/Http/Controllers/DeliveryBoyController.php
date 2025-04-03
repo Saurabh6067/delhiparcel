@@ -354,13 +354,13 @@ class DeliveryBoyController extends Controller
         sort($orderId);
         $order_status = $request->order_status;
 
-        if ($order_status == 'Pending') {
+        if ($order_status == 'Processing') {
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $order = Branch::whereIn('id', $orderId)->first();
             $order->branch_otp = $otp;
             $order->save();
         }
-        
+
         foreach ($orderId as $idValue) {
             $order = Order::where('id', $idValue)->first();
             if ($order) {
