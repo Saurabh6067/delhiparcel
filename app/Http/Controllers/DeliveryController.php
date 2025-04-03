@@ -698,7 +698,7 @@ class DeliveryController extends Controller
 
         if ($request->filter) {
             $filterType = $request->filter;
-            $data = Order::where(['service_type' => $filterType, 'sender_order_status' => 'Delivered'])->get();
+            $data = Order::where(['service_type' => $filterType, 'sender_order_status' => 'Delivered'])->pluck('sender_order_pin', $pinCodes)->get();
             dd($data->toArray());
             return response()->json([
                 'success' => true,
