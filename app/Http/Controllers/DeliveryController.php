@@ -697,7 +697,6 @@ class DeliveryController extends Controller
         $pinCodes = explode(',', $delivery->pincode);
 
         if ($request->filter) {
-            dd($request->filter);
             $filterType = $request->filter;
             $data = Order::where(['service_type' => $filterType, 'sender_order_status' => 'Delivered'])->get();
             dd($data->toArray());
