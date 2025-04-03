@@ -36,6 +36,28 @@
                         </a>
                     </div>
                     <div class="col-md-3 col-sm-6 col-12">
+                        <a href="{{ route('delivery.other.branch.order') }}" class="text-dark">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><strong>Transfer Other Branch Order</strong></span>
+                                    <span class="info-box-number">{{ $allOrderDetail ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <a href="{{ route('delivery.order-pin-code-orders') }}" class="text-dark">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-box"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><strong>Pending Other Branch Order</strong></span>
+                                    <span class="info-box-number">{{ $myOrderDetail ?? 0 }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-12">
                         <a href="{{ url('/delivery-order-details/' . 'toDayPendingOrder') }}" class="text-dark">
                             <div class="info-box">
                                 <span class="info-box-icon bg-success"><i class="fas fa-hourglass"></i></span>
@@ -140,7 +162,7 @@
                     </div>
                 </div>
                 {{-- branch orders --}}
-                <h5 class="mt-3 font-weight-bold">Branch Order Details</h5>
+                {{-- <h5 class="mt-3 font-weight-bold">Branch Order Details</h5>
                 <div class="row">
                     <div class="col-md-3 col-sm-6 col-12">
                         <a href="{{ route('delivery.other.branch.order') }}" class="text-dark">
@@ -164,7 +186,7 @@
                             </div>
                         </a>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </section>
     </div>
