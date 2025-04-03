@@ -349,7 +349,7 @@ class DeliveryController extends Controller
     public function deliveryAssignOrder(Request $request)
     {
         $id = Session::get('dyid');
-        $deliveryBoy = DlyBoy::find($deliverBoyData);
+        $deliveryBoy = DlyBoy::find($request->deliverBoyData);
         dd($deliveryBoy->toArray());
 
 
