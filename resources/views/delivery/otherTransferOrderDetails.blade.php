@@ -48,7 +48,8 @@
                                                 </select>
                                             </div>
                                         </div>
-
+                                        <input type="checkbox" id="select-all-assign"
+                                        onclick="toggleCheckboxes(this, 'row-checkbox1', 'btn-assign')">
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
@@ -71,8 +72,7 @@
                                             <th>#</th>
                                             <th>
                                                 <label for="select-all-assign">Assign</label>
-                                                <input type="checkbox" id="select-all-assign"
-                                                    onclick="toggleCheckboxes(this, 'row-checkbox1', 'btn-assign')">
+                                                
                                             </th>
                                             {{-- <th>
                                                 <label for="select-all-transfer">Transfer</label>
