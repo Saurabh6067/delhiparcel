@@ -708,7 +708,7 @@ class DeliveryController extends Controller
 
             $data = $data->get();
 
-            dd($data->toArray());
+            // dd($data->toArray());
             return response()->json([
                 'success' => true,
                 'html' => view('delivery.inc.otherTransferOrderDetails', compact('data'))->render(),
