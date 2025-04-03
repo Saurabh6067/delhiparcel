@@ -48,7 +48,14 @@
                                                 </select>
                                             </div>
                                         </div>
-
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text">
+                                                    <input type="checkbox">
+                                                </div>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Select All Orders" readonly>
+                                        </div>
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
