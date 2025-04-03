@@ -351,23 +351,35 @@ class DeliveryController extends Controller
         $id = Session::get('dyid');
         $deliverBoyId = $request->deliverBoyData;
         $deliveryBoy = DlyBoy::find($deliverBoyId);
-        $deliveryBoyPinCode = $deliveryBoy->pincode;
 
-        $orderId = explode(',', $request->orderId);
-        $order = Order::whereIn('id', $orderId)->get();
-        $sender_pincode = $order->pluck('receiver_pincode')->toArray();
-
-        $arrayPinCode = in_array($sender_pincode, $deliveryBoyPinCode);
-        dd($arrayPinCode);
-        if ($arrayPinCode) {
-            $order->assign_to = $deliverBoyId;
-            $order->status_message = $request->status_message;
-            $order->assign_by = $id;
-            $order->save();
-            $msg = 'Order assign successfully!';
-        } else {
-            $msg = 'Error! Order not assign.';
+        if (!$deliveryBoy) {
+            return response()->json(['success' => false, 'message' => 'Delivery boy not found.'], 404);
         }
+
+        $deliveryBoyPinCodes = explode(',', $deliveryBoy->pincode ?? ''); // Convert to array
+        $orderIds = explode(',', $request->orderId);
+        $orders = Order::whereIn('id', $orderIds)->get();
+        $senderPincodes = $orders->pluck('receiver_pincode')->toArray();
+
+        // Check if any sender pincode matches the delivery boy's pincodes
+        $matchingPincodes = array_intersect($senderPincodes, $deliveryBoyPinCodes);
+
+        if (!empty($matchingPincodes)) {
+            // Update only matching orders
+            foreach ($orders as $order) {
+                if (in_array($order->receiver_pincode, $matchingPincodes)) {
+                    $order->assign_to = $deliverBoyId;
+                    $order->status_message = $request->status_message;
+                    $order->assign_by = $id;
+                    $order->save();
+                }
+            }
+
+            return response()->json(['success' => true, 'message' => 'Order assigned successfully!']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Error! Order not assigned.']);
+
 
         // $orderId = explode(',', $request->orderId);
         // sort($orderId);
