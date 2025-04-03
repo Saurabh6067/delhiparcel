@@ -71,7 +71,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body">
+                            {{-- <div class="card-body">
                                 <table id="example1" class="table table-bordered table-striped table-sm">
                                     <thead>
                                         <tr>
@@ -153,7 +153,7 @@
                                         @endif
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
                 </div>
