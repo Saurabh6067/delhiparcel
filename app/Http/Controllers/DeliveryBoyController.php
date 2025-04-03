@@ -349,10 +349,18 @@ class DeliveryBoyController extends Controller
 
     public function transferOrderStatus(Request $request)
     {
-        dd($request->all());
+        // dd($request->all());
         $orderId = explode(',', $request->orderId);
         sort($orderId);
         $order_status = $request->order_status;
+
+        if ($order_status == 'Pending') {
+            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $order = Branch::whereIn('id', $orderId)->first();
+            dd($order);
+            $order->branch_otp = $otp;
+            $order->save();
+        }
 
         foreach ($orderId as $idValue) {
             $order = Order::where('id', $idValue)->first();
@@ -366,12 +374,6 @@ class DeliveryBoyController extends Controller
                 $msg = 'Error! Status not update.';
             }
         }
-
-        // if($order_status == 'Delivered') {
-        //     $order = Order::whereIn('id', $idValue)->first();
-        //     $order->sender_order_pin_by = null;
-        //     $order->save();
-        // }
 
         if ($request->ajax()) {
             return response()->json([
