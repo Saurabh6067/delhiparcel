@@ -143,7 +143,7 @@
         </td>
         <td>
             @if ($item->sender_order_pin_by)
-                {{ $item->dlyBoy1->name ?? '-' }} | {{ $item->sender_order_status ?? '-' }}
+                {{-- {{ $item->dlyBoy1->name ?? '-' }} | {{ $item->sender_order_status ?? '-' }} --}}
             @endif
         </td>
     </tr>
