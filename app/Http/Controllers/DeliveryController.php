@@ -698,7 +698,7 @@ class DeliveryController extends Controller
 
         if ($request->filter) {
             $filterType = $request->filter;
-            $data = Order::where(['service_type' => $filterType])->whereIn('sender_order_pin', $pinCodes)->get();
+            $data = Order::where(['service_type' => $filterType, 'sender_order_status' => 'Delivered'])->get();
             dd($data->toArray());
             return response()->json([
                 'success' => true,
