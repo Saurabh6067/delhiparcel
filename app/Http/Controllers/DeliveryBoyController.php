@@ -234,7 +234,7 @@ class DeliveryBoyController extends Controller
             if ($action == 'totalOrder') {
                 $data = $ordersQuery->where('assign_to', $id)->orderBy('id', 'desc')->get();
             } elseif ($action == 'PendingOrder') {
-                $data = $ordersQuery->where(['order_status' => 'Booked', 'assign_to' => $id])->orderBy('id', 'desc')->get();
+                $data = $ordersQuery->whereIn('order_status', ['Booked', 'Delivered to branch'])->where(['assign_to' => $id])->orderBy('id', 'desc')->get();
             } elseif ($action == 'totalCompleteOrder') {
                 $data = $ordersQuery->where(['order_status' => 'Delivered', 'assign_to' => $id])->orderBy('id', 'desc')->get();
             } elseif ($action == 'PendingSuperExpressOrder') {
