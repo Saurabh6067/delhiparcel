@@ -354,7 +354,7 @@ class DeliveryController extends Controller
        
         $orderId = explode(',', $request->orderId);
         $order = Order::whereIn('id', $orderId)->get();
-        $sender_pincode = $order->pluck('sender_pincode')->toArray();
+        $sender_pincode = $order->pluck('receiver_pincode')->toArray();
         dd($sender_pincode);
 
 
