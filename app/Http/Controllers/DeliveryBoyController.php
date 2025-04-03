@@ -357,11 +357,10 @@ class DeliveryBoyController extends Controller
         if ($order_status == 'Pending') {
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
             $order = Branch::whereIn('id', $orderId)->first();
-            dd($order);
             $order->branch_otp = $otp;
             $order->save();
         }
-
+        
         foreach ($orderId as $idValue) {
             $order = Order::where('id', $idValue)->first();
             if ($order) {
