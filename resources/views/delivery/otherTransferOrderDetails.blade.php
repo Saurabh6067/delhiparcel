@@ -74,11 +74,6 @@
                                                 <input type="checkbox" id="select-all-assign"
                                                     onclick="toggleCheckboxes(this, 'row-checkbox1', 'btn-assign')">
                                             </th>
-                                            {{-- <th>
-                                                <label for="select-all-transfer">Transfer</label>
-                                                <input type="checkbox" id="select-all-transfer"
-                                                    onclick="toggleCheckboxes(this, 'row-checkbox2', 'btn-transfer')">
-                                            </th> --}}
                                             <th>Order Id</th>
                                             <th>Service Type</th>
                                             <th>Order Date</th>
@@ -94,8 +89,61 @@
                                             <th>Transfer Status</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tbody">
-                                        @include('delivery.inc.otherTransferOrderDetails')
+                                    <tbody>
+                                        @foreach ($orders as $key => $order)
+                                            <tr>
+                                                <td>{{ $key + 1 }}</td>
+                                                <td>
+                                                    <input type="checkbox" class="row-checkbox1" value="{{ $order->id }}"
+                                                        name="order_ids[]">
+                                                </td>
+                                                <td>{{ $order->order_id }}</td>
+                                                <td>{{ $order->service_type }}</td>
+                                                <td>{{ $order->created_at->format('d-m-Y') }}</td>
+                                                <td>{{ $order->sender_name }}</td>
+                                                <td>{{ $order->receiver_name }}</td>
+                                                <td>{{ $order->amount }}</td>
+                                                <td>
+                                                    <span
+                                                        class="badge {{ $order->payment_status == 'paid' ? 'badge-success' : 'badge-danger' }}">
+                                                        {{ ucfirst($order->payment_status) }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ $order->pickup_pincode }}</td>
+                                                <td>{{ $order->delivery_pincode }}</td>
+                                                <td>{{ ucfirst($order->order_type) }}</td>
+                                                <td>
+                                                    <span
+                                                        class="badge 
+                                                        @if ($order->status == 'pending') badge-warning 
+                                                        @elseif($order->status == 'processing') badge-info 
+                                                        @elseif($order->status == 'completed') badge-success 
+                                                        @elseif($order->status == 'cancelled') badge-danger @endif">
+                                                        {{ ucfirst($order->status) }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ route('delivery.assign', $order->id) }}"
+                                                        class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-user-plus"></i> Assign
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge 
+                                                        @if ($order->transfer_status == 'pending') badge-warning 
+                                                        @elseif($order->transfer_status == 'completed') badge-success @endif">
+                                                        {{ ucfirst($order->transfer_status) }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+
+                                        @if (count($orders) == 0)
+                                            <tr>
+                                                <td colspan="15" class="text-center">No orders found</td>
+                                            </tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
