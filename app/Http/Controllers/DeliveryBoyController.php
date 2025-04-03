@@ -112,7 +112,7 @@ class DeliveryBoyController extends Controller
 
         // totalOrder details
         $totalOrder = Order::count();
-        $PendingOrder = Order::where(['order_status' => 'Booked', 'assign_to' => $id])->count();
+        $PendingOrder = Order::where('order_status', ['Booked', 'Delivered to branch'])->where(['assign_to' => $id])->count();
         $totalCompleteOrder = Order::where(['order_status' => 'Delivered', 'assign_to' => $id])->count();
         $PendingDeliveryOrder = Order::whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled', 'Delivered to branch'])->where('assign_to', $id)->count();
 
