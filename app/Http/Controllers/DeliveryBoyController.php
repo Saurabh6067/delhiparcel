@@ -361,6 +361,21 @@ class DeliveryBoyController extends Controller
             $order->save();
         }
 
+        if ($order_status == 'Delivered') {
+            $otp = $request->inputOTP;
+            if ($otp) {
+                $order = Branch::whereIn('id', $orderId)->where('branch_otp', $otp)->first();
+                if (!$order) {
+                    $msg = 'OTP not Matched!';
+                } else {
+                    $order->branch_otp = null;
+                    $order->save();
+                }
+            } else {
+                $msg = 'Error! OTP not matched.';
+            }
+        }
+        
         foreach ($orderId as $idValue) {
             $order = Order::where('id', $idValue)->first();
             if ($order) {
