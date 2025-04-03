@@ -348,6 +348,7 @@ class DeliveryController extends Controller
 
     public function deliveryAssignOrder(Request $request)
     {
+        dd($request->all());
         $id = Session::get('dyid');
         $orderId = explode(',', $request->orderId);
         sort($orderId);
