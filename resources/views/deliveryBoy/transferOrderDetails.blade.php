@@ -145,7 +145,8 @@
                     return $(this).data("id");
                 }).get();
 
-                console.log(selectedOrders);
+                // console.log(selectedOrders);
+
                 $('#assignOrderData').modal('show');
                 $('#orderId').val(selectedOrders);
             });
@@ -199,6 +200,11 @@
                                     <option value="Processing">Processing</option>
                                     <option value="Delivered">Delivered</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputOTP" class="form-label">Enter OTP</label>
+                                <input type="text" class="form-control" id="inputOTP" name="inputOTP"
+                                    placeholder="Enter OTP" required>
                             </div>
                         </div>
                         <div class="card-footer">
