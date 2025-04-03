@@ -350,7 +350,12 @@ class DeliveryController extends Controller
     {
         $id = Session::get('dyid');
         $deliveryBoy = DlyBoy::find($request->deliverBoyData);
-        dd($deliveryBoy->toArray());
+        $deliveryBoyPinCode = $deliveryBoy->pincode;
+       
+        $orderId = explode(',', $request->orderId);
+        $order = Order::whereIn('id', $orderId)->get();
+
+        dd($order->toArray());
 
 
         // $orderId = explode(',', $request->orderId);
