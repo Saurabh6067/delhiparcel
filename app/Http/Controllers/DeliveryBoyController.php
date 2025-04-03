@@ -356,38 +356,54 @@ class DeliveryBoyController extends Controller
 
         if ($order_status == 'Processing') {
             $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            $order = Branch::whereIn('id', $orderId)->first();
-            $order->branch_otp = $otp;
-            $order->save();
-        }
+            $branch = Branch::whereIn('id', $orderId)->first();
 
-        if ($order_status == 'Delivered') {
-            $otp = $request->inputOTP;
-            if ($otp) {
-                $order = Branch::whereIn('id', $orderId)->where('branch_otp', $otp)->first();
-                if (!$order) {
-                    $msg = 'OTP not Matched!';
-                } else {
-                    $order->branch_otp = null;
+            if ($branch) {
+                $branch->branch_otp = $otp;
+                $branch->save();
+            }
+
+            $orders = Order::whereIn('id', $orderId)->get();
+            if ($orders->isNotEmpty()) {
+                foreach ($orders as $order) {
+                    $order->sender_order_status = $order_status;
+                    $order->assign_to = null;
+                    $order->assign_by = null;
                     $order->save();
                 }
+                $msg = 'Status updated successfully!';
             } else {
-                $msg = 'Error! OTP not matched.';
+                $msg = 'Error! Status not updated.';
+            }
+        } elseif ($order_status == 'Delivered') {
+            $otp = $request->inputOTP;
+
+            if (!$otp) {
+                $msg = 'Error! OTP not provided.';
+            } else {
+                $branch = Branch::whereIn('id', $orderId)->where('branch_otp', $otp)->first();
+                if (!$branch) {
+                    $msg = 'OTP not matched!';
+                } else {
+                    $branch->branch_otp = null;
+                    $branch->save();
+
+                    $orders = Order::whereIn('id', $orderId)->get();
+                    if ($orders->isNotEmpty()) {
+                        foreach ($orders as $order) {
+                            $order->sender_order_status = $order_status;
+                            $order->assign_to = null;
+                            $order->assign_by = null;
+                            $order->save();
+                        }
+                        $msg = 'Status updated successfully!';
+                    } else {
+                        $msg = 'Error! Status not updated.';
+                    }
+                }
             }
         }
-        
-        foreach ($orderId as $idValue) {
-            $order = Order::where('id', $idValue)->first();
-            if ($order) {
-                $order->sender_order_status = $order_status;
-                $order->assign_to = null;
-                $order->assign_by = null;
-                $order->save();
-                $msg = 'Status update successfully!';
-            } else {
-                $msg = 'Error! Status not update.';
-            }
-        }
+
 
         if ($request->ajax()) {
             return response()->json([
