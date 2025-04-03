@@ -48,14 +48,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <div class="input-group-text">
-                                                    <input type="checkbox">
-                                                </div>
-                                            </div>
-                                            <input type="text" class="form-control" placeholder="Select All Orders" readonly>
-                                        </div>
+
                                         @foreach ($data as $value)
                                             @if (empty($value->assign_to))
                                                 <button class="btn btn-sm btn-light font-weight-bold btn-assign d-none"
@@ -71,7 +64,41 @@
                                     </div>
                                 </div>
                             </div>
-                            
+                            <div class="card-body">
+                                <table id="example1" class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>
+                                                <label for="select-all-assign">Assign</label>
+                                                <input type="checkbox" id="select-all-assign"
+                                                    onclick="toggleCheckboxes(this, 'row-checkbox1', 'btn-assign')">
+                                            </th>
+                                            {{-- <th>
+                                                <label for="select-all-transfer">Transfer</label>
+                                                <input type="checkbox" id="select-all-transfer"
+                                                    onclick="toggleCheckboxes(this, 'row-checkbox2', 'btn-transfer')">
+                                            </th> --}}
+                                            <th>Order Id</th>
+                                            <th>Service Type</th>
+                                            <th>Order Date</th>
+                                            <th>Sender Name</th>
+                                            <th>Receiver Name</th>
+                                            <th>Amount</th>
+                                            <th>Payment Status</th>
+                                            <th>Pickup PinCode</th>
+                                            <th>Delivery PinCode</th>
+                                            <th>Order Type</th>
+                                            <th>Order Status</th>
+                                            <th>Assign Order</th>
+                                            <th>Transfer Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody">
+                                        @include('delivery.inc.otherTransferOrderDetails')
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
