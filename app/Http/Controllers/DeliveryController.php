@@ -348,26 +348,28 @@ class DeliveryController extends Controller
 
     public function deliveryAssignOrder(Request $request)
     {
-        dd($request->all());
         $id = Session::get('dyid');
-        $orderId = explode(',', $request->orderId);
-        sort($orderId);
-        $deliverBoy = $request->deliverBoyData;
-        $status = $request->status_message;
+        $deliveryBoy = DlyBoy::find($deliverBoyData);
+        dd($deliveryBoy->toArray());
 
-        foreach ($orderId as $idValue) {
-            // dd($idValue);
-            $order = Order::where('id', $idValue)->first();
-            if ($order) {
-                $order->assign_to = $deliverBoy;
-                $order->status_message = $status;
-                $order->assign_by = $id;
-                $order->save();
-                $msg = 'Order assign successfully!';
-            } else {
-                $msg = 'Error! Order not assign.';
-            }
-        }
+
+        // $orderId = explode(',', $request->orderId);
+        // sort($orderId);
+        // $deliverBoy = $request->deliverBoyData;
+        // $status = $request->status_message;
+
+        // foreach ($orderId as $idValue) {
+        //     $order = Order::where('id', $idValue)->first();
+        //     if ($order) {
+        //         $order->assign_to = $deliverBoy;
+        //         $order->status_message = $status;
+        //         $order->assign_by = $id;
+        //         $order->save();
+        //         $msg = 'Order assign successfully!';
+        //     } else {
+        //         $msg = 'Error! Order not assign.';
+        //     }
+        // }
 
         if ($request->ajax()) {
             return response()->json([
