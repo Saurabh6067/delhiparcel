@@ -175,6 +175,15 @@
                     }
                 });
             });
+
+            $(document).on("click", "#order_status", function() {
+                let selectedStatus = $(this).val();
+                if (selectedStatus == 'Delivered') {
+                    $('#enterOTP').removeClass('d-none');
+                } else {
+                    $('#enterOTP').addClass('d-none');
+                }
+            });
         });
     </script>
 @endpush
@@ -201,7 +210,7 @@
                                     <option value="Delivered">Delivered</option>
                                 </select>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group d-none" id="enterOTP">
                                 <label for="inputOTP" class="form-label">Enter OTP</label>
                                 <input type="text" class="form-control" id="inputOTP" name="inputOTP"
                                     placeholder="Enter OTP">
