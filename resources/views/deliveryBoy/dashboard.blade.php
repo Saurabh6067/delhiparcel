@@ -147,7 +147,7 @@
                             <div class="info-box">
                                 <span class="info-box-icon bg-info"><i class="fas fa-box"></i></span>
                                 <div class="info-box-content">
-                                    <span class="info-box-text"><strong>All Other PinCode Orders</strong></span>
+                                    <span class="info-box-text"><strong>Delivery All Other PinCode Orders</strong></span>
                                     <span class="info-box-number">{{ $CompleteOtherPinCodeOrders ?? 0 }}</span>
                                 </div>
                             </div>
