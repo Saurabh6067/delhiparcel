@@ -19,7 +19,7 @@
         }
 
         .error-container {
-            max-width: 600px;
+            max-width: 100%;
             text-align: center;
             padding: 2rem;
             background-color: white;
