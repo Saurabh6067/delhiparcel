@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('password');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->text('branch_cm')->nullable();
+            $table->string('branch_otp', 6)->nullable();
             $table->timestamps();
         });
     }
