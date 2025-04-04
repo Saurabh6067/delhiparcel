@@ -368,8 +368,8 @@ class DeliveryBoyController extends Controller
                 $sender_order_pin = $orders->first()->sender_order_pin;
                 $branches = Branch::whereRaw("FIND_IN_SET(?, pincode)", [$sender_order_pin])
                     ->where('type', 'Delivery')
-                    ->get();
-                if ($branches->isNotEmpty()) {
+                    ->first();
+                if ($branches) {
                     $branches->branch_otp = $otp;
                     $branches->save();
                 }
