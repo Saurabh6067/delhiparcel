@@ -354,7 +354,7 @@ class DeliveryBoyController extends Controller
         $order_status = $request->order_status;
 
         if ($order_status == 'Processing') {
-            $otp = rand(100000, 999999);
+            $otp = 123456;
             $orders = Order::whereIn('id', $orderId)->get();
 
             if ($orders->isNotEmpty()) {
@@ -369,6 +369,7 @@ class DeliveryBoyController extends Controller
                 $branches = Branch::whereRaw("FIND_IN_SET(?, pincode)", [$sender_order_pin])
                     ->where('type', 'Delivery')
                     ->first();
+
                 if ($branches) {
                     $branches->branch_otp = $otp;
                     $branches->save();
