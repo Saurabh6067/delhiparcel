@@ -351,18 +351,12 @@ class DeliveryBoyController extends Controller
     {
         // dd($request->all());
         $orderId = explode(',', $request->orderId);
-        sort($orderId);
         $order_status = $request->order_status;
 
         if ($order_status == 'Processing') {
-            $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-            // $otp = 123456;
-            $branch = Branch::whereIn('id', $orderId)->first();
-            if ($branch) {
-                $branch->branch_otp = $otp;
-                $branch->save();
-            }
+            $otp = rand(100000, 999999);
             $orders = Order::whereIn('id', $orderId)->get();
+
             if ($orders->isNotEmpty()) {
                 foreach ($orders as $order) {
                     $order->sender_order_status = $order_status;
@@ -371,6 +365,14 @@ class DeliveryBoyController extends Controller
                     $order->save();
                 }
                 $msg = 'Status updated successfully!';
+                $sender_order_pin = $orders->first()->sender_order_pin;
+                $branches = Branch::whereRaw("FIND_IN_SET(?, pincode)", [$sender_order_pin])
+                    ->where('type', 'Delivery')
+                    ->get();
+                if ($branches->isNotEmpty()) {
+                    $branches->branch_otp = $otp;
+                    $branches->save();
+                }
             } else {
                 $msg = 'Error! Status not updated.';
             }
@@ -408,7 +410,4 @@ class DeliveryBoyController extends Controller
             ]);
         }
     }
-
-
-    
 }
