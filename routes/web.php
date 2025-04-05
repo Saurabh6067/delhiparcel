@@ -292,7 +292,7 @@ Route::middleware(['deliverylogin'])->group(function () {
     Route::any('/delivery-transfer-assign-order', [DeliveryController::class, 'deliveryTransferAssignOrder'])->name('delivery.transfer.assign.order');
     Route::any('/delivery-other-branch-order-status', [DeliveryController::class, 'otherBranchOrderStatus'])->name('delivery.other.branch.order.status');
     Route::any('/delivery-other-branch-order-details', [DeliveryController::class, 'otherTransferOrderDetails'])->name('delivery.order-pin-code-orders');
-
+ 
     Route::any('/delivery-direct-orders', [DeliveryController::class, 'webDirectOrders'])->name('delivery.DirectOrders');
     Route::any('/delivery-invoice/{id}', [DeliveryController::class, 'deliverInvoice']);
     Route::any('/delivery-direct-orders-status', [DeliveryController::class, 'webDirectOrdersStatus'])->name('delivery.DirectOrdersStatus.get');
