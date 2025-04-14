@@ -1,6 +1,6 @@
 @extends('deliveryBoy.layout.main')
 @push('style')
-    <!-- DataTables -->
+    <!-- DataTables  config-->
     <link rel="stylesheet" href="{{ asset('admin/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('admin/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
@@ -121,8 +121,8 @@
                                 <h1 class="card-title">All COD History</h1>
                                 {{-- <form id="codAmount">
                                     <div class="input-group input-group-sm">
-                                        <input type="hidden" name="delivery_boy" name="delivery_boy_id"
-                                            id="delivery_boy_id" value="{{ request()->segment(2) }}">
+                                        <input type="hidden" name="delivery_boy" name="delivery_boy_id" id="delivery_boy_id"
+                                            value="{{ request()->segment(2) }}">
                                         <input type="number" class="form-control" name="amount" id="amount"
                                             placeholder="0.0">
                                         <span class="input-group-append">
@@ -167,7 +167,7 @@
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
     <script>
-        $(function() {
+        $(function () {
             // Page specific script 
             $("#example1").DataTable({
                 "responsive": true,
@@ -183,9 +183,10 @@
             }).buttons().container().appendTo('#example2_wrapper .col-md-6:eq(0)');
         });
     </script>
-    {{-- <script>
-        $(document).ready(function() {
-            $('#codAmount').submit(function(e) {
+    {{--
+    <script>
+        $(document).ready(function () {
+            $('#codAmount').submit(function (e) {
                 e.preventDefault();
                 var amount = $("#amount").val();
                 var delivery_boy = $("#delivery_boy_id").val();
@@ -200,7 +201,7 @@
                         amount: amount,
                         delivery_boy: delivery_boy
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             Toast("success", response.message);
                             $("#amount").val('');
