@@ -82,14 +82,14 @@
                 </div>
                 <div class="modal-body">
                     <!-- <form id="walletAdd">
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
-                                        aria-describedby="basic-addon2" name="amount" required>
-                                    <div class="input-group-append">
-                                        <button class="btn btn-success">Pay Now</button>
-                                    </div>
-                                </div>
-                            </form> -->
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
+                                                aria-describedby="basic-addon2" name="amount" required>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-success">Pay Now</button>
+                                            </div>
+                                        </div>
+                                    </form> -->
 
                     <!-- This Form is Phonepay Gateway-->
                     <form method="POST" action="{{ route('seller.addWalletAmount') }}">
