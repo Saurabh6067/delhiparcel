@@ -252,7 +252,7 @@ class SellerController extends Controller
             $res = $response->json();
             Log::info('PhonePe Status API Response:', $res);
 
-            if (isset($res['success']) && $res['success'] === true && $res['code'] === 'PAYMENT_SUCCESS') {
+            if (isset($res['success']) && $res['success'] === true && $res['data']['state'] === 'COMPLETED') {
                 $wallet = Wallet::where('refno', $merchantTransactionId)->first();
 
                 if ($wallet && $wallet->status !== 'success') {
