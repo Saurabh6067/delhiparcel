@@ -1,0 +1,806 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1:3306
+-- Generation Time: Mar 31, 2025 at 07:07 AM
+-- Server version: 10.11.10-MariaDB-log
+-- PHP Version: 7.2.34
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `u472368514_delhiparcel`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `branchs`
+--
+
+CREATE TABLE `branchs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `fulladdress` text NOT NULL,
+  `itemcount` varchar(255) NOT NULL,
+  `phoneno` varchar(255) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `gst_panno` varchar(255) NOT NULL,
+  `gst_panno_img` varchar(255) DEFAULT NULL,
+  `pincode` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `type_logo` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `branch_cm` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `branchs`
+--
+
+INSERT INTO `branchs` (`id`, `fullname`, `email`, `fulladdress`, `itemcount`, `phoneno`, `category`, `gst_panno`, `gst_panno_img`, `pincode`, `type`, `type_logo`, `password`, `status`, `branch_cm`, `created_at`, `updated_at`) VALUES
+(25, 'Bhajanpura', 'bhajanpura@gmail.com', 'Bhajanpura', '100', '9953187035', '11', '1', NULL, '110001,110002,110003,110004,110005,110006,110007,110008,110009,110010', 'Delivery', NULL, 'Delivery@9953187035', 'active', NULL, '2025-03-31 05:34:28', '2025-03-31 05:34:28'),
+(26, 'Pratap Nagar', 'pratapnagar@gmail.com', 'Pratap Nagar', '100', '7065193555', '11', '1', NULL, '110011,110013,110012,110014,110015,110016,110017,110018,110019,110020', 'Delivery', NULL, 'Delivery@7065193555', 'active', NULL, '2025-03-31 05:36:26', '2025-03-31 05:36:26'),
+(27, 'Aiims', 'aiims@gmail.com', 'Aiims', '100', '9868385152', '12', '1', NULL, '110021,110022,110023,110024,110025,110026,110027,110028,110029,110030', 'Delivery', NULL, 'Delivery@9868385152', 'active', NULL, '2025-03-31 05:38:06', '2025-03-31 05:38:45'),
+(28, 'Ravi', 'ravi@gmail.com', 'noida', '12', '9876543210', '12', '1fgh234cxcz', NULL, '110001', 'Seller', 'admin/upload/branch/BL_1743400011.jpg', 'Seller@9876543210', 'active', NULL, '2025-03-31 05:46:51', '2025-03-31 05:46:51'),
+(29, 'S5', 'S5@GMAIL.COM', 'Bhajanpura', '1', '9876543211', '11', '1', 'admin/upload/branch/EID_1743399960.pdf', '110001', 'Seller', 'web/images/logo.png', 'S5@110001', 'active', NULL, '2025-03-31 05:47:41', '2025-03-31 05:47:41'),
+(30, 'S1', 's1@gmail.com', 'S1', '1', '9876543219', '11', '1', 'admin/upload/branch/BID_1743400100.pdf', '110001', 'Seller', NULL, 'Seller@9876543219', 'active', NULL, '2025-03-31 05:48:20', '2025-03-31 05:48:20'),
+(31, 'S2', 's2@gmail.com', 'S2', '1', '9876543212', '12', '1', 'admin/upload/branch/BID_1743400193.pdf', '110011', 'Seller', NULL, 'Seller@9876543212', 'active', NULL, '2025-03-31 05:49:53', '2025-03-31 05:49:53'),
+(32, 'S4', 's4@gmail.com', 's4@gmail.com', '1', '9865321112', '11', '1', 'admin/upload/branch/BID_1743400337.pdf', '110033', 'Seller', NULL, 'Seller@9865321112', 'active', NULL, '2025-03-31 05:52:17', '2025-03-31 05:52:17');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `cat_name` varchar(255) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`id`, `cat_name`, `status`, `created_at`, `updated_at`) VALUES
+(11, 'Books', 'active', '2025-03-31 05:25:55', '2025-03-31 05:25:55'),
+(12, 'Gifting Items', 'active', '2025-03-31 05:26:04', '2025-03-31 05:26:04');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cod`
+--
+
+CREATE TABLE `cod` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `order_id` varchar(255) NOT NULL,
+  `delivery_boy_id` varchar(255) NOT NULL,
+  `pyment_method` enum('NA','cash','online') NOT NULL DEFAULT 'NA',
+  `datetime` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cod_amount`
+--
+
+CREATE TABLE `cod_amount` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `amount` varchar(255) NOT NULL,
+  `delivery_boy_id` varchar(255) NOT NULL,
+  `user_id` varchar(255) NOT NULL,
+  `datetime` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `dlyboy`
+--
+
+CREATE TABLE `dlyboy` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `address` text NOT NULL,
+  `pincode` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `orderRate` varchar(255) DEFAULT NULL,
+  `userid` bigint(20) UNSIGNED DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `dlyboy`
+--
+
+INSERT INTO `dlyboy` (`id`, `name`, `email`, `phone`, `address`, `pincode`, `password`, `orderRate`, `userid`, `status`, `created_at`, `updated_at`) VALUES
+(23, 'Preet', 'preet@gmail.com', '9876543217', 'Ghar', '110001,110002,110003,110004,110005', 'preet@123', '15', 1, 'active', '2025-03-31 05:56:37', '2025-03-31 05:56:37'),
+(24, 'Babul', 'babul@gmail.com', '9876543215', 'Ghar', '110006,110007,110008,110009,110010', 'babul@123', '10', 25, 'active', '2025-03-31 05:59:39', '2025-03-31 05:59:39'),
+(25, 'mukesh', 'mukesh@gmail.com', '09087654321', 'delhi', '110021,110022,110023,110024,110025', 'Mukesh@123', '13', 27, 'active', '2025-03-31 06:17:40', '2025-03-31 06:17:40'),
+(26, 'arun', 'arun@gmail.com', '09087654321', 'delhi', '110026,110027,110028,110029,110030', 'Arun@123', '11', 27, 'active', '2025-03-31 06:18:25', '2025-03-31 06:18:25');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `enquirys`
+--
+
+CREATE TABLE `enquirys` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `itemno` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `gst_panno` varchar(255) NOT NULL,
+  `phoneno` varchar(255) NOT NULL,
+  `category` varchar(255) NOT NULL,
+  `fulladdress` text NOT NULL,
+  `message` longtext NOT NULL,
+  `gst_panno_img` varchar(255) DEFAULT NULL,
+  `pinCode` varchar(6) DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'inactive',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `enquirys`
+--
+
+INSERT INTO `enquirys` (`id`, `fullname`, `itemno`, `email`, `gst_panno`, `phoneno`, `category`, `fulladdress`, `message`, `gst_panno_img`, `pinCode`, `status`, `created_at`, `updated_at`) VALUES
+(4, 'S5', '1', 'S5@GMAIL.COM', '1', '9876543211', '11', 'Bhajanpura', 'Q', 'admin/upload/branch/EID_1743399960.pdf', '110001', 'active', '2025-03-31 05:45:09', '2025-03-31 05:47:41');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `failed_jobs`
+--
+
+CREATE TABLE `failed_jobs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `uuid` varchar(255) NOT NULL,
+  `connection` text NOT NULL,
+  `queue` text NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feed_backs`
+--
+
+CREATE TABLE `feed_backs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `phone` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'inactive',
+  `datetime` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `migrations`
+--
+
+CREATE TABLE `migrations` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `migration` varchar(255) NOT NULL,
+  `batch` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `migrations`
+--
+
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
+(19, '2014_10_12_000000_create_users_table', 1),
+(20, '2014_10_12_100000_create_password_reset_tokens_table', 1),
+(21, '2019_08_19_000000_create_failed_jobs_table', 1),
+(22, '2019_12_14_000001_create_personal_access_tokens_table', 1),
+(23, '2025_01_07_111251_create_services_table', 1),
+(24, '2025_01_08_065129_create_pincodes_table', 1),
+(25, '2025_01_08_075107_create_categories_table', 1),
+(26, '2025_01_08_103846_create_branchs_table', 1),
+(27, '2025_01_09_130603_create_enquiry_table', 1),
+(28, '2025_01_11_050151_create_dlyboy_table', 1),
+(29, '2025_01_11_105929_create_wallets_table', 1),
+(30, '2025_01_13_081908_create_orders_table', 1),
+(31, '2025_01_27_065927_create_servicetypes_table', 1),
+(32, '2025_01_30_092532_create_cod_table', 1),
+(33, '2025_02_01_054512_create_cod_amount_table', 1),
+(34, '2025_02_25_053801_create_web_orders_table', 1),
+(35, '2025_03_04_093130_create_order_cod_table', 1),
+(36, '2025_03_15_131004_create_feed_backs_table', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `pickupAddress` text DEFAULT NULL,
+  `deliveryAddress` text DEFAULT NULL,
+  `receiver_name` varchar(255) NOT NULL,
+  `receiver_cnumber` varchar(255) NOT NULL,
+  `receiver_email` varchar(255) NOT NULL,
+  `receiver_add` text NOT NULL,
+  `receiver_pincode` varchar(10) NOT NULL,
+  `sender_name` varchar(255) DEFAULT NULL,
+  `sender_number` varchar(255) DEFAULT NULL,
+  `sender_email` varchar(255) DEFAULT NULL,
+  `sender_address` text DEFAULT NULL,
+  `sender_pincode` varchar(10) DEFAULT NULL,
+  `service_type` varchar(255) NOT NULL,
+  `service_title` varchar(255) NOT NULL,
+  `service_price` varchar(255) NOT NULL,
+  `order_id` varchar(255) NOT NULL,
+  `seller_id` varchar(255) DEFAULT NULL,
+  `price` varchar(255) NOT NULL,
+  `payment_mode` enum('online','COD') NOT NULL,
+  `codAmount` varchar(255) DEFAULT NULL,
+  `insurance` varchar(10) DEFAULT NULL,
+  `order_status` enum('Booked','Item Picked Up','Returned','In Transit','Arrived at Destination','Out for Delivery','Delivered','Not Delivered','Returning to Origin','Out for Delivery to Origin','Cancelled','Item Not Picked Up','Delivered to branch') NOT NULL,
+  `status_message` text DEFAULT NULL,
+  `parcel_type` varchar(255) DEFAULT NULL,
+  `assign_to` varchar(255) DEFAULT NULL,
+  `assign_by` varchar(255) DEFAULT NULL,
+  `sender_order_pin` varchar(255) DEFAULT NULL,
+  `sender_order_pin_by` varchar(255) DEFAULT NULL,
+  `sender_order_status` enum('Pending','Processing','Delivered') DEFAULT NULL,
+  `datetime` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`id`, `pickupAddress`, `deliveryAddress`, `receiver_name`, `receiver_cnumber`, `receiver_email`, `receiver_add`, `receiver_pincode`, `sender_name`, `sender_number`, `sender_email`, `sender_address`, `sender_pincode`, `service_type`, `service_title`, `service_price`, `order_id`, `seller_id`, `price`, `payment_mode`, `codAmount`, `insurance`, `order_status`, `status_message`, `parcel_type`, `assign_to`, `assign_by`, `sender_order_pin`, `sender_order_pin_by`, `sender_order_status`, `datetime`, `created_at`, `updated_at`) VALUES
+(1, 'NA', 'NA', 'Vinita', '7654123000', 'vinita@gmail.com', 'Vinita Ka Ghar', '110047', 'Pravi', '9999418800', 'prabhi@gmail.com', 'Prabhi Ka Ghar', '110074', 'ex', 'Upto 200 Gm', '₹ 20.00', 'DLKEZ0IT7Y', '24', '₹ 20.00', 'online', NULL, NULL, 'Booked', NULL, 'Direct', '20', NULL, NULL, NULL, NULL, '28-03-2025 | 03:29:04 PM', '2025-03-28 09:59:04', '2025-03-28 09:59:04'),
+(9, 'NA', 'NA', 'Rose Mclean', '9087654321', 'fubeq@mailinator.com', 'Et minima eius tempo', '110061', 'Iona Norton', '9087654321', 'kinidik@mailinator.com', 'Vel laborum esse do', '110076', 'ex', '300g', '₹ 100.00', 'DL58C13DQT', '24', '₹ 100.00', 'online', NULL, 'insurance', 'Booked', NULL, 'Direct', '21', NULL, NULL, NULL, NULL, '29-03-2025 | 10:42:58 AM', '2025-03-28 23:42:58', '2025-03-28 23:42:58'),
+(10, 'NA', 'NA', 'Rishi', '9087654321', 'fubeq@mailinator.com', '63 Sector A, Noida, Uttar Pradesh, India\r\nNoida 63,F block, F Block, Sector 63, Noida, Uttar Pradesh, India', '110076', 'Tobias Thomas', '9876542321', 'rufc@gmail.com', 'noida 63', '110076', 'ex', '300g', '₹ 80.00', 'DLIJXAEWKZ', '24', '₹ 80.00', 'COD', '100', NULL, 'Booked', NULL, 'Direct', '21', '21', NULL, NULL, NULL, '29-03-2025 | 10:50:27 AM', '2025-03-28 23:50:27', '2025-03-29 01:57:14'),
+(11, 'NA', 'NA', 'ankit', '8907654321', 'anjit@gmail.com', 'noida 62', '110004', 'rohit', '9087654321', 'rohit@gmail.com', 'noida 63', '110027', 'ex', '300g', '₹ 80.00', 'DLYZS750ZC', '27', '₹ 80.00', 'COD', '100', NULL, 'Delivered to branch', NULL, 'Direct', NULL, NULL, '110004', '25', 'Delivered', '31-03-2025 | 11:50:16 AM', '2025-03-31 06:20:16', '2025-03-31 07:03:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_cod`
+--
+
+CREATE TABLE `order_cod` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` bigint(20) UNSIGNED NOT NULL,
+  `debit_by` bigint(20) UNSIGNED DEFAULT NULL,
+  `c_amount` varchar(255) DEFAULT NULL,
+  `d_amount` varchar(255) DEFAULT NULL,
+  `total` varchar(255) DEFAULT NULL,
+  `datetime` varchar(255) DEFAULT NULL,
+  `status` enum('success','cancelled','pending') NOT NULL,
+  `adminid` varchar(255) DEFAULT NULL,
+  `refno` varchar(255) DEFAULT NULL,
+  `msg` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_tokens`
+--
+
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `personal_access_tokens`
+--
+
+CREATE TABLE `personal_access_tokens` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `tokenable_type` varchar(255) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `abilities` text DEFAULT NULL,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `expires_at` timestamp NULL DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pincodes`
+--
+
+CREATE TABLE `pincodes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `pincodes` varchar(10) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `pincodes`
+--
+
+INSERT INTO `pincodes` (`id`, `pincodes`, `status`, `created_at`, `updated_at`) VALUES
+(109, '110001', 'active', '2025-03-31 05:26:27', '2025-03-31 05:26:27'),
+(110, '110002', 'active', '2025-03-31 05:26:29', '2025-03-31 05:26:29'),
+(111, '110003', 'active', '2025-03-31 05:26:31', '2025-03-31 05:26:31'),
+(112, '110004', 'active', '2025-03-31 05:26:33', '2025-03-31 05:26:33'),
+(113, '110005', 'active', '2025-03-31 05:26:34', '2025-03-31 05:26:34'),
+(114, '110006', 'active', '2025-03-31 05:26:36', '2025-03-31 05:26:36'),
+(115, '110007', 'active', '2025-03-31 05:26:38', '2025-03-31 05:26:38'),
+(116, '110008', 'active', '2025-03-31 05:26:39', '2025-03-31 05:26:39'),
+(117, '110009', 'active', '2025-03-31 05:26:42', '2025-03-31 05:26:42'),
+(118, '110010', 'active', '2025-03-31 05:26:44', '2025-03-31 05:26:44'),
+(119, '110011', 'active', '2025-03-31 05:26:46', '2025-03-31 05:26:46'),
+(120, '110013', 'active', '2025-03-31 05:26:47', '2025-03-31 05:26:47'),
+(121, '110012', 'active', '2025-03-31 05:26:54', '2025-03-31 05:26:54'),
+(122, '110014', 'active', '2025-03-31 05:26:57', '2025-03-31 05:26:57'),
+(123, '110015', 'active', '2025-03-31 05:26:59', '2025-03-31 05:26:59'),
+(124, '110016', 'active', '2025-03-31 05:27:02', '2025-03-31 05:27:02'),
+(125, '110017', 'active', '2025-03-31 05:27:03', '2025-03-31 05:27:03'),
+(127, '110018', 'active', '2025-03-31 05:27:09', '2025-03-31 05:27:09'),
+(128, '110019', 'active', '2025-03-31 05:27:15', '2025-03-31 05:27:15'),
+(129, '110020', 'active', '2025-03-31 05:30:50', '2025-03-31 05:30:50'),
+(130, '110021', 'active', '2025-03-31 05:30:52', '2025-03-31 05:30:52'),
+(131, '110022', 'active', '2025-03-31 05:30:55', '2025-03-31 05:30:55'),
+(132, '110023', 'active', '2025-03-31 05:30:57', '2025-03-31 05:30:57'),
+(133, '110024', 'active', '2025-03-31 05:31:00', '2025-03-31 05:31:00'),
+(134, '110025', 'active', '2025-03-31 05:31:02', '2025-03-31 05:31:02'),
+(135, '110026', 'active', '2025-03-31 05:31:05', '2025-03-31 05:31:05'),
+(136, '110027', 'active', '2025-03-31 05:31:08', '2025-03-31 05:31:08'),
+(137, '110028', 'active', '2025-03-31 05:31:10', '2025-03-31 05:31:10'),
+(138, '110029', 'active', '2025-03-31 05:31:17', '2025-03-31 05:31:17'),
+(139, '110030', 'active', '2025-03-31 05:31:22', '2025-03-31 05:31:22'),
+(140, '110031', 'active', '2025-03-31 05:31:32', '2025-03-31 05:31:32'),
+(141, '110032', 'active', '2025-03-31 05:31:34', '2025-03-31 05:31:34'),
+(142, '110033', 'active', '2025-03-31 05:31:37', '2025-03-31 05:31:37'),
+(143, '110034', 'active', '2025-03-31 05:31:39', '2025-03-31 05:31:39'),
+(144, '110035', 'active', '2025-03-31 05:31:50', '2025-03-31 05:31:50'),
+(145, '110036', 'active', '2025-03-31 05:31:52', '2025-03-31 05:31:52'),
+(146, '110037', 'active', '2025-03-31 05:31:55', '2025-03-31 05:31:55'),
+(147, '110038', 'active', '2025-03-31 05:31:57', '2025-03-31 05:31:57'),
+(148, '110039', 'active', '2025-03-31 05:32:00', '2025-03-31 05:32:00'),
+(149, '110040', 'active', '2025-03-31 05:32:07', '2025-03-31 05:32:07');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `services`
+--
+
+CREATE TABLE `services` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `price` varchar(255) NOT NULL,
+  `type` varchar(255) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `services`
+--
+
+INSERT INTO `services` (`id`, `title`, `price`, `type`, `status`, `created_at`, `updated_at`) VALUES
+(3, '300g', '50', 'ex', 'active', '2025-03-23 23:29:26', '2025-03-23 23:29:26'),
+(4, '505g ot 1kg', '55', 'ss', 'active', '2025-03-23 23:29:49', '2025-03-23 23:29:49'),
+(5, 'Upto 200 Gm', '20', 'ex', 'active', '2025-03-26 12:14:33', '2025-03-26 12:14:33'),
+(6, '3km', '50', 'se', 'active', '2025-03-27 06:13:31', '2025-03-27 06:13:31'),
+(7, '1km', '5', 'se', 'active', '2025-03-27 06:13:39', '2025-03-27 06:13:39');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `servicetypes`
+--
+
+CREATE TABLE `servicetypes` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userId` varchar(255) NOT NULL,
+  `services` varchar(255) NOT NULL,
+  `servicesType` varchar(255) NOT NULL,
+  `servicesId` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `email_verified_at` timestamp NULL DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `address` text DEFAULT NULL,
+  `category` varchar(255) DEFAULT NULL,
+  `gst_no` varchar(255) DEFAULT NULL,
+  `gst_img` varchar(255) DEFAULT NULL,
+  `pin_code` varchar(255) DEFAULT NULL,
+  `type` enum('admin','seller','booking','delivery','delivery_boy') NOT NULL DEFAULT 'admin',
+  `logo` varchar(255) DEFAULT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active',
+  `remember_token` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `phone`, `password`, `address`, `category`, `gst_no`, `gst_img`, `pin_code`, `type`, `logo`, `status`, `remember_token`, `created_at`, `updated_at`) VALUES
+(1, 'Admin-DelhiParcel', 'admin@gmail.com', NULL, NULL, '$2y$10$b/feN/hJ6jWKplyei7O0bOFkHV8G0AxhbMZYGbDnzkWAmDDr5d7S6', NULL, NULL, NULL, NULL, NULL, 'admin', NULL, 'active', NULL, '2025-03-20 23:22:14', '2025-03-20 23:22:14');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wallets`
+--
+
+CREATE TABLE `wallets` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `userid` bigint(20) UNSIGNED NOT NULL,
+  `c_amount` varchar(255) DEFAULT NULL,
+  `d_amount` varchar(255) DEFAULT NULL,
+  `total` varchar(255) DEFAULT NULL,
+  `datetime` varchar(255) DEFAULT NULL,
+  `status` enum('success','cancelled','pending') NOT NULL,
+  `adminid` varchar(255) DEFAULT NULL,
+  `refno` varchar(255) DEFAULT NULL,
+  `msg` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `wallets`
+--
+
+INSERT INTO `wallets` (`id`, `userid`, `c_amount`, `d_amount`, `total`, `datetime`, `status`, `adminid`, `refno`, `msg`, `created_at`, `updated_at`) VALUES
+(1, 2, '5000', NULL, '5000', '24-03-2025 | 03:27:54 PM', 'success', NULL, NULL, 'credit', '2025-03-24 04:27:54', '2025-03-24 04:27:54'),
+(2, 2, NULL, '80.00', '4920', '24-03-2025 | 03:29:43 PM', 'success', NULL, NULL, 'debit', '2025-03-24 04:29:43', '2025-03-24 04:29:43'),
+(3, 2, NULL, '85.00', '4835', '25-03-2025 | 01:07:17 PM', 'success', NULL, NULL, 'debit', '2025-03-25 02:07:17', '2025-03-25 02:07:17'),
+(4, 14, '100', NULL, '100', '27-03-2025 | 01:08:49 PM', 'success', NULL, NULL, 'credit', '2025-03-27 07:38:49', '2025-03-27 07:38:49'),
+(5, 14, NULL, '20', '80', '27-03-2025 | 01:09:22 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:39:22', '2025-03-27 07:39:22'),
+(6, 14, NULL, '20.00', '60', '27-03-2025 | 01:09:27 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:39:27', '2025-03-27 07:39:27'),
+(7, 14, NULL, '55', '5', '27-03-2025 | 01:09:56 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:39:56', '2025-03-27 07:39:56'),
+(8, 14, '500', NULL, '505', '27-03-2025 | 01:20:07 PM', 'success', NULL, NULL, 'credit', '2025-03-27 07:50:07', '2025-03-27 07:50:07'),
+(9, 14, NULL, '50', '455', '27-03-2025 | 01:20:58 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:50:58', '2025-03-27 07:50:58'),
+(10, 14, NULL, '85.00', '370', '27-03-2025 | 01:21:11 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:51:11', '2025-03-27 07:51:11'),
+(11, 14, NULL, '50.00', '320', '27-03-2025 | 01:22:33 PM', 'success', NULL, NULL, 'debit', '2025-03-27 07:52:33', '2025-03-27 07:52:33'),
+(12, 14, NULL, '50.00', '270', '27-03-2025 | 04:02:45 PM', 'success', NULL, NULL, 'debit', '2025-03-27 10:32:45', '2025-03-27 10:32:45'),
+(13, 14, NULL, '100.00', '170', '27-03-2025 | 04:22:31 PM', 'success', NULL, NULL, 'debit', '2025-03-27 10:52:31', '2025-03-27 10:52:31'),
+(14, 14, NULL, '100.00', '70', '27-03-2025 | 04:22:36 PM', 'success', NULL, NULL, 'debit', '2025-03-27 10:52:36', '2025-03-27 10:52:36');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `web_orders`
+--
+
+CREATE TABLE `web_orders` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `order_id` varchar(255) NOT NULL,
+  `service_type` varchar(255) NOT NULL,
+  `service_id` varchar(255) NOT NULL,
+  `pickupAddress` varchar(255) DEFAULT NULL,
+  `deliveryAddress` varchar(255) DEFAULT NULL,
+  `sender_name` varchar(255) NOT NULL,
+  `sender_number` varchar(255) NOT NULL,
+  `sender_email` varchar(255) NOT NULL,
+  `sender_address` text NOT NULL,
+  `senderPinCode` varchar(255) NOT NULL,
+  `receiver_name` varchar(255) NOT NULL,
+  `receiver_number` varchar(255) NOT NULL,
+  `receiver_email` varchar(255) NOT NULL,
+  `receiver_address` text NOT NULL,
+  `receiverPinCode` varchar(255) NOT NULL,
+  `payment_methods` varchar(255) NOT NULL,
+  `codAmount` varchar(255) DEFAULT NULL,
+  `insurance` varchar(255) DEFAULT NULL,
+  `price` varchar(255) NOT NULL,
+  `order_status` enum('Booked','Item Picked Up','Returned','In Transit','Arrived at Destination','Out for Delivery','Delivered','Not Delivered','Returning to Origin','Out for Delivery to Origin','Cancelled') NOT NULL,
+  `status_message` text DEFAULT NULL,
+  `parcel_type` varchar(255) DEFAULT NULL,
+  `assign_to` varchar(255) DEFAULT NULL,
+  `datetime` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `branchs`
+--
+ALTER TABLE `branchs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `branchs_email_unique` (`email`);
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cod`
+--
+ALTER TABLE `cod`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `cod_amount`
+--
+ALTER TABLE `cod_amount`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `dlyboy`
+--
+ALTER TABLE `dlyboy`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `enquirys`
+--
+ALTER TABLE `enquirys`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `enquirys_email_unique` (`email`);
+
+--
+-- Indexes for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`);
+
+--
+-- Indexes for table `feed_backs`
+--
+ALTER TABLE `feed_backs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `migrations`
+--
+ALTER TABLE `migrations`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `order_cod`
+--
+ALTER TABLE `order_cod`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `password_reset_tokens`
+--
+ALTER TABLE `password_reset_tokens`
+  ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `personal_access_tokens_token_unique` (`token`),
+  ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
+
+--
+-- Indexes for table `pincodes`
+--
+ALTER TABLE `pincodes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `services`
+--
+ALTER TABLE `services`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `servicetypes`
+--
+ALTER TABLE `servicetypes`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `users_email_unique` (`email`);
+
+--
+-- Indexes for table `wallets`
+--
+ALTER TABLE `wallets`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `web_orders`
+--
+ALTER TABLE `web_orders`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `branchs`
+--
+ALTER TABLE `branchs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT for table `categories`
+--
+ALTER TABLE `categories`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT for table `cod`
+--
+ALTER TABLE `cod`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `cod_amount`
+--
+ALTER TABLE `cod_amount`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `dlyboy`
+--
+ALTER TABLE `dlyboy`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `enquirys`
+--
+ALTER TABLE `enquirys`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `failed_jobs`
+--
+ALTER TABLE `failed_jobs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `feed_backs`
+--
+ALTER TABLE `feed_backs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `migrations`
+--
+ALTER TABLE `migrations`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `order_cod`
+--
+ALTER TABLE `order_cod`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `personal_access_tokens`
+--
+ALTER TABLE `personal_access_tokens`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pincodes`
+--
+ALTER TABLE `pincodes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=150;
+
+--
+-- AUTO_INCREMENT for table `services`
+--
+ALTER TABLE `services`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `servicetypes`
+--
+ALTER TABLE `servicetypes`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `wallets`
+--
+ALTER TABLE `wallets`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT for table `web_orders`
+--
+ALTER TABLE `web_orders`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
