@@ -152,14 +152,10 @@ class SellerController extends Controller
         $redirectUrl = route('wallet.payment.callback');
         $callbackUrl = $redirectUrl;
 
-        // Get latest wallet total for user
         $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
         $currentTotal = $latestWallet ? $latestWallet->total : 0;
-
-        // Calculate new total
         $newTotal = $currentTotal + $amount;
 
-        // Save pending transaction
         $wallet = new Wallet();
         $wallet->userid = $user;
         $wallet->c_amount = $amount;
@@ -172,7 +168,6 @@ class SellerController extends Controller
         $wallet->msg = 'credit';
         $wallet->save();
 
-        // Create payload
         $amountInPaise = (int) ($amount * 100);
         $payload = [
             'merchantId' => $merchantId,
@@ -187,13 +182,11 @@ class SellerController extends Controller
             ],
         ];
 
-
         $jsonPayload = json_encode($payload);
         $base64Payload = base64_encode($jsonPayload);
         $stringToSign = $base64Payload . "/pg/v1/pay" . $saltKey;
         $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
 
-        // Send request to PhonePe
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'X-VERIFY' => $xVerify,
@@ -209,20 +202,16 @@ class SellerController extends Controller
             return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
         }
     }
-
     public function walletPaymentCallback(Request $request)
     {
         $input = $request->all();
 
-        // PhonePe callback payload structure varies
         $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
-        $code = $input['code'] ?? null;
-
         if (!$merchantTransactionId) {
             return redirect()->route('seller.wallet')->with('error', 'Invalid callback data.');
         }
 
-        // Re-verify the transaction status from PhonePe
+        // Re-verify with PhonePe
         $merchantId = 'M1SMOAY31YWH';
         $saltKey = '06df03a2-65b9-42f8-b7b9-26590674bc29';
         $saltIndex = 1;
@@ -240,22 +229,81 @@ class SellerController extends Controller
 
         if (isset($res['success']) && $res['success'] === true && $res['code'] === 'PAYMENT_SUCCESS') {
             $wallet = Wallet::where('refno', $merchantTransactionId)->first();
+
             if ($wallet && $wallet->status !== 'success') {
+                // Update wallet status
                 $last = Wallet::where('userid', $wallet->userid)
                     ->where('status', 'success')
                     ->orderBy('id', 'desc')
                     ->first();
                 $previousTotal = $last ? $last->total : 0;
+
                 $wallet->total = $previousTotal + $wallet->c_amount;
                 $wallet->status = 'success';
                 $wallet->save();
+
+                // Restore user session
+                Auth::loginUsingId($wallet->userid);
+
+                // Restore session SID if needed
+                Session::put('sid', $wallet->userid);
             }
-            return redirect()->route('seller.wallet')->with('success', 'Wallet updated!');
+
+            return redirect()->route('seller.wallet')->with('success', 'Wallet updated successfully!');
         } else {
             Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
             return redirect()->route('seller.wallet')->with('error', 'Payment failed.');
         }
     }
+
+
+
+    // public function walletPaymentCallback(Request $request)
+    // {
+    //     $input = $request->all();
+
+    //     // PhonePe callback payload structure varies
+    //     $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
+    //     $code = $input['code'] ?? null;
+
+    //     if (!$merchantTransactionId) {
+    //         return redirect()->route('seller.wallet')->with('error', 'Invalid callback data.');
+    //     }
+
+    //     // Re-verify the transaction status from PhonePe
+    //     $merchantId = 'M1SMOAY31YWH';
+    //     $saltKey = '06df03a2-65b9-42f8-b7b9-26590674bc29';
+    //     $saltIndex = 1;
+
+    //     $url = "https://api.phonepe.com/apis/hermes/pg/v1/status/{$merchantId}/{$merchantTransactionId}";
+    //     $stringToSign = "/pg/v1/status/{$merchantId}/{$merchantTransactionId}" . $saltKey;
+    //     $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
+
+    //     $response = Http::withHeaders([
+    //         'X-VERIFY' => $xVerify,
+    //         'X-MERCHANT-ID' => $merchantId
+    //     ])->get($url);
+
+    //     $res = $response->json();
+
+    //     if (isset($res['success']) && $res['success'] === true && $res['code'] === 'PAYMENT_SUCCESS') {
+    //         $wallet = Wallet::where('refno', $merchantTransactionId)->first();
+    //         if ($wallet && $wallet->status !== 'success') {
+    //             $last = Wallet::where('userid', $wallet->userid)
+    //                 ->where('status', 'success')
+    //                 ->orderBy('id', 'desc')
+    //                 ->first();
+    //             $previousTotal = $last ? $last->total : 0;
+    //             $wallet->total = $previousTotal + $wallet->c_amount;
+    //             $wallet->status = 'success';
+    //             $wallet->save();
+    //         }
+    //         return redirect()->route('seller.wallet')->with('success', 'Wallet updated!');
+    //     } else {
+    //         Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
+    //         return redirect()->route('seller.wallet')->with('error', 'Payment failed.');
+    //     }
+    // }
 
 
 
