@@ -54,7 +54,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://delhiparcel.nilet.in'),
+    'url' => env('APP_URL', 'https://delhiparcel.com'),
 
     'asset_url' => env('ASSET_URL', '/'),
 
