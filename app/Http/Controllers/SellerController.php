@@ -23,6 +23,8 @@ use App\Mail\SellerBookingConfirmation;
 use Illuminate\Support\Facades\Http;  // for phone pay
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class SellerController extends Controller
@@ -249,7 +251,8 @@ class SellerController extends Controller
                 Session::put('sid', $wallet->userid);
             }
 
-            return redirect()->route('seller.wallet')->with('success', 'Wallet updated successfully!');
+            // return redirect()->route('seller.wallet')->with('success', 'Wallet updated successfully!');
+            return redirect()->back()->with('success', 'Wallet updated successfully!');
         } else {
             Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
             return redirect()->route('seller.wallet')->with('error', 'Payment failed.');
