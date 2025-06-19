@@ -143,7 +143,16 @@ class SellerController extends Controller
 
     public function addWalletAmount(Request $request)
     {
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
         $user = Session::get('sid');
+        if (!$user) {
+            \Log::error('User session not found');
+            return back()->with('error', 'Session expired. Please log in again.');
+        }
+
         $amount = $request->amount;
 
         $merchantId = 'M1SMOAY31YWH';
@@ -189,27 +198,38 @@ class SellerController extends Controller
         $stringToSign = $base64Payload . "/pg/v1/pay" . $saltKey;
         $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'X-VERIFY' => $xVerify,
-            'X-MERCHANT-ID' => $merchantId,
-        ])->withBody(json_encode(['request' => $base64Payload]), 'application/json')
-            ->post('https://api.phonepe.com/apis/hermes/pg/v1/pay');
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+                'X-VERIFY' => $xVerify,
+                'X-MERCHANT-ID' => $merchantId,
+            ])->withBody(json_encode(['request' => $base64Payload]), 'application/json')
+                ->post('https://api.phonepe.com/apis/hermes/pg/v1/pay');
 
-        $res = $response->json();
-        if (isset($res['success']) && $res['success']) {
-            $paymentUrl = $res['data']['instrumentResponse']['redirectInfo']['url'];
-            return redirect()->away($paymentUrl);
-        } else {
-            return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+            $res = $response->json();
+            \Log::info('PhonePe Payment Initiation Response:', $res);
+
+            if (isset($res['success']) && $res['success']) {
+                $paymentUrl = $res['data']['instrumentResponse']['redirectInfo']['url'];
+                return redirect()->away($paymentUrl);
+            } else {
+                \Log::error('Payment initiation failed:', $res);
+                return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error initiating payment: ' . $e->getMessage());
+            return back()->with('error', 'An error occurred while initiating payment.');
         }
     }
     public function walletPaymentCallback(Request $request)
     {
-        $input = $request->all();
+        \Log::info('Wallet Payment Callback Request:', $request->all());
 
+        $input = $request->all();
         $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
+
         if (!$merchantTransactionId) {
+            \Log::error('Invalid callback data: No merchantTransactionId');
             return redirect()->route('seller.wallet')->with('error', 'Invalid callback data.');
         }
 
@@ -222,40 +242,48 @@ class SellerController extends Controller
         $stringToSign = "/pg/v1/status/{$merchantId}/{$merchantTransactionId}" . $saltKey;
         $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
 
-        $response = Http::withHeaders([
-            'X-VERIFY' => $xVerify,
-            'X-MERCHANT-ID' => $merchantId
-        ])->get($url);
+        try {
+            $response = Http::withHeaders([
+                'X-VERIFY' => $xVerify,
+                'X-MERCHANT-ID' => $merchantId
+            ])->get($url);
 
-        $res = $response->json();
+            $res = $response->json();
+            \Log::info('PhonePe Status API Response:', $res);
 
-        if (isset($res['success']) && $res['success'] === true && $res['code'] === 'PAYMENT_SUCCESS') {
-            $wallet = Wallet::where('refno', $merchantTransactionId)->first();
+            if (isset($res['success']) && $res['success'] === true && $res['code'] === 'PAYMENT_SUCCESS') {
+                $wallet = Wallet::where('refno', $merchantTransactionId)->first();
 
-            if ($wallet && $wallet->status !== 'success') {
-                // Update wallet status
-                $last = Wallet::where('userid', $wallet->userid)
-                    ->where('status', 'success')
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $previousTotal = $last ? $last->total : 0;
+                if ($wallet && $wallet->status !== 'success') {
+                    // Update wallet status
+                    $last = Wallet::where('userid', $wallet->userid)
+                        ->where('status', 'success')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    $previousTotal = $last ? $last->total : 0;
 
-                $wallet->total = $previousTotal + $wallet->c_amount;
-                $wallet->status = 'success';
-                $wallet->save();
+                    $wallet->total = $previousTotal + $wallet->c_amount;
+                    $wallet->status = 'success';
+                    $wallet->save();
 
-                // Restore user session
-                Auth::loginUsingId($wallet->userid);
+                    // Restore user session
+                    Auth::loginUsingId($wallet->userid);
+                    Session::put('sid', $wallet->userid);
 
-                // Restore session SID if needed
-                Session::put('sid', $wallet->userid);
+                    \Log::info('Wallet updated successfully for transaction: ' . $merchantTransactionId);
+                    return redirect()->route('seller.wallet')->with('success', 'Wallet updated successfully!');
+                } else {
+                    \Log::warning('Wallet not found or already success for transaction: ' . $merchantTransactionId);
+                    return redirect()->route('seller.wallet')->with('error', 'Wallet already updated or not found.');
+                }
+            } else {
+                \Log::error('Payment failed for transaction: ' . $merchantTransactionId, ['response' => $res]);
+                Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
+                return redirect()->route('seller.wallet')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
             }
-
-            // return redirect()->route('seller.wallet')->with('success', 'Wallet updated successfully!');
-            return redirect()->back()->with('success', 'Wallet updated successfully!');
-        } else {
-            Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
-            return redirect()->route('seller.wallet')->with('error', 'Payment failed.');
+        } catch (\Exception $e) {
+            \Log::error('Error in wallet payment callback: ' . $e->getMessage());
+            return redirect()->route('seller.wallet')->with('error', 'An error occurred during payment processing.');
         }
     }
 
