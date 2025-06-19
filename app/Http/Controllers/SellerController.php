@@ -173,7 +173,7 @@ class SellerController extends Controller
         $wallet->d_amount = 0;
         $wallet->total = $newTotal;
         $wallet->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $wallet->status = 'pending';
+        $wallet->status = 'success';
         $wallet->adminid = null;
         $wallet->refno = $transactionId;
         $wallet->msg = 'credit';
