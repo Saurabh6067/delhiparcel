@@ -81,26 +81,28 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="walletAdd">
+                    <!-- <form id="walletAdd">
+                                <div class="input-group mb-3">
+                                    <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
+                                        aria-describedby="basic-addon2" name="amount" required>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-success">Pay Now</button>
+                                    </div>
+                                </div>
+                            </form> -->
+
+                    <!-- This Form is Phonepay Gateway-->
+                    <form method="POST" action="{{ route('seller.addWalletAmount') }}">
+                        @csrf
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
-                                aria-describedby="basic-addon2" name="amount" required>
+                            <input type="text" class="form-control" name="amount" placeholder="0.0" required>
                             <div class="input-group-append">
-                                <button class="btn btn-success">Pay Now</button>
+                                <button type="submit" class="btn btn-success">Pay Now</button>
                             </div>
                         </div>
                     </form>
-                    
-                    <!-- This Form is Phonepay Gateway-->
-                    <!--<form method="POST" action="{{ route('seller.addWalletAmount') }}">-->
-                    <!--    @csrf-->
-                    <!--    <div class="input-group mb-3">-->
-                    <!--        <input type="text" class="form-control" name="amount" placeholder="0.0" required>-->
-                    <!--        <div class="input-group-append">-->
-                    <!--            <button type="submit" class="btn btn-success">Pay Now</button>-->
-                    <!--        </div>-->
-                    <!--    </div>-->
-                    <!--</form>-->
+
+
                 </div>
             </div>
         </div>
@@ -120,7 +122,7 @@
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
     <!-- Page specific script -->
     <script>
-        $(function() {
+        $(function () {
             $("#example1").DataTable({
                 "responsive": true,
                 "lengthChange": false,
@@ -138,8 +140,8 @@
             });
         });
 
-        $(document).ready(function() {
-            $("#walletAdd").on("submit", function(e) {
+        $(document).ready(function () {
+            $("#walletAdd").on("submit", function (e) {
                 e.preventDefault();
                 let formData = new FormData(this);
 
@@ -150,7 +152,7 @@
                     processData: false,
                     contentType: false,
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         $('#walletAdd')[0].reset();
                         if (response.success) {
                             Toast("success", response.message);
@@ -160,9 +162,9 @@
                             Toast("error", response.message);
                         }
                     },
-                    error: function(err) {
+                    error: function (err) {
                         $('#exampleModal').modal('hide');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             location.reload();
                         }, 1000);
                         Toast("success", "Amount added successfully!");

@@ -14,12 +14,12 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         @media screen and (min-width: 250px) and (max-width: 592px) {
             .hero {
                 /*height: 80vh;*/
                 /*background-image: none !important;*/
-               
+
             }
         }
 
@@ -104,7 +104,8 @@
             .image_block_1 {
                 margin-top: 60px !important;
             }
-            .btn-mobile_section{
+
+            .btn-mobile_section {
                 font-size: 10px;
             }
         }

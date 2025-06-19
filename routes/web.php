@@ -78,7 +78,7 @@ Route::get('/AdminPanel', function () {
 });
 Route::post('/Admin-Login', [AdminController::class, 'adminLogin'])->name('admin.login');
 Route::middleware(['checklogin'])->group(function () {
-    
+
     // 16 june 
     Route::get('/service_estimited_time', [AdminController::class, 'serviceEstimitedTime']);
     Route::post('/service_estimated_time', [AdminController::class, 'storeEstimatedService'])->name('store_estimated_service');
@@ -86,21 +86,21 @@ Route::middleware(['checklogin'])->group(function () {
     Route::put('/admin/estimated-services/{id}', [AdminController::class, 'updateEstimatedService']);
     Route::delete('/admin/estimated-services/{id}', [AdminController::class, 'deleteEstimatedService']);
     Route::get('/admin/estimated-services/{id}', [AdminController::class, 'getEstimatedService']);
-    
-    
-    
+
+
+
     // all cod history manage delivery panel 
     Route::post('/admin-update-cod-status', [AdminController::class, 'adminupdateCodStatus'])->name('admin.updateCodStatus');
-    
+
     // admin panel delivery boy earning perticular 
     Route::get('/deliveryboy_earning/{id}', [AdminController::class, 'DeliveryboyEarning']);
-    
+
     Route::get('/admin-logout', [AdminController::class, 'adminLogout'])->name('admin.logout');
     Route::any('/admin-dashboard', [AdminController::class, 'adminDashboard']);
     Route::get('/admin-order-details/{action}', [AdminController::class, 'adminOrderDetails']);
     Route::get('/admin/toDayRevenueOrder', [AdminController::class, 'toDayRevenueOrder']);
     Route::any('/admin-revenueHistory', [AdminController::class, 'revenuedateHistory'])->name('admin.revenueHistory');
-    
+
 
     Route::any('/super-express/{id?}', [AdminController::class, 'superExpress'])->name('admin.superExpress');
     Route::any('/addUpdate-Super-Express-Services', [AdminController::class, 'addSuperExpressServices'])->name('admin.addSuperExpressServices');
@@ -129,12 +129,12 @@ Route::middleware(['checklogin'])->group(function () {
     // All Delivery Branch 
     Route::any('/all-branch', [AdminController::class, 'allBranch'])->name('admin.allBranch');
     Route::any('/admin-branch/{id?}', [AdminController::class, 'adminBranch'])->name('admin.branch');
-    
+
     // All Booking Branch 
     Route::any('/all-booking-branch', [AdminController::class, 'allBookingBranch'])->name('admin.allBookingBranch');
     Route::any('/admin-booking-branch/{id?}', [AdminController::class, 'adminBookingBranch'])->name('admin.bookingbranch');  // edit ke case me 
-    
-    
+
+
     Route::any('/all-seller-branch', [AdminController::class, 'allSellerBranch'])->name('admin.seller.allBranch');
     Route::any('/all-booking-branchs', [AdminController::class, 'allBookingBranchData'])->name('admin.booking.allBranch');
 
@@ -143,7 +143,7 @@ Route::middleware(['checklogin'])->group(function () {
     Route::get('/manage-services-type/{id}', [AdminController::class, 'manageServicesType']);
     Route::any('/get-services-type', [AdminController::class, 'servicesType'])->name('admin.servicesType');
     Route::any('/add-Services-Type', [AdminController::class, 'addServicesType'])->name('admin.addServicesType');
-    
+
     Route::get('/delete-manage-services-type/{id}', [AdminController::class, 'deleteServiceType']);    // for delete 
 
     // Route::get('/branch-AllDeliveryBoy/{id}', [AdminController::class, 'branchAllDeliveryBoy']);
@@ -172,19 +172,19 @@ Route::middleware(['checklogin'])->group(function () {
 
     // Route::any('/admin-branch-COD-History/{id}', [AdminController::class, 'branchCodHistory']);
     Route::any('/admin-branch-date-COD-History', [AdminController::class, 'branchDateCodHistory'])->name('admin.branch.date.COD.history');
-    
+
     Route::any('/admin-branch-COD-History/{id}', [AdminController::class, 'branchCodHistory'])->name('admin-branch-COD-History');
     Route::any('/admin-deduct-branch-COD', [AdminController::class, 'deductBranchCod'])->name('admin.deductBranchCod'); // deduct wallet 
-    
+
     // 12 june my code 
     Route::any('/admin-branch-COD-History-DateFilter', [AdminController::class, 'branchCodHistorydatefilter'])->name('admin-branch-COD-History-datefilter');
-        // 16 june admin 
+    // 16 june admin 
     Route::any('/all-deliveryboy_enq', [AdminController::class, 'allDeliveryBoyEnq'])->name('admin.deliveryboy_enq');
     Route::any('/all-franchise_enq', [AdminController::class, 'allFranchiseEnq'])->name('admin.franchise_enq');
     Route::any('/delete-deliveryboysform', [AdminController::class, 'deletedeliveryboysform'])->name('admin.delete.deliveryboysform');
     Route::any('/delete-franchiseform', [AdminController::class, 'deletefranchiseform'])->name('admin.delete.franchiseform');
 
-    
+
 
     Route::any('/all-Enquiry', [AdminController::class, 'allEnquiry'])->name('admin.allEnquiry');
     Route::any('/delete-enquiry', [AdminController::class, 'deleteEnquiry'])->name('admin.delete.enquiry');
@@ -201,13 +201,13 @@ Route::middleware(['checklogin'])->group(function () {
     // 14 june 
     Route::get('/monthly-admin-invoice', [AdminController::class, 'MonthlyAdminInvoice']);
     Route::get('/get-branches', [AdminController::class, 'getBranches']);
-    
+
     // Route::get('/get-branches', function () {
     // $type = request()->input('type', 'Seller');
     // $branches = \App\Models\Branch::where('type', $type)->get(['id', 'fullname']);
     // return response()->json(['branches' => $branches]);
     // });
-    
+
     Route::any('/admin-label/{id}', [AdminController::class, 'adminLabel']);
     Route::any('/admin-direct-orders-status', [AdminController::class, 'webDirectOrdersStatus'])->name('admin.DirectOrdersStatus.get');
     Route::any('/admin-direct-orders-assign', [AdminController::class, 'webDirectOrdersAssign'])->name('admin.DirectOrdersAssign.get');
@@ -221,7 +221,7 @@ Route::middleware(['checklogin'])->group(function () {
 
     // today cod history 
     Route::any('/admin-Today-COD-History', [AdminController::class, 'TodayCodHistory'])->name('admin.TodayCodHistory');
-    
+
     // all cod history 
     Route::any('/admin-All-COD-History', [AdminController::class, 'allCodHistory'])->name('admin.allCodHistory');
     Route::any('/delivery-Admin-COD-History', [AdminController::class, 'adminCodHistory'])->name('delivery.adminCodHistory');
@@ -257,16 +257,16 @@ Route::middleware(['sellerlogin'])->group(function () {
     Route::any('/seller-add-wallet', [SellerController::class, 'addWalletAmount'])->name('seller.addWalletAmount');
     // addon this url for phonepay 2june
     Route::match(['get', 'post'], '/wallet/payment/callback', [SellerController::class, 'walletPaymentCallback'])->name('wallet.payment.callback');
-    
-    
+
+
     Route::any('/seller-cod-sattlement', [SellerController::class, 'CodSellerAmount']); // seller sattlement 
-    
-    
+
+
 
     Route::any('/seller-add-Delivery-Order', [SellerController::class, 'addDeliveryOrder'])->name('seller.addDeliveryOrder');
     Route::any('/seller-add-Pickup-Order', [SellerController::class, 'addPickupOrder'])->name('seller.addPickupOrder');
 
-    Route::post('/seller-addOrderParcel', [SellerController::class, 'addOrderParcel'])->name('seller.addOrderParcel'); 
+    Route::post('/seller-addOrderParcel', [SellerController::class, 'addOrderParcel'])->name('seller.addOrderParcel');
     Route::get('/seller-allOrders', [SellerController::class, 'allOrders'])->name('seller.allOrders');
     Route::get('/order-details/{action}', [SellerController::class, 'orderDetails']);
 
@@ -340,9 +340,9 @@ Route::middleware(['bookinglogin'])->group(function () {
 
     Route::any('/booking-order-cod-history', [BookingController::class, 'orderCodHistory'])->name('booking.orderCodHistory');
     Route::any('/booking-order-cod-Amount', [BookingController::class, 'orderCodAmount'])->name('booking.orderCodAmount');
-    
+
     Route::any('/booking-cod-sattlement', [BookingController::class, 'CodBookingAmount']); // seller sattlement 
-     
+
 });
 // Booking End
 
@@ -354,9 +354,9 @@ Route::post('/delivery-login', [DeliveryController::class, 'deliveryLogin'])->na
 Route::middleware(['deliverylogin'])->group(function () {
     // here 31 may for filter 
     Route::get('/delivery/branch/{branchId}/orders-by-delivery-boy', [DeliveryController::class, 'getOrdersByDeliveryBoyPincode'])->name('delivery.orders.by.delivery.boy');
-    
-    
-    
+
+
+
     Route::any('/delivery-setting', [DeliveryController::class, 'setting'])->name('delivery.setting');
     Route::any('/delivery-update-profile', [DeliveryController::class, 'updateProfile'])->name('delivery.update.profile');
     Route::any('/delivery-password-change', [DeliveryController::class, 'passwordChange'])->name('delivery.passwordChange');
@@ -403,7 +403,7 @@ Route::middleware(['deliverylogin'])->group(function () {
     Route::any('/delivery-label/{id}', [DeliveryController::class, 'deliveryLabel']);
     Route::any('/delivery-All-COD-History', [DeliveryController::class, 'allCodHistory'])->name('delivery.allCodHistory');
     Route::post('/update-cod-status', [DeliveryController::class, 'updateCodStatus'])->name('delivery.updateCodStatus');
-    
+
 });
 // Delivery End
 
@@ -413,7 +413,7 @@ Route::get('/DeliveryBoy', function () {
 });
 Route::post('/delivery-boy-login', [DeliveryBoyController::class, 'deliveryLogin'])->name('deliveryBoy.login');
 Route::middleware(['deliveryboy'])->group(function () {
-   
+
     Route::any('/delivery-boy-dashboard', [DeliveryBoyController::class, 'dashboard']);
     Route::any('/delivery-boy-logout', [DeliveryBoyController::class, 'logout'])->name('delivery.boy.logout');
     Route::any('/delivery-boy-setting', [DeliveryBoyController::class, 'setting'])->name('delivery.boy.setting');
@@ -424,7 +424,7 @@ Route::middleware(['deliveryboy'])->group(function () {
     Route::get('delivery-boy-wallet', [DeliveryBoyController::class, 'deliveryBoyWallet'])->name('delivery.boy.wallet');
     Route::get('delivery-boy-totalOrders', [DeliveryBoyController::class, 'deliveryBoyTotalOrders'])->name('delivery.boy.totalOrders');
     Route::post('delivery-boy-cod-submit', [DeliveryBoyController::class, 'submitCodToBranch'])->name('delivery.boy.cod.submit');
-    
+
     // my earning 
     Route::get('delivery-boy-myearning', [DeliveryBoyController::class, 'deliveryBoyMyEarning'])->name('delivery.boy.myearning');
 
