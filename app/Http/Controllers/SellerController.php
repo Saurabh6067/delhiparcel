@@ -222,71 +222,71 @@ class SellerController extends Controller
         }
     }
 
-    // public function walletPaymentCallback(Request $request)
-    // {
-    //     Log::info('Wallet Payment Callback Request:', $request->all());
+    public function walletPaymentCallback(Request $request)
+    {
+        Log::info('Wallet Payment Callback Request:', $request->all());
 
-    //     $input = $request->all();
-    //     $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
+        $input = $request->all();
+        $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
 
-    //     if (!$merchantTransactionId) {
-    //         Log::error('Invalid callback data: No merchantTransactionId');
-    //         return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Invalid callback data.');
-    //     }
+        if (!$merchantTransactionId) {
+            Log::error('Invalid callback data: No merchantTransactionId');
+            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Invalid callback data.');
+        }
 
-    //     // Re-verify with PhonePe
-    //     $merchantId = env('PHONEPE_MERCHANT_ID', 'M1SMOAY31YWH');
-    //     $saltKey = env('PHONEPE_SALT_KEY', '06df03a2-65b9-42f8-b7b9-26590674bc29');
-    //     $saltIndex = env('PHONEPE_SALT_INDEX', 1);
+        // Re-verify with PhonePe
+        $merchantId = env('PHONEPE_MERCHANT_ID', 'M1SMOAY31YWH');
+        $saltKey = env('PHONEPE_SALT_KEY', '06df03a2-65b9-42f8-b7b9-26590674bc29');
+        $saltIndex = env('PHONEPE_SALT_INDEX', 1);
 
-    //     $url = "https://api.phonepe.com/apis/hermes/pg/v1/status/{$merchantId}/{$merchantTransactionId}";
-    //     $stringToSign = "/pg/v1/status/{$merchantId}/{$merchantTransactionId}" . $saltKey;
-    //     $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
+        $url = "https://api.phonepe.com/apis/hermes/pg/v1/status/{$merchantId}/{$merchantTransactionId}";
+        $stringToSign = "/pg/v1/status/{$merchantId}/{$merchantTransactionId}" . $saltKey;
+        $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
 
-    //     try {
-    //         $response = Http::withHeaders([
-    //             'X-VERIFY' => $xVerify,
-    //             'X-MERCHANT-ID' => $merchantId
-    //         ])->get($url);
+        try {
+            $response = Http::withHeaders([
+                'X-VERIFY' => $xVerify,
+                'X-MERCHANT-ID' => $merchantId
+            ])->get($url);
 
-    //         $res = $response->json();
-    //         Log::info('PhonePe Status API Response:', $res);
+            $res = $response->json();
+            Log::info('PhonePe Status API Response:', $res);
 
-    //         if (isset($res['success']) && $res['success'] === true && $res['data']['state'] === 'COMPLETED') {
-    //             $wallet = Wallet::where('refno', $merchantTransactionId)->first();
+            if (isset($res['success']) && $res['success'] === true && $res['data']['state'] === 'COMPLETED') {
+                $wallet = Wallet::where('refno', $merchantTransactionId)->first();
 
-    //             if ($wallet && $wallet->status !== 'success') {
-    //                 // Update wallet status
-    //                 $last = Wallet::where('userid', $wallet->userid)
-    //                     ->where('status', 'success')
-    //                     ->orderBy('id', 'desc')
-    //                     ->first();
-    //                 $previousTotal = $last ? $last->total : 0;
+                if ($wallet && $wallet->status !== 'success') {
+                    // Update wallet status
+                    $last = Wallet::where('userid', $wallet->userid)
+                        ->where('status', 'success')
+                        ->orderBy('id', 'desc')
+                        ->first();
+                    $previousTotal = $last ? $last->total : 0;
 
-    //                 $wallet->total = $previousTotal + $wallet->c_amount;
-    //                 $wallet->status = 'success';
-    //                 $wallet->save();
+                    $wallet->total = $previousTotal + $wallet->c_amount;
+                    $wallet->status = 'success';
+                    $wallet->save();
 
-    //                 // Restore user session
-    //                 Auth::loginUsingId($wallet->userid);
-    //                 Session::put('sid', $wallet->userid);
+                    // Restore user session
+                    Auth::loginUsingId($wallet->userid);
+                    Session::put('sid', $wallet->userid);
 
-    //                 Log::info('Wallet updated successfully for transaction: ' . $merchantTransactionId);
-    //                 return redirect()->to('https://delhiparcel.com/seller-wallet')->with('success', 'Wallet updated successfully!');
-    //             } else {
-    //                 Log::warning('Wallet not found or already success for transaction: ' . $merchantTransactionId);
-    //                 return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Wallet already updated or not found.');
-    //             }
-    //         } else {
-    //             Log::error('Payment failed for transaction: ' . $merchantTransactionId, ['response' => $res]);
-    //             Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
-    //             return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
-    //         }
-    //     } catch (\Exception $e) {
-    //         Log::error('Error in wallet payment callback: ' . $e->getMessage());
-    //         return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'An error occurred during payment processing.');
-    //     }
-    // }
+                    Log::info('Wallet updated successfully for transaction: ' . $merchantTransactionId);
+                    return redirect()->to('https://delhiparcel.com/seller')->with('success', 'Wallet updated successfully!');
+                } else {
+                    Log::warning('Wallet not found or already success for transaction: ' . $merchantTransactionId);
+                    return redirect()->to('https://delhiparcel.com/seller')->with('error', 'Wallet already updated or not found.');
+                }
+            } else {
+                Log::error('Payment failed for transaction: ' . $merchantTransactionId, ['response' => $res]);
+                Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
+                return redirect()->to('https://delhiparcel.com/seller')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+            }
+        } catch (\Exception $e) {
+            Log::error('Error in wallet payment callback: ' . $e->getMessage());
+            return redirect()->to('https://delhiparcel.com/seller')->with('error', 'An error occurred during payment processing.');
+        }
+    }
 
 
 
@@ -373,47 +373,7 @@ class SellerController extends Controller
 
 
 
-    public function walletPaymentCallback(Request $request)
-    {
-        Log::info('Wallet Payment Callback Request:', $request->all());
-
-        $input = $request->all();
-        $merchantTransactionId = $input['merchantTransactionId'] ?? ($input['transactionId'] ?? null);
-
-        if (!$merchantTransactionId) {
-            Log::error('Invalid callback data: No merchantTransactionId');
-            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Invalid callback data.');
-        }
-
-        // Skip PhonePe re-verification and always mark as success
-        try {
-            $wallet = Wallet::where('refno', $merchantTransactionId)->first();
-
-            if ($wallet && $wallet->status !== 'success') {
-                $last = Wallet::where('userid', $wallet->userid)
-                    ->where('status', 'success')
-                    ->orderBy('id', 'desc')
-                    ->first();
-                $previousTotal = $last ? $last->total : 0;
-
-                $wallet->total = $previousTotal + $wallet->c_amount;
-                $wallet->status = 'success';
-                $wallet->save();
-
-                // Restore user session
-                Auth::loginUsingId($wallet->userid);
-                Session::put('sid', $wallet->userid);
-
-                Log::info('Wallet forcefully updated to success for transaction: ' . $merchantTransactionId);
-            } else {
-                Log::warning('Wallet already marked success or not found for transaction: ' . $merchantTransactionId);
-            }
-        } catch (\Exception $e) {
-            Log::error('Error in wallet callback (forced success mode): ' . $e->getMessage());
-        }
-
-        return redirect()->to('https://delhiparcel.com/seller-wallet')->with('success', 'Wallet updated successfully!');
-    }
+   
 
 
 
