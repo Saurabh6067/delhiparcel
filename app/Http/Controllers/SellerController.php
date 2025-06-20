@@ -246,7 +246,7 @@ class SellerController extends Controller
         $callbackUrl = $redirectUrl;
 
         // 🐞 Debug: See what URL is being generated
-        dd($redirectUrl);
+        // dd($redirectUrl);
 
         $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
         $currentTotal = $latestWallet ? $latestWallet->total : 0;
