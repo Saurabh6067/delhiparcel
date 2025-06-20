@@ -204,7 +204,7 @@
                 // Payment failed handler
                 rzp.on('payment.failed', function (response) {
                     $.ajax({
-                        url: "{{ route('seller.addWalletAmount') }}",
+                        url: "{{ route('seller.wallet') }}",
                         method: "POST",
                         data: {
                             amount: amount,
