@@ -69,54 +69,53 @@ class SellerController extends Controller
 
     public function addWalletAmount(Request $request)
     {
+        // Validate request inputs
+        $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+            'status' => 'in:success,failed,cancelled',
+            'razorpay_payment_id' => 'nullable|string',
+        ]);
+
         $user = Session::get('sid');
-        $status = $request->input('status', 'success');
-
-        // Don't credit wallet unless success
-        if ($status === 'success') {
-            $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-            $total = $data ? $data->total + $request->amount : $request->amount;
-
-            $branch = Branch::where('id', $user)->first();
-            $mobile = $branch ? $branch->phoneno : '0000000000';
-
-            $wlt = new Wallet();
-            $wlt->userid = $user;
-            $wlt->c_amount = $request->amount;
-            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-            $wlt->total = $total;
-            $wlt->msg = 'credit';
-            $wlt->txn_id = $request->razorpay_payment_id ?? null;
-            $wlt->status = 'success'; // Add this column if not present
-            $wlt->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Amount added successfully!',
-            ]);
-        } else {
-            // Optional: log or store failure/cancellation attempts
-            // If you want to track even failed or cancelled attempts
-            $wlt = new Wallet();
-            $wlt->userid = $user;
-            $wlt->c_amount = $request->amount;
-            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-            $wlt->total = Wallet::where('userid', $user)->orderBy('id', 'desc')->value('total') ?? 0;
-            $wlt->msg = 'credit';
-            $wlt->txn_id = $request->razorpay_payment_id ?? null;
-            $wlt->status = $status; // 'failed' or 'cancelled'
-            $wlt->save();
-
+        if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => "Payment $status"
+                'message' => 'User not authenticated.',
+            ], 401);
+        }
+
+        $status = $request->input('status', 'success');
+
+        try {
+            // Fetch the latest wallet record for the user
+            $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
+            $currentTotal = $latestWallet ? $latestWallet->total : 0;
+            $newTotal = $status === 'success' ? $currentTotal + $request->amount : $currentTotal;
+
+            // Create a new wallet transaction
+            $wallet = new Wallet();
+            $wallet->userid = $user;
+            $wallet->c_amount = $request->amount;
+            $wallet->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wallet->total = $newTotal;
+            $wallet->msg = 'credit';
+            $wallet->txn_id = $request->razorpay_payment_id ?? null;
+            $wallet->status = $status;
+            $wallet->save();
+
+            return response()->json([
+                'success' => $status === 'success',
+                'message' => $status === 'success' ? 'Amount added successfully!' : "Payment $status",
             ]);
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Wallet update failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while processing the payment.',
+            ], 500);
         }
     }
-
-
-
-
 
     public function sellerLogin(Request $request)
     {
