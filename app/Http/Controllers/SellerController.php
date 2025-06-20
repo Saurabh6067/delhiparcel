@@ -106,6 +106,9 @@ class SellerController extends Controller
 
         // Don't credit wallet unless success
         if ($status === 'success') {
+
+            dd($status);
+
             $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
             $total = $data ? $data->total + $request->amount : $request->amount;
 
@@ -127,8 +130,6 @@ class SellerController extends Controller
                 'message' => 'Amount added successfully!',
             ]);
         } else {
-            // Optional: log or store failure/cancellation attempts
-            // If you want to track even failed or cancelled attempts
             $wlt = new Wallet();
             $wlt->userid = $user;
             $wlt->c_amount = $request->amount;
