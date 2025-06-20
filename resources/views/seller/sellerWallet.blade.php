@@ -81,28 +81,15 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- <form id="walletAdd">
-                                            <div class="input-group mb-3">
-                                                <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
-                                                    aria-describedby="basic-addon2" name="amount" required>
-                                                <div class="input-group-append">
-                                                    <button class="btn btn-success">Pay Now</button>
-                                                </div>
-                                            </div>
-                                        </form> -->
-
-                    <!-- This Form is Phonepay Gateway-->
-                    <form method="POST" action="{{ route('seller.addWalletAmount') }}">
-                        @csrf
+                    <form id="walletAdd">
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control" name="amount" placeholder="0.0" required>
+                            <input type="text" class="form-control" placeholder="0.0" aria-label="Recipient's username"
+                                aria-describedby="basic-addon2" name="amount" required>
                             <div class="input-group-append">
-                                <button type="submit"  class="btn btn-success">Pay Now</button>
+                                <button class="btn btn-success">Pay Now</button>
                             </div>
                         </div>
                     </form>
-
-
                 </div>
             </div>
         </div>
@@ -140,37 +127,94 @@
             });
         });
 
-        $(document).ready(function () {
-            $("#walletAdd").on("submit", function (e) {
-                e.preventDefault();
-                let formData = new FormData(this);
 
+
+
+    </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        $('#walletAdd').on('submit', function (e) {
+            e.preventDefault();
+            let amount = $('input[name="amount"]').val();
+            if (!amount || isNaN(amount)) {
+                alert("Please enter a valid amount");
+                return;
+            }
+
+            let amountInPaise = amount * 100;
+
+            let rzp = new Razorpay({
+                "key": "rzp_live_swdLQ9ocZUoa9F", // Your Key ID
+                "amount": amountInPaise,
+                "currency": "INR",
+                "name": "Delhi Parcel",
+                "description": "Seller Wallet Recharge",
+                "handler": function (response) {
+                    // ✅ Payment success
+                    $.ajax({
+                        url: "{{ route('seller.addWalletAmount') }}",
+                        method: "POST",
+                        data: {
+                            amount: amount,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            status: 'success',
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function (res) {
+                            if (res.success) {
+                                $('#exampleModal').modal('hide'); // Close modal
+                                alert(res.message);
+                                location.reload(); // Refresh wallet data
+                            }
+                        }
+                    });
+                },
+                "prefill": {
+                    name: "Seller",
+                    email: "seller@example.com",
+                    contact: "9999999999" // Optional: Dynamic contact if needed
+                },
+                "theme": {
+                    color: "#28a745"
+                },
+                "modal": {
+                    ondismiss: function () {
+                        // ❌ Payment was cancelled by user
+                        $.ajax({
+                            url: "{{ route('seller.addWalletAmount') }}",
+                            method: "POST",
+                            data: {
+                                amount: amount,
+                                status: 'cancelled',
+                                _token: "{{ csrf_token() }}"
+                            },
+                            success: function (res) {
+                                alert('Payment was cancelled.');
+                            }
+                        });
+                    }
+                }
+            });
+
+            // ❌ Payment failed handler
+            rzp.on('payment.failed', function (response) {
                 $.ajax({
                     url: "{{ route('seller.addWalletAmount') }}",
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function (response) {
-                        $('#walletAdd')[0].reset();
-                        if (response.success) {
-                            Toast("success", response.message);
-                            $('#bodyData').html(response.html);
-                            $('#exampleModal').modal('hide');
-                        } else {
-                            Toast("error", response.message);
-                        }
+                    method: "POST",
+                    data: {
+                        amount: amount,
+                        status: 'failed',
+                        reason: response.error.description,
+                        _token: "{{ csrf_token() }}"
                     },
-                    error: function (err) {
-                        $('#exampleModal').modal('hide');
-                        setTimeout(function () {
-                            location.reload();
-                        }, 1000);
-                        Toast("success", "Amount added successfully!");
+                    success: function (res) {
+                        alert('Payment failed: ' + response.error.description);
                     }
                 });
             });
+
+            rzp.open();
         });
     </script>
+
 @endpush
