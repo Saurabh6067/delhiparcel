@@ -776,246 +776,197 @@ class WebController extends Controller
     //     }
     // }
 
-    public function createRazorpayOrder(Request $request)
-    {
-        // Validate the request
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-        ]);
+  
 
-        // Prepare the data for Razorpay order creation
-        $data = [
-            'amount' => $request->amount * 100, // Convert to paisa
-            'currency' => 'INR',
-            'payment_capture' => 1, // Auto-capture
-        ];
+    public function storeParcelDetails(Request $request)
+{
+    // Validate request data
+    $request->validate([
+        'service_id' => 'required',
+        'sender_name' => 'required',
+        'number' => 'required|regex:/^[6789][0-9]{9}$/', // Sender number
+        'email' => 'required|email', // Sender email
+        'sender_address' => 'required',
+        'senderPinCode' => 'required',
+        'receiver_name' => 'required',
+        'receiver_number' => 'required|regex:/^[6789][0-9]{9}$/',
+        'receiver_email' => 'required|email',
+        'receiver_address' => 'required',
+        'receiverPinCode' => 'required',
+        'payment_methods' => 'required|in:COD,online',
+        'codAmount' => 'required_if:payment_methods,COD|numeric|min:0',
+        'price' => 'required',
+        'status' => 'required|in:success,failed,cancelled',
+        'razorpay_payment_id' => 'nullable|string',
+        'razorpay_order_id' => 'nullable|string',
+        'reason' => 'nullable|string',
+    ]);
 
+    $response = [
+        'success' => false,
+        'message' => 'Order processing failed.',
+    ];
+
+    // Skip Razorpay verification for COD or non-online payments
+    if ($request->payment_methods === 'online' && $request->status === 'success' && $request->razorpay_payment_id) {
         try {
-            // Make HTTP POST request to Razorpay orders endpoint
-            $response = Http::withBasicAuth(
+            $paymentResponse = Http::withBasicAuth(
                 env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'),
                 env('RAZORPAY_SECRET')
-            )->post('https://api.razorpay.com/v1/orders', $data);
+            )->get("https://api.razorpay.com/v1/payments/{$request->razorpay_payment_id}");
 
-            // Check if the request was successful
-            if ($response->successful()) {
-                $order = $response->json();
-                return response()->json([
-                    'success' => true,
-                    'order' => [
-                        'id' => $order['id'],
-                        'amount' => $order['amount'] / 100 // Convert back to rupees
-                    ]
-                ]);
+            if ($paymentResponse->successful()) {
+                $payment = $paymentResponse->json();
+                if ($payment['status'] !== 'captured') {
+                    throw new \Exception('Payment not captured');
+                }
             } else {
-                // Log the error response from Razorpay
-                Log::error("Razorpay order creation failed: " . $response->body());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Failed to create payment order'
-                ], 500);
+                throw new \Exception('Failed to fetch payment details: ' . $paymentResponse->body());
             }
         } catch (\Exception $e) {
-            // Log any other exceptions (e.g., network issues)
-            Log::error("Razorpay order creation failed: " . $e->getMessage());
+            Log::error("Razorpay payment verification failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create payment order'
-            ], 500);
+                'message' => 'Payment verification failed'
+            ], 400);
         }
     }
 
-     public function storeParcelDetails(Request $request)
-    {
-        // Validate request data
-        $request->validate([
-            'service_id' => 'required',
-            'sender_name' => 'required',
-            'number' => 'required|regex:/^[6789][0-9]{9}$/', // Sender number
-            'email' => 'required|email', // Sender email
-            'sender_address' => 'required',
-            'senderPinCode' => 'required',
-            'receiver_name' => 'required',
-            'receiver_number' => 'required|regex:/^[6789][0-9]{9}$/',
-            'receiver_email' => 'required|email',
-            'receiver_address' => 'required',
-            'receiverPinCode' => 'required',
-            'payment_methods' => 'required|in:COD,online',
-            'codAmount' => 'required_if:payment_methods,COD|numeric|min:0',
-            'price' => 'required',
-            'status' => 'required|in:success,failed,cancelled',
-            'razorpay_payment_id' => 'nullable|string',
-            'razorpay_order_id' => 'nullable|string',
-            'reason' => 'nullable|string',
-        ]);
+    if ($request->status === 'success') {
+        // Book parcel for successful payments (online or COD)
+        $service = Service::where('id', $request->service_id)->first();
+        $branch = Branch::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
+            ->where('type', 'Delivery')->first();
+        $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
+            ->where('status', 'active')->first();
+
+        $order = new Order();
+        $order_history = new OrderHistory();
+
+        $order->pickupAddress = $request->pickupAddress;
+        $order->deliveryAddress = $request->deliveryAddress;
+        $order->sender_name = $request->sender_name;
+        $order->sender_number = $request->number; // Sender number
+        $order->sender_email = $request->email; // Sender email
+        $order->sender_address = $request->sender_address;
+        $order->sender_pincode = $request->senderPinCode;
+        $order->receiver_name = $request->receiver_name;
+        $order->receiver_cnumber = $request->receiver_number;
+        $order->receiver_email = $request->receiver_email;
+        $order->receiver_add = $request->receiver_address;
+        $order->receiver_pincode = $request->receiverPinCode;
+
+        $fixedPrefix = 'DP1516800';
+
+        $order->service_type = $request->service_type;
+        $order->service_title = $service->title ?? $request->service_id;
+        $order->service_price = trim(str_replace('₹', '', $request->price));
+        $order->order_id = ''; // Temporary
+        $order->seller_id = $branch->id ?? null;
+        $order->price = trim(str_replace('₹', '', $request->price));
+        $order->payment_mode = $request->payment_methods;
+        $order->codAmount = $request->codAmount ?? 0;
+        $order->insurance = $request->insurance ? 'insurance' : null;
+        $order->order_status = 'Booked';
+        $order->assign_to = $DlyBoy->id ?? null;
+        $order->assign_by = $branch->id ?? null;
+        $order->parcel_type = 'Direct';
+        $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+        $order->created_at = $this->date;
+        $order->updated_at = $this->date;
+
+        // Save Razorpay details only if provided
+        if ($request->payment_methods === 'online' && $request->razorpay_payment_id) {
+            $order->razorpay_payment_id = $request->razorpay_payment_id;
+            $order->razorpay_order_id = $request->razorpay_order_id;
+        }
+
+        $order->save();
+        $lastInsertId = $order->id;
+
+        $generatedOrderId = $fixedPrefix . $lastInsertId;
+        $order->order_id = $generatedOrderId;
+        $order->save();
+
+        $orderId = $generatedOrderId;
+
+        // Order history
+        $order_history->tracking_id = $orderId;
+        $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+        $order_history->status = 'Booked';
+        $order_history->save();
+
+        // Mail data preparation
+        $mailData = null;
+        if ($order->sender_email || $order->receiver_email) {
+            $mailData = [
+                'title' => 'Order Booking Confirmation',
+                'order_id' => $orderId,
+                'service_type' => $order->service_type,
+                'price' => $order->price,
+                'payment_mode' => $order->payment_mode,
+                'sender_name' => $order->sender_name,
+                'sender_number' => $order->sender_number,
+                'sender_email' => $order->sender_email,
+                'sender_address' => $order->sender_address,
+                'sender_pincode' => $order->sender_pincode,
+                'receiver_name' => $order->receiver_name,
+                'receiver_cnumber' => $order->receiver_cnumber,
+                'receiver_email' => $order->receiver_email,
+                'receiver_add' => $order->receiver_add,
+                'receiver_pincode' => $order->receiver_pincode,
+                'datetime' => $order->datetime,
+            ];
+        }
+
+        if ($mailData) {
+            register_shutdown_function(function () use ($order, $mailData, $orderId) {
+                try {
+                    $recipients = [];
+                    if ($order->sender_email) {
+                        $recipients[] = $order->sender_email;
+                    }
+                    if ($order->receiver_email) {
+                        $recipients[] = $order->receiver_email;
+                    }
+
+                    if (!empty($recipients)) {
+                        Mail::to($recipients)->queue(new BookingOtp($mailData));
+                        Log::info("Order confirmation email sent to: " . implode(', ', $recipients) . ' for order ID: ' . $orderId);
+                    } else {
+                        Log::warning("No valid email addresses provided for order ID: " . $orderId);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("Failed to send order confirmation email: " . $e->getMessage());
+                }
+            });
+        }
 
         $response = [
-            'success' => false,
-            'message' => 'Order processing failed.',
+            'success' => true,
+            'msg' => 'Order Booked Successfully!',
+            'data' => $orderId,
         ];
-
-        if ($request->payment_methods === 'online' && $request->status === 'success') {
-            // Verify Razorpay payment using HTTP request
-            try {
-                $paymentResponse = Http::withBasicAuth(
-                    env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'),
-                    env('RAZORPAY_SECRET')
-                )->get("https://api.razorpay.com/v1/payments/{$request->razorpay_payment_id}");
-
-                if ($paymentResponse->successful()) {
-                    $payment = $paymentResponse->json();
-                    if ($payment['status'] !== 'captured') {
-                        throw new \Exception('Payment not captured');
-                    }
-                } else {
-                    throw new \Exception('Failed to fetch payment details: ' . $paymentResponse->body());
-                }
-            } catch (\Exception $e) {
-                Log::error("Razorpay payment verification failed: " . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Payment verification failed'
-                ], 400);
-            }
-        }
-
-        if ($request->status === 'success') {
-            // Book parcel for successful payments (online or COD)
-            $service = Service::where('id', $request->service_id)->first();
-            $branch = Branch::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
-                ->where('type', 'Delivery')->first();
-            $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
-                ->where('status', 'active')->first();
-
-            $order = new Order();
-            $order_history = new OrderHistory();
-
-            $order->pickupAddress = $request->pickupAddress;
-            $order->deliveryAddress = $request->deliveryAddress;
-            $order->sender_name = $request->sender_name;
-            $order->sender_number = $request->number; // Sender number
-            $order->sender_email = $request->email; // Sender email
-            $order->sender_address = $request->sender_address;
-            $order->sender_pincode = $request->senderPinCode;
-            $order->receiver_name = $request->receiver_name;
-            $order->receiver_cnumber = $request->receiver_number;
-            $order->receiver_email = $request->receiver_email;
-            $order->receiver_add = $request->receiver_address;
-            $order->receiver_pincode = $request->receiverPinCode;
-
-            $fixedPrefix = 'DP1516800';
-
-            $order->service_type = $request->service_type;
-            $order->service_title = $service->title ?? $request->service_id;
-            $order->service_price = trim(str_replace('₹', '', $request->price));
-            $order->order_id = ''; // Temporary
-            $order->seller_id = $branch->id ?? null;
-            $order->price = trim(str_replace('₹', '', $request->price));
-            $order->payment_mode = $request->payment_methods;
-            $order->codAmount = $request->codAmount ?? 0;
-            $order->insurance = $request->insurance ? 'insurance' : null;
-            $order->order_status = 'Booked';
-            $order->assign_to = $DlyBoy->id ?? null;
-            $order->assign_by = $branch->id ?? null;
-            $order->parcel_type = 'Direct';
-            $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-            $order->created_at = $this->date;
-            $order->updated_at = $this->date;
-
-            // if ($request->payment_methods === 'online') {
-            //     $order->razorpay_payment_id = $request->razorpay_payment_id;
-            //     $order->razorpay_order_id = $request->razorpay_order_id;
-            // }
-
-            $order->save();
-            $lastInsertId = $order->id;
-
-            $generatedOrderId = $fixedPrefix . $lastInsertId;
-            $order->order_id = $generatedOrderId;
-            $order->save();
-
-            $orderId = $generatedOrderId;
-
-            // Order history
-            $order_history->tracking_id = $orderId;
-            $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-            $order_history->status = 'Booked';
-            $order_history->save();
-
-            // Mail data preparation
-            $mailData = null;
-            if ($order->sender_email || $order->receiver_email) {
-                $mailData = [
-                    'title' => 'Order Booking Confirmation',
-                    'order_id' => $orderId,
-                    'service_type' => $order->service_type,
-                    'price' => $order->price,
-                    'payment_mode' => $order->payment_mode,
-                    'sender_name' => $order->sender_name,
-                    'sender_number' => $order->sender_number,
-                    'sender_email' => $order->sender_email,
-                    'sender_address' => $order->sender_address,
-                    'sender_pincode' => $order->sender_pincode,
-                    'receiver_name' => $order->receiver_name,
-                    'receiver_cnumber' => $order->receiver_cnumber,
-                    'receiver_email' => $order->receiver_email,
-                    'receiver_add' => $order->receiver_add,
-                    'receiver_pincode' => $order->receiver_pincode,
-                    'datetime' => $order->datetime,
-                ];
-            }
-
-            if ($mailData) {
-                register_shutdown_function(function () use ($order, $mailData, $orderId) {
-                    try {
-                        $recipients = [];
-                        if ($order->sender_email) {
-                            $recipients[] = $order->sender_email;
-                        }
-                        if ($order->receiver_email) {
-                            $recipients[] = $order->receiver_email;
-                        }
-
-                        if (!empty($recipients)) {
-                            Mail::to($recipients)->queue(new BookingOtp($mailData));
-                            Log::info("Order confirmation email sent to: " . implode(', ', $recipients) . ' for order ID: ' . $orderId);
-                        } else {
-                            Log::warning("No valid email addresses provided for order ID: " . $orderId);
-                        }
-                    } catch (\Exception $e) {
-                        Log::error("Failed to send order confirmation email: " . $e->getMessage());
-                    }
-                });
-            }
-
-            $response = [
-                'success' => true,
-                'msg' => 'Order Booked Successfully!',
-                'data' => $orderId,
-            ];
-        } elseif ($request->status === 'failed') {
-            // Log failed payment
-            Log::info("Failed payment attempt: Amount: {$request->amount}, Reason: " . ($request->reason ?? ''));
-            $response = [
-                'success' => false,
-                'message' => 'Payment failed: ' . ($request->reason ?? 'Unknown error'),
-            ];
-        } elseif ($request->status === 'cancelled') {
-            // Log cancelled payment
-            Log::info("Cancelled payment attempt: Amount: {$request->amount}");
-            $response = [
-                'success' => false,
-                'message' => 'Payment was cancelled',
-            ];
-        }
-
-        if ($request->ajax()) {
-            return response()->json($response);
-        }
-
-        return redirect()->back()->with('error', $response['message']);
+    } elseif ($request->status === 'failed') {
+        Log::info("Failed payment attempt: Amount: {$request->amount}, Reason: " . ($request->reason ?? ''));
+        $response = [
+            'success' => false,
+            'message' => 'Payment failed: ' . ($request->reason ?? 'Unknown error'),
+        ];
+    } elseif ($request->status === 'cancelled') {
+        Log::info("Cancelled payment attempt: Amount: {$request->amount}");
+        $response = [
+            'success' => false,
+            'message' => 'Payment was cancelled',
+        ];
     }
 
+    if ($request->ajax()) {
+        return response()->json($response);
+    }
+
+    return redirect()->back()->with('error', $response['message']);
+}
 
 
 
