@@ -259,6 +259,7 @@ Route::middleware(['sellerlogin'])->group(function () {
     Route::match(['get', 'post'], '/wallet/payment/callback', [SellerController::class, 'walletPaymentCallback'])->name('wallet.payment.callback');
 
 
+
     Route::any('/seller-cod-sattlement', [SellerController::class, 'CodSellerAmount']); // seller sattlement 
 
 
