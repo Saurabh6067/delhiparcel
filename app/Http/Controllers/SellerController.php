@@ -141,88 +141,6 @@ class SellerController extends Controller
     //     }
     // }
 
-    // public function addWalletAmount(Request $request)
-    // {
-    //     $request->validate([
-    //         'amount' => 'required|numeric|min:1',
-    //     ]);
-
-    //     $user = Session::get('sid');
-    //     if (!$user) {
-    //         \Log::error('User session not found');
-    //         return back()->with('error', 'Session expired. Please log in again.');
-    //     }
-
-    //     $amount = $request->amount;
-
-    //     $merchantId = 'M1SMOAY31YWH';
-    //     $saltKey = '06df03a2-65b9-42f8-b7b9-26590674bc29';
-    //     $saltIndex = 1;
-
-    //     $transactionId = uniqid('TXN_');
-    //     $redirectUrl = route('wallet.payment.callback');
-    //     $callbackUrl = $redirectUrl;
-
-    //     $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-    //     $currentTotal = $latestWallet ? $latestWallet->total : 0;
-    //     $newTotal = $currentTotal + $amount;
-
-    //     $wallet = new Wallet();
-    //     $wallet->userid = $user;
-    //     $wallet->c_amount = $amount;
-    //     $wallet->d_amount = 0;
-    //     $wallet->total = $newTotal;
-    //     $wallet->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-    //     $wallet->status = 'pending';
-    //     $wallet->adminid = null;
-    //     $wallet->refno = $transactionId;
-    //     $wallet->msg = 'credit';
-    //     $wallet->save();
-
-    //     $amountInPaise = (int) ($amount * 100);
-    //     $payload = [
-    //         'merchantId' => $merchantId,
-    //         'merchantTransactionId' => $transactionId,
-    //         'merchantUserId' => 'user_' . $user,
-    //         'amount' => $amountInPaise,
-    //         'redirectUrl' => $redirectUrl,
-    //         'redirectMode' => 'POST',
-    //         'callbackUrl' => $callbackUrl,
-    //         'paymentInstrument' => [
-    //             'type' => 'PAY_PAGE',
-    //         ],
-    //     ];
-
-    //     $jsonPayload = json_encode($payload);
-    //     $base64Payload = base64_encode($jsonPayload);
-    //     $stringToSign = $base64Payload . "/pg/v1/pay" . $saltKey;
-    //     $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
-
-    //     try {
-    //         $response = Http::withHeaders([
-    //             'Content-Type' => 'application/json',
-    //             'X-VERIFY' => $xVerify,
-    //             'X-MERCHANT-ID' => $merchantId,
-    //         ])->withBody(json_encode(['request' => $base64Payload]), 'application/json')
-    //             ->post('https://api.phonepe.com/apis/hermes/pg/v1/pay');
-
-    //         $res = $response->json();
-    //         \Log::info('PhonePe Payment Initiation Response:', $res);
-
-    //         if (isset($res['success']) && $res['success']) {
-    //             $paymentUrl = $res['data']['instrumentResponse']['redirectInfo']['url'];
-    //             return redirect()->away($paymentUrl);
-    //         } else {
-    //             \Log::error('Payment initiation failed:', $res);
-    //             return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
-    //         }
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error initiating payment: ' . $e->getMessage());
-    //         return back()->with('error', 'An error occurred while initiating payment.');
-    //     }
-    // }
-
-
     public function addWalletAmount(Request $request)
     {
         $request->validate([
@@ -242,11 +160,8 @@ class SellerController extends Controller
         $saltIndex = 1;
 
         $transactionId = uniqid('TXN_');
-        $redirectUrl = route('wallet.payment.callback'); // Route helper
+        $redirectUrl = route('wallet.payment.callback');
         $callbackUrl = $redirectUrl;
-
-        // 🐞 Debug: See what URL is being generated
-        // dd($redirectUrl);
 
         $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
         $currentTotal = $latestWallet ? $latestWallet->total : 0;
@@ -306,7 +221,6 @@ class SellerController extends Controller
             return back()->with('error', 'An error occurred while initiating payment.');
         }
     }
-
     public function walletPaymentCallback(Request $request)
     {
         Log::info('Wallet Payment Callback Request:', $request->all());
@@ -316,7 +230,7 @@ class SellerController extends Controller
 
         if (!$merchantTransactionId) {
             Log::error('Invalid callback data: No merchantTransactionId');
-            return redirect()->to('https://delhiparcel.com')->with('error', 'Invalid callback data.');
+            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Invalid callback data.');
         }
 
         // Re-verify with PhonePe
@@ -357,19 +271,19 @@ class SellerController extends Controller
                     Session::put('sid', $wallet->userid);
 
                     Log::info('Wallet updated successfully for transaction: ' . $merchantTransactionId);
-                    return redirect()->to('https://delhiparcel.com')->with('success', 'Wallet updated successfully!');
+                    return redirect()->to('https://delhiparcel.com/seller-wallet')->with('success', 'Wallet updated successfully!');
                 } else {
                     Log::warning('Wallet not found or already success for transaction: ' . $merchantTransactionId);
-                    return redirect()->to('https://delhiparcel.com')->with('error', 'Wallet already updated or not found.');
+                    return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Wallet already updated or not found.');
                 }
             } else {
                 Log::error('Payment failed for transaction: ' . $merchantTransactionId, ['response' => $res]);
                 Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
-                return redirect()->to('https://delhiparcel.com')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+                return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
             }
         } catch (\Exception $e) {
             Log::error('Error in wallet payment callback: ' . $e->getMessage());
-            return redirect()->to('https://delhiparcel.com')->with('error', 'An error occurred during payment processing.');
+            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'An error occurred during payment processing.');
         }
     }
 

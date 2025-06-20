@@ -23,6 +23,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::any('/order-Label-Email/{id}', [SellerController::class, 'sellerConfirmLabel']);
 
+   Route::any('/seller-wallet', [SellerController::class, 'sellerWallet'])->name('seller.wallet');
+    Route::any('/seller-add-wallet', [SellerController::class, 'addWalletAmount'])->name('seller.addWalletAmount');
+    // addon this url for phonepay 2june
+    Route::match(['get', 'post'], '/wallet/payment/callback', [SellerController::class, 'walletPaymentCallback'])->name('wallet.payment.callback');
+
 
 Route::fallback(function () {
     abort(404);
