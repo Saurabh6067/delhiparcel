@@ -123,58 +123,46 @@
             let amountInPaise = amount * 100;
 
             let rzp = new Razorpay({
-                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}",
+                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
                 "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
                 "amount": amountInPaise,
                 "currency": "INR",
-                "name": "Delhi oikein
-
-    System: Delhi Parcel",
+                "name": "Delhi Parcel",
                 "description": "Add to Wallet",
                 "handler": function (response) {
                     // ✅ On success
                     $.ajax({
                         url: "{{ route('booking.addWalletAmount') }}",
                         type: "POST",
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
                         data: {
                             amount: amount,
                             razorpay_payment_id: response.razorpay_payment_id,
-                            status: 'success'
+                            status: 'success',
+                            _token: "{{ csrf_token() }}"
                         },
                         success: function (res) {
                             if (res.success) {
-                                $('#exampleModal').modal('hide');
-                                alert(res.message);
+                                $('#exampleModal').modal('hide'); // Close modal
+                                alert(res.message); // Show success message
                                 // Update DataTable dynamically
-                                $('#bodyData').html(res.html);
-                                $('#example1').DataTable().destroy();
-                                $('#example1').DataTable({
+                                $('#bodyData').html(res.html); // Update table body with new data
+                                $('#example1').DataTable().destroy(); // Destroy existing DataTable
+                                $('#example1').DataTable({ // Reinitialize DataTable
                                     "responsive": true,
                                     "lengthChange": false,
                                     "autoWidth": false,
                                     "buttons": ["copy", "excel", "pdf", "print"]
                                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                                 // Update wallet balance display
-                                $('.wallet-amount').text('₹ ' + (res.data?.total || '0.00'));
+                                $('.wallet-amount').text('₹ ' + res.data.total.toFixed(2));
                             } else {
-                                alert(res.message || 'An unexpected error occurred.');
-                                console.error('Server Response:', res);
+                                alert(res.message); // Show server error message
+                                console.error('Error:', res);
                             }
                         },
-                        error: function (xhr, status, error) {
-                            let errorMessage = 'An error occurred while processing your request.';
-                            if (xhr.status === 419) {
-                                errorMessage = 'Session expired. Please refresh the page.';
-                            } else if (xhr.status === 422) {
-                                errorMessage = 'Invalid input data.';
-                            } else if (xhr.responseJSON?.message) {
-                                errorMessage = xhr.responseJSON.message;
-                            }
-                            alert(errorMessage);
-                            console.error('AJAX Error:', { status, error, response: xhr.responseJSON });
+                        error: function (xhr) {
+                            alert('An error occurred while processing your request.');
+                            console.error('AJAX Error:', xhr);
                         }
                     });
                 },
@@ -192,15 +180,13 @@
                         $.ajax({
                             url: "{{ route('booking.addWalletAmount') }}",
                             type: "POST",
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
                             data: {
                                 amount: amount,
-                                status: 'cancelled'
+                                status: 'cancelled',
+                                _token: "{{ csrf_token() }}"
                             },
                             success: function (res) {
-                                alert(res.message || 'Payment was cancelled.');
+                                alert(res.message); // Show cancellation message
                                 console.log('Cancellation Response:', res);
                             },
                             error: function (xhr) {
@@ -217,16 +203,14 @@
                 $.ajax({
                     url: "{{ route('booking.addWalletAmount') }}",
                     type: "POST",
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
                     data: {
                         amount: amount,
                         status: 'failed',
-                        reason: response.error.description
+                        reason: response.error.description,
+                        _token: "{{ csrf_token() }}"
                     },
                     success: function (res) {
-                        alert(res.message || 'Payment failed: ' + response.error.description);
+                        alert('Payment failed: ' + res.message); // Show failure message
                         console.log('Failure Response:', res);
                     },
                     error: function (xhr) {
