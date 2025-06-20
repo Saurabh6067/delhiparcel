@@ -156,12 +156,12 @@
                                 // Update wallet balance display
                                 $('.wallet-amount').text('₹ ' + res.data.total.toFixed(2));
                             } else {
-                                alert(res.message); // Show server error message
+                                // alert(res.message); 
                                 console.error('Error:', res);
                             }
                         },
                         error: function (xhr) {
-                            alert('An error occurred while processing your request.');
+                            // alert('An error occurred while processing your request.');
                             console.error('AJAX Error:', xhr);
                         }
                     });
@@ -186,11 +186,11 @@
                                 _token: "{{ csrf_token() }}"
                             },
                             success: function (res) {
-                                alert(res.message); // Show cancellation message
+                                // alert(res.message); 
                                 console.log('Cancellation Response:', res);
                             },
                             error: function (xhr) {
-                                alert('Error occurred while cancelling payment.');
+                                // alert('Error occurred while cancelling payment.');
                                 console.error('AJAX Error:', xhr);
                             }
                         });
@@ -210,11 +210,11 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function (res) {
-                        alert('Payment failed: ' + res.message); // Show failure message
+                        // alert('Payment failed: ' + res.message); 
                         console.log('Failure Response:', res);
                     },
                     error: function (xhr) {
-                        alert('Error occurred while processing failed payment.');
+                        // alert('Error occurred while processing failed payment.');
                         console.error('AJAX Error:', xhr);
                     }
                 });
