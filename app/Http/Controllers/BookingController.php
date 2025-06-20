@@ -242,31 +242,50 @@ class BookingController extends Controller
     public function addWalletAmount(Request $request)
     {
         $user = Session::get('bid');
+        $status = $request->input('status', 'success');
 
-        $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-        $total = $data ? $data->total + $request->amount : $request->amount;
+        // Don't credit wallet unless success
+        if ($status === 'success') {
+            $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
+            $total = $data ? $data->total + $request->amount : $request->amount;
 
-        // ✅ Get mobile number of the branch user
-        $branch = Branch::where('id', $user)->first();
-        $mobile = $branch ? $branch->phoneno : '9999999999'; // fallback number
+            $branch = Branch::where('id', $user)->first();
+            $mobile = $branch ? $branch->phoneno : '0000000000';
 
-        $wlt = new Wallet();
-        $wlt->userid = $user;
-        $wlt->c_amount = $request->amount;
-        $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $wlt->total = $total;
-        $wlt->msg = 'credit';
-        $wlt->save();
+            $wlt = new Wallet();
+            $wlt->userid = $user;
+            $wlt->c_amount = $request->amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = $total;
+            $wlt->msg = 'credit';
+            $wlt->txn_id = $request->razorpay_payment_id ?? null;
+            $wlt->status = 'success'; // Add this column if not present
+            $wlt->save();
 
-        if ($request->ajax()) {
             return response()->json([
                 'success' => true,
                 'message' => 'Amount added successfully!',
-                'mobile' => $mobile, // ✅ Return mobile number for Razorpay use
-                'html' => view('booking.inc.wallet', compact('data'))->render(),
+            ]);
+        } else {
+            // Optional: log or store failure/cancellation attempts
+            // If you want to track even failed or cancelled attempts
+            $wlt = new Wallet();
+            $wlt->userid = $user;
+            $wlt->c_amount = $request->amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = Wallet::where('userid', $user)->orderBy('id', 'desc')->value('total') ?? 0;
+            $wlt->msg = 'credit';
+            $wlt->txn_id = $request->razorpay_payment_id ?? null;
+            $wlt->status = $status; // 'failed' or 'cancelled'
+            $wlt->save();
+
+            return response()->json([
+                'success' => false,
+                'message' => "Payment $status"
             ]);
         }
     }
+
 
 
     public function addDeliveryOrder()

@@ -112,7 +112,7 @@
 
     <!-- Page specific script -->
     <script>
-        $(function() {
+        $(function () {
             $("#example1").DataTable({
                 "responsive": true,
                 "lengthChange": false,
@@ -130,9 +130,9 @@
             });
         });
 
-       
+
     </script>
-    <script>
+   <script>
     $('#walletAdd').on('submit', function(e) {
         e.preventDefault();
         let amount = $('input[name="amount"]').val();
@@ -143,42 +143,79 @@
 
         let amountInPaise = amount * 100;
 
-        let options = {
-            "key": "rzp_live_swdLQ9ocZUoa9F", // Your Razorpay Key ID
-            "amount": amountInPaise, // Amount is in paise
+        let rzp = new Razorpay({
+            "key": "rzp_live_swdLQ9ocZUoa9F",
+            "amount": amountInPaise,
             "currency": "INR",
             "name": "Delhi Parcel",
             "description": "Add to Wallet",
-            "handler": function (response) {
-                // After successful payment
+            "handler": function(response) {
+                // ✅ On success
                 $.ajax({
                     url: "{{ route('booking.addWalletAmount') }}",
                     type: "POST",
                     data: {
                         amount: amount,
                         razorpay_payment_id: response.razorpay_payment_id,
+                        status: 'success',
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(res) {
                         if (res.success) {
+                            $('#exampleModal').modal('hide'); // Close modal
                             alert(res.message);
-                            location.reload();
+                            location.reload(); // Refresh page
                         }
                     }
                 });
             },
             "prefill": {
+                "contact": "{{ $mobile ?? '9999999999' }}", // if passed to blade
                 "name": "User",
                 "email": "user@example.com"
             },
             "theme": {
                 "color": "#28a745"
+            },
+            "modal": {
+                "ondismiss": function () {
+                    // ❌ If payment is dismissed/cancelled
+                    $.ajax({
+                        url: "{{ route('booking.addWalletAmount') }}",
+                        type: "POST",
+                        data: {
+                            amount: amount,
+                            status: 'cancelled',
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function (res) {
+                            alert('Payment was cancelled.');
+                        }
+                    });
+                }
             }
-        };
+        });
 
-        let rzp = new Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+            // ❌ If payment fails
+            $.ajax({
+                url: "{{ route('booking.addWalletAmount') }}",
+                type: "POST",
+                data: {
+                    amount: amount,
+                    status: 'failed',
+                    reason: response.error.description,
+                    _token: "{{ csrf_token() }}"
+                },
+                success: function (res) {
+                    alert('Payment failed: ' + response.error.description);
+                }
+            });
+        });
+
         rzp.open();
     });
 </script>
+
 
 @endpush
