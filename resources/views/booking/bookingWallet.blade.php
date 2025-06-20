@@ -157,11 +157,12 @@
                                 $('.wallet-amount').text('₹ ' + res.data.total.toFixed(2));
                             } else {
                                 // alert(res.message); 
+                                window.location.reload();
                                 console.error('Error:', res);
                             }
                         },
                         error: function (xhr) {
-                            // alert('An error occurred while processing your request.');
+                            window.location.reload();
                             console.error('AJAX Error:', xhr);
                         }
                     });
@@ -187,10 +188,12 @@
                             },
                             success: function (res) {
                                 // alert(res.message); 
+                                window.location.reload();
                                 console.log('Cancellation Response:', res);
                             },
                             error: function (xhr) {
                                 // alert('Error occurred while cancelling payment.');
+                                window.location.reload();
                                 console.error('AJAX Error:', xhr);
                             }
                         });
@@ -211,10 +214,12 @@
                     },
                     success: function (res) {
                         // alert('Payment failed: ' + res.message); 
+                        window.location.reload();
                         console.log('Failure Response:', res);
                     },
                     error: function (xhr) {
                         // alert('Error occurred while processing failed payment.');
+                        window.location.reload();
                         console.error('AJAX Error:', xhr);
                     }
                 });
