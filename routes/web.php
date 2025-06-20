@@ -253,7 +253,7 @@ Route::middleware(['sellerlogin'])->group(function () {
 
 
 
-    Route::any('/seller-wallet', [SellerController::class, 'sellerWallet'])->name('seller.wallet');
+    Route::any('/seller', [SellerController::class, 'sellerWallet'])->name('seller.wallet');
     Route::any('/seller-add-wallet', [SellerController::class, 'addWalletAmount'])->name('seller.addWalletAmount');
     // addon this url for phonepay 2june
     Route::match(['get', 'post'], '/wallet/payment/callback', [SellerController::class, 'walletPaymentCallback'])->name('wallet.payment.callback');
