@@ -110,37 +110,19 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <!-- Page specific script -->
     <script>
-        $(function () {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["copy", "excel", "pdf", "print"]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-            $('#example2').DataTable({
-                "paging": true,
-                "lengthChange": false,
-                "searching": false,
-                "ordering": true,
-                "info": true,
-                "autoWidth": false,
-                "responsive": true,
-            });
-        });
-    </script>
-    <script>
         $('#walletAdd').on('submit', function (e) {
             e.preventDefault();
             let amount = $('input[name="amount"]').val();
-            if (!amount || isNaN(amount)) {
-                alert("Please enter a valid amount");
+            if (!amount || isNaN(amount) || amount <= 0) {
+                alert("Please enter a valid positive amount");
                 return;
             }
 
             let amountInPaise = amount * 100;
 
             let rzp = new Razorpay({
-                "key": "rzp_live_swdLQ9ocZUoa9F",
+                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
+                "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
                 "amount": amountInPaise,
                 "currency": "INR",
                 "name": "Delhi Parcel",
@@ -159,14 +141,32 @@
                         success: function (res) {
                             if (res.success) {
                                 $('#exampleModal').modal('hide'); // Close modal
-                                alert(res.message);
-                                location.reload(); // Refresh page
+                                alert(res.message); // Show success message
+                                // Update DataTable dynamically
+                                $('#bodyData').html(res.html); // Update table body with new data
+                                $('#example1').DataTable().destroy(); // Destroy existing DataTable
+                                $('#example1').DataTable({ // Reinitialize DataTable
+                                    "responsive": true,
+                                    "lengthChange": false,
+                                    "autoWidth": false,
+                                    "buttons": ["copy", "excel", "pdf", "print"]
+                                }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+                                // Update wallet balance display
+                                $('.wallet-amount').text('₹ ' + res.data.total.toFixed(2));
+                            } else {
+                                // alert(res.message); 
+                                window.location.reload();
+                                console.error('Error:', res);
                             }
+                        },
+                        error: function (xhr) {
+                            window.location.reload();
+                            console.error('AJAX Error:', xhr);
                         }
                     });
                 },
                 "prefill": {
-                    "contact": "{{ $mobile ?? '9999999999' }}", // if passed to blade
+                    "contact": "{{ $mobile ?? '9999999999' }}",
                     "name": "User",
                     "email": "user@example.com"
                 },
@@ -177,7 +177,7 @@
                     "ondismiss": function () {
                         // ❌ If payment is dismissed/cancelled
                         $.ajax({
-                            url: "{{ route('seller.addWalletAmount') }}",
+                            url: "{{ route('seller.wallet') }}",
                             type: "POST",
                             data: {
                                 amount: amount,
@@ -185,7 +185,14 @@
                                 _token: "{{ csrf_token() }}"
                             },
                             success: function (res) {
-                                alert('Payment was cancelled.');
+                                // alert(res.message); 
+                                window.location.reload();
+                                console.log('Cancellation Response:', res);
+                            },
+                            error: function (xhr) {
+                                // alert('Error occurred while cancelling payment.');
+                                window.location.reload();
+                                console.error('AJAX Error:', xhr);
                             }
                         });
                     }
@@ -195,7 +202,7 @@
             rzp.on('payment.failed', function (response) {
                 // ❌ If payment fails
                 $.ajax({
-                    url: "{{ route('seller.addWalletAmount') }}",
+                    url: "{{ route('seller.wallet') }}",
                     type: "POST",
                     data: {
                         amount: amount,
@@ -204,7 +211,14 @@
                         _token: "{{ csrf_token() }}"
                     },
                     success: function (res) {
-                        alert('Payment failed: ' + response.error.description);
+                        // alert('Payment failed: ' + res.message); 
+                        window.location.reload();
+                        console.log('Failure Response:', res);
+                    },
+                    error: function (xhr) {
+                        // alert('Error occurred while processing failed payment.');
+                        window.location.reload();
+                        console.error('AJAX Error:', xhr);
                     }
                 });
             });

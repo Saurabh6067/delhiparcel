@@ -67,77 +67,92 @@ class SellerController extends Controller
         return view('seller.CodSellerAmount', compact('data', 'amount'));
     }
 
-    // public function addWalletAmount(Request $request)
-    // {
-    //     $user = Session::get('sid');
-    //     $status = $request->input('status', 'success');
-
-    //     // Don't credit wallet unless success
-    //     if ($status === 'success') {
-    //         $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-    //         $total = $data ? $data->total + $request->amount : $request->amount;
-
-    //         $branch = Branch::where('id', $user)->first();
-    //         $mobile = $branch ? $branch->phoneno : '0000000000';
-
-    //         $wlt = new Wallet();
-    //         $wlt->userid = $user;
-    //         $wlt->c_amount = $request->amount;
-    //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-    //         $wlt->total = $total;
-    //         $wlt->msg = 'credit';
-    //         $wlt->txn_id = $request->razorpay_payment_id ?? null;
-    //         $wlt->status = 'success'; // Add this column if not present
-    //         $wlt->save();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Amount added successfully!',
-    //         ]);
-    //     } else {
-    //         $wlt = new Wallet();
-    //         $wlt->userid = $user;
-    //         $wlt->c_amount = $request->amount;
-    //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-    //         $wlt->total = Wallet::where('userid', $user)->orderBy('id', 'desc')->value('total') ?? 0;
-    //         $wlt->msg = 'credit';
-    //         $wlt->txn_id = $request->razorpay_payment_id ?? null;
-    //         $wlt->status = $status; // 'failed' or 'cancelled'
-    //         $wlt->save();
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => "Payment $status"
-    //         ]);
-    //     }
-    // }
-
     public function addWalletAmount(Request $request)
     {
         $user = Session::get('sid');
 
+        // Get the user's current wallet balance
         $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-        $total = $data ? $data->total + $request->amount : $request->amount;
+        $total = $data ? $data->total : 0; // Default to 0 if no previous record
 
+        // Get mobile number of the branch user
         $branch = Branch::where('id', $user)->first();
-        $mobile = $branch ? $branch->phoneno : '9999999999'; // fallback number
+        $mobile = $branch ? $branch->phoneno : '9999999999'; // Fallback number
 
-        $wlt = new Wallet();
-        $wlt->userid = $user;
-        $wlt->c_amount = $request->amount;
-        $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $wlt->total = $total;
-        $wlt->msg = 'credit';
-        $wlt->save();
+        // Validate request data
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+            'status' => 'required|in:success,failed,cancelled',
+            'razorpay_payment_id' => 'nullable|string',
+            'reason' => 'nullable|string',
+        ]);
 
-        if ($request->ajax()) {
-            return response()->json([
+        // Initialize response array
+        $response = [
+            'success' => false,
+            'message' => 'Payment processing failed.',
+        ];
+
+        // Handle payment status
+        if ($request->status === 'success') {
+            // Only update wallet on successful payment
+            $wlt = new Wallet();
+            $wlt->userid = $user;
+            $wlt->c_amount = $request->amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = $total + $request->amount; // Update total
+            $wlt->msg = 'credit';
+            $wlt->refno = $request->razorpay_payment_id; // Store payment ID
+            $wlt->status = 'success'; // Store payment status
+            $wlt->save();
+
+            $response = [
                 'success' => true,
                 'message' => 'Amount added successfully!',
-                'mobile' => $mobile, // ✅ Return mobile number for Razorpay use
-                'html' => view('booking.inc.wallet', compact('data'))->render(),
-            ]);
+                'mobile' => $mobile,
+                'html' => view('booking.inc.wallet', ['data' => $wlt])->render(),
+            ];
+        } elseif ($request->status === 'failed') {
+            // Log failed payment for reference
+            $wlt = new Wallet();
+            $wlt->userid = $user;
+            $wlt->c_amount = $request->amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = $total; // No change in total
+            $wlt->msg = 'failed: ' . ($request->reason ?? 'Payment failed');
+            $wlt->refno = $request->razorpay_payment_id;
+            $wlt->status = 'failed';
+            $wlt->save();
+
+            $response = [
+                'success' => false,
+                'message' => 'Payment failed: ' . ($request->reason ?? 'Unknown error'),
+                'mobile' => $mobile,
+            ];
+        } elseif ($request->status === 'cancelled') {
+            // Log cancelled payment
+            $wlt = new Wallet();
+            $wlt->userid = $user;
+            $wlt->c_amount = $request->amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = $total; // No change in total
+            $wlt->msg = 'cancelled';
+            $wlt->status = 'cancelled';
+            $wlt->save();
+
+            $response = [
+                'success' => false,
+                'message' => 'Payment was cancelled.',
+                'mobile' => $mobile,
+            ];
         }
+
+        if ($request->ajax()) {
+            return response()->json($response);
+        }
+
+        // For non-AJAX requests (optional, if needed)
+        return redirect()->back()->with('message', $response['message']);
     }
     public function sellerLogin(Request $request)
     {
