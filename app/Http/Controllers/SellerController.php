@@ -67,38 +67,6 @@ class SellerController extends Controller
         return view('seller.CodSellerAmount', compact('data', 'amount'));
     }
 
-    // public function addWalletAmount(Request $request)
-    // {
-    //     $user = Session::get('sid');
-    //     $data = Wallet::where('userid', $user)
-    //         ->orderBy('id', 'desc')
-    //         ->first();
-    //     if ($data) {
-    //         $total = $data->total + $request->amount;
-    //     } else {
-    //         $total = $request->amount;
-    //     }
-
-    //     $wlt = new Wallet();
-    //     $wlt->userid = $user;
-    //     $wlt->c_amount = $request->amount;
-
-    //     $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-
-    //     $wlt->total = $total;
-    //     $wlt->msg = 'credit';
-    //     $wlt->save();
-
-    //     if ($request->ajax()) {
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Amount added successfully!',
-    //             'html' => view('seller.inc.wallet', compact('data'))->render(),
-    //         ]);
-    //     }
-    // }
-
-
     public function addWalletAmount(Request $request)
     {
         $user = Session::get('sid');
