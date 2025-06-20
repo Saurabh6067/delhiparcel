@@ -230,7 +230,7 @@ class SellerController extends Controller
 
         if (!$merchantTransactionId) {
             Log::error('Invalid callback data: No merchantTransactionId');
-            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Invalid callback data.');
+            return redirect()->to('https://delhiparcel.com')->with('error', 'Invalid callback data.');
         }
 
         // Re-verify with PhonePe
@@ -271,19 +271,19 @@ class SellerController extends Controller
                     Session::put('sid', $wallet->userid);
 
                     Log::info('Wallet updated successfully for transaction: ' . $merchantTransactionId);
-                    return redirect()->to('https://delhiparcel.com/seller-wallet')->with('success', 'Wallet updated successfully!');
+                    return redirect()->to('https://delhiparcel.com')->with('success', 'Wallet updated successfully!');
                 } else {
                     Log::warning('Wallet not found or already success for transaction: ' . $merchantTransactionId);
-                    return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Wallet already updated or not found.');
+                    return redirect()->to('https://delhiparcel.com')->with('error', 'Wallet already updated or not found.');
                 }
             } else {
                 Log::error('Payment failed for transaction: ' . $merchantTransactionId, ['response' => $res]);
                 Wallet::where('refno', $merchantTransactionId)->update(['status' => 'failed']);
-                return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+                return redirect()->to('https://delhiparcel.com')->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
             }
         } catch (\Exception $e) {
             Log::error('Error in wallet payment callback: ' . $e->getMessage());
-            return redirect()->to('https://delhiparcel.com/seller-wallet')->with('error', 'An error occurred during payment processing.');
+            return redirect()->to('https://delhiparcel.com')->with('error', 'An error occurred during payment processing.');
         }
     }
 
