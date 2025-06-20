@@ -178,7 +178,7 @@
                     "ondismiss": function () {
                         // ❌ If payment is dismissed/cancelled
                         $.ajax({
-                            url: "{{ route('booking.addWalletAmount') }}",
+                            url: "{{ route('booking.wallet') }}",
                             type: "POST",
                             data: {
                                 amount: amount,
@@ -201,7 +201,7 @@
             rzp.on('payment.failed', function (response) {
                 // ❌ If payment fails
                 $.ajax({
-                    url: "{{ route('booking.addWalletAmount') }}",
+                    url: "{{ route('booking.wallet') }}",
                     type: "POST",
                     data: {
                         amount: amount,
