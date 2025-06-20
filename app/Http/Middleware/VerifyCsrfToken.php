@@ -11,10 +11,10 @@ class VerifyCsrfToken extends Middleware
      *
      * @var array<int, string>
      */
-    // protected $except = [
-    //     '*'
-    // ];
     protected $except = [
-        'wallet/payment/callback', // ✅ Add this line
+        '*'
     ];
+    // protected $except = [
+    //     'wallet/payment/callback', // ✅ Add this line
+    // ];
 }
