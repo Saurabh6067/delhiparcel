@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Api;
 use Carbon\Carbon;
 use App\Models\Branch;
 use App\Models\Category;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookingOtp;
 use Illuminate\Support\Facades\DB;
+
+use Illuminate\Support\Facades\Http;
 
 
 class WebController extends Controller
@@ -773,30 +776,47 @@ class WebController extends Controller
     //     }
     // }
 
-
     public function createRazorpayOrder(Request $request)
     {
+        // Validate the request
         $request->validate([
             'amount' => 'required|numeric|min:1',
         ]);
 
-        $api = new Api(env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'), env('RAZORPAY_SECRET'));
+        // Prepare the data for Razorpay order creation
+        $data = [
+            'amount' => $request->amount * 100, // Convert to paisa
+            'currency' => 'INR',
+            'payment_capture' => 1, // Auto-capture
+        ];
 
         try {
-            $order = $api->order->create([
-                'amount' => $request->amount * 100, // Convert to paisa
-                'currency' => 'INR',
-                'payment_capture' => 1 // Auto-capture
-            ]);
+            // Make HTTP POST request to Razorpay orders endpoint
+            $response = Http::withBasicAuth(
+                env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'),
+                env('RAZORPAY_SECRET')
+            )->post('https://api.razorpay.com/v1/orders', $data);
 
-            return response()->json([
-                'success' => true,
-                'order' => [
-                    'id' => $order->id,
-                    'amount' => $order->amount / 100 // Convert back to rupees
-                ]
-            ]);
+            // Check if the request was successful
+            if ($response->successful()) {
+                $order = $response->json();
+                return response()->json([
+                    'success' => true,
+                    'order' => [
+                        'id' => $order['id'],
+                        'amount' => $order['amount'] / 100 // Convert back to rupees
+                    ]
+                ]);
+            } else {
+                // Log the error response from Razorpay
+                Log::error("Razorpay order creation failed: " . $response->body());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to create payment order'
+                ], 500);
+            }
         } catch (\Exception $e) {
+            // Log any other exceptions (e.g., network issues)
             Log::error("Razorpay order creation failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
@@ -807,7 +827,7 @@ class WebController extends Controller
 
     public function storeParcelDetails(Request $request)
     {
-        $user = Session::get('bid'); // Assuming user/branch ID is stored in session
+
 
         // Validate request data
         $request->validate([
