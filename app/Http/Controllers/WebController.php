@@ -825,10 +825,8 @@ class WebController extends Controller
         }
     }
 
-    public function storeParcelDetails(Request $request)
+     public function storeParcelDetails(Request $request)
     {
-
-
         // Validate request data
         $request->validate([
             'service_id' => 'required',
@@ -857,13 +855,20 @@ class WebController extends Controller
         ];
 
         if ($request->payment_methods === 'online' && $request->status === 'success') {
-            // Verify Razorpay payment
-            $api = new Api(env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'), env('RAZORPAY_SECRET'));
-
+            // Verify Razorpay payment using HTTP request
             try {
-                $payment = $api->payment->fetch($request->razorpay_payment_id);
-                if ($payment->status !== 'captured') {
-                    throw new \Exception('Payment not captured');
+                $paymentResponse = Http::withBasicAuth(
+                    env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw'),
+                    env('RAZORPAY_SECRET')
+                )->get("https://api.razorpay.com/v1/payments/{$request->razorpay_payment_id}");
+
+                if ($paymentResponse->successful()) {
+                    $payment = $paymentResponse->json();
+                    if ($payment['status'] !== 'captured') {
+                        throw new \Exception('Payment not captured');
+                    }
+                } else {
+                    throw new \Exception('Failed to fetch payment details: ' . $paymentResponse->body());
                 }
             } catch (\Exception $e) {
                 Log::error("Razorpay payment verification failed: " . $e->getMessage());
@@ -890,7 +895,7 @@ class WebController extends Controller
             $order->sender_name = $request->sender_name;
             $order->sender_number = $request->number; // Sender number
             $order->sender_email = $request->email; // Sender email
-            $order->sender_address = $request->sender_address; // Fixed typo
+            $order->sender_address = $request->sender_address;
             $order->sender_pincode = $request->senderPinCode;
             $order->receiver_name = $request->receiver_name;
             $order->receiver_cnumber = $request->receiver_number;
@@ -917,10 +922,10 @@ class WebController extends Controller
             $order->created_at = $this->date;
             $order->updated_at = $this->date;
 
-            if ($request->payment_methods === 'online') {
-                $order->razorpay_payment_id = $request->razorpay_payment_id;
-                $order->razorpay_order_id = $request->razorpay_order_id;
-            }
+            // if ($request->payment_methods === 'online') {
+            //     $order->razorpay_payment_id = $request->razorpay_payment_id;
+            //     $order->razorpay_order_id = $request->razorpay_order_id;
+            // }
 
             $order->save();
             $lastInsertId = $order->id;
@@ -973,12 +978,12 @@ class WebController extends Controller
 
                         if (!empty($recipients)) {
                             Mail::to($recipients)->queue(new BookingOtp($mailData));
-                            Log::info("Booking confirmation email sent to: " . implode(', ', $recipients) . " for order ID: {$orderId}");
+                            Log::info("Order confirmation email sent to: " . implode(', ', $recipients) . ' for order ID: ' . $orderId);
                         } else {
-                            Log::warning("No valid email addresses provided for order ID: {$orderId}");
+                            Log::warning("No valid email addresses provided for order ID: " . $orderId);
                         }
                     } catch (\Exception $e) {
-                        Log::error("Failed to send booking confirmation email: " . $e->getMessage());
+                        Log::error("Failed to send order confirmation email: " . $e->getMessage());
                     }
                 });
             }
@@ -990,7 +995,7 @@ class WebController extends Controller
             ];
         } elseif ($request->status === 'failed') {
             // Log failed payment
-            Log::info("Failed payment attempt: Amount: {$request->amount}, Reason: {$request->reason}");
+            Log::info("Failed payment attempt: Amount: {$request->amount}, Reason: " . ($request->reason ?? ''));
             $response = [
                 'success' => false,
                 'message' => 'Payment failed: ' . ($request->reason ?? 'Unknown error'),
@@ -1010,6 +1015,8 @@ class WebController extends Controller
 
         return redirect()->back()->with('error', $response['message']);
     }
+
+
 
 
 
