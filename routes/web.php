@@ -318,6 +318,8 @@ Route::middleware(['bookinglogin'])->group(function () {
     // Route::any('/booking-update-boySt', [BookingController::class, 'bookingUpdateBoySt'])->name('booking.update.boySt');
 
     Route::any('/booking-wallet', [BookingController::class, 'bookingWallet'])->name('booking.wallet');
+
+    // booking razorpay 
     Route::any('/booking-add-wallet', [BookingController::class, 'addWalletAmount'])->name('booking.addWalletAmount');
 
     Route::any('/booking-add-Delivery-Order', [BookingController::class, 'addDeliveryOrder'])->name('booking.addDeliveryOrder');
