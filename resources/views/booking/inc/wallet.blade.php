@@ -4,7 +4,7 @@
 @foreach ($data as $item)
     <tr>
         <td>{{ $sr++ }}</td>
-        <td>{{ $item->datetime }}</td>
+        <td>{{ $item->datetime ?? '-'}}</td>
         <td>{{ $item->c_amount ?? '-' }}</td>
         <td>{{ $item->d_amount ?? '-' }}</td>
         <td>{{ $item->total }}</td>
