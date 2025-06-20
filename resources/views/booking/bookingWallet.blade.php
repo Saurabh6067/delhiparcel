@@ -107,6 +107,9 @@
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
     <script src="{{ asset('admin/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <!-- Page specific script -->
     <script>
         $(function() {
@@ -127,37 +130,55 @@
             });
         });
 
-        $(document).ready(function() {
-            $("#walletAdd").on("submit", function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
+       
+    </script>
+    <script>
+    $('#walletAdd').on('submit', function(e) {
+        e.preventDefault();
+        let amount = $('input[name="amount"]').val();
+        if (!amount || isNaN(amount)) {
+            alert("Please enter a valid amount");
+            return;
+        }
 
+        let amountInPaise = amount * 100;
+
+        let options = {
+            "key": "rzp_live_swdLQ9ocZUoa9F", // Your Razorpay Key ID
+            "amount": amountInPaise, // Amount is in paise
+            "currency": "INR",
+            "name": "Delhi Parcel",
+            "description": "Add to Wallet",
+            "handler": function (response) {
+                // After successful payment
                 $.ajax({
                     url: "{{ route('booking.addWalletAmount') }}",
-                    type: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(response) {
-                        $('#walletAdd')[0].reset();
-                        if (response.success) {
-                            Toast("success", response.message);
-                            $('#bodyData').html(response.html);
-                            $('#exampleModal').modal('hide');
-                        } else {
-                            Toast("error", response.message);
-                        }
+                    type: "POST",
+                    data: {
+                        amount: amount,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        _token: "{{ csrf_token() }}"
                     },
-                    error: function(err) {
-                        $('#exampleModal').modal('hide');
-                        setTimeout(function() {
+                    success: function(res) {
+                        if (res.success) {
+                            alert(res.message);
                             location.reload();
-                        }, 1000);
-                        Toast("success", "Amount added successfully!");
+                        }
                     }
                 });
-            });
-        });
-    </script>
+            },
+            "prefill": {
+                "name": "User",
+                "email": "user@example.com"
+            },
+            "theme": {
+                "color": "#28a745"
+            }
+        };
+
+        let rzp = new Razorpay(options);
+        rzp.open();
+    });
+</script>
+
 @endpush
