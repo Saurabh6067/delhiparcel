@@ -61,7 +61,11 @@ Route::any('/blogs', [WebController::class, 'blog'])->name('web.blog');
 
 Route::any('/check-PinCode', [WebController::class, 'checkPinCode'])->name('web.checkPinCode');
 Route::any('/parcel-details', [WebController::class, 'parcelDetails'])->name('web.parcelDetails');
+
 Route::post('/store-Parcel-Details', [WebController::class, 'storeParcelDetails'])->name('web.storeParcelDetails');
+Route::post('/create-razorpay-order', [WebController::class, 'createRazorpayOrder'])->name('web.createRazorpayOrder');
+
+
 Route::any('/reviews/{action}', [WebController::class, 'review'])->name('web.reviews');
 Route::post('/addReviews', [WebController::class, 'storeReview'])->name('web.addReviews');
 
