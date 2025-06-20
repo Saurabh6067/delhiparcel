@@ -138,7 +138,7 @@
                             <div class="single-features-sec">
                                 <div class="icon"><img src="{{ asset('web/images/features-icon1.png') }}" alt="">
                                 </div>
-                                <h4>10. Fill Form</h4>
+                                <h4>1. Fill Form</h4>
                                 <span>You just need to fill the form by clicking on the below apply now
                                     button.</span><br>
                                 <a href="{{ route('web.enquiry') }}">Apply Now</a>
