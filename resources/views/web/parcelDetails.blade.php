@@ -1,7 +1,7 @@
 @extends('web.layout.main')
 @section('main')
     <div class="container-fluid pt-5">
-        <section class="services-sec bg-light mt-5 pt-5">
+        <section class="services-sec bg-light mt-5">
             <div class="container mt-5">
                 <div class="row justify-content-center">
                     <div class="col-lg-8 col-md-8">
@@ -22,25 +22,28 @@
                     <input type="hidden" name="pickupAddress" id="pickupAddress" value="{{ $data['pickupAddress'] }}">
                     <input type="hidden" name="deliveryAddress" id="deliveryAddress" value="{{ $data['deliveryAddress'] }}">
 
-                    <!-- Sender and Receiver Details (unchanged) -->
+                    <!-- Sender and Receiver (unchanged) -->
                     <div class="row">
                         <div class="col-sm-12 col-lg-6">
                             <h2 class="text-center mb-4">Sender Details</h2>
                             <div class="row">
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="name">Sender Name</label>
-                                    <input type="text" id="name" name="sender_name" class="form-control"
-                                        placeholder="Enter Sender Name" required>
+                                    <input type="text" id="sender_name" name="id" class="form-control"
+                                        placeholder="Enter Sender Name" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="number">Sender Contact Number</label>
                                     <input type="tel" id="sender_number" name="number" pattern="[6789][0-9]{9}"
-                                        class="form-control" placeholder="Enter Sender Contact Number" required>
+                                        class="form-control" placeholder="Enter Sender Contact Number" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="email">Sender Email</label>
                                     <input type="email" id="sender_email" name="email" class="form-control"
-                                        placeholder="Enter Sender Email" required>
+                                        placeholder="Enter Sender Email" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="address">Sender Full Address</label>
@@ -51,32 +54,36 @@
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="senderPinCode">Sender Pin Code</label>
                                     <input type="text" id="senderPinCode" name="senderPinCode" class="form-control"
-                                        placeholder="Enter Sender Pin Code" value="{{ $data['pickupPincode'] }}" readonly>
+                                        placeholder="Enter Sender Pin Code" value="{{ $data['pickupPincode'] }}" readonly
+                                        >
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-12 col-lg-6">
                             <h2 class="text-center mb-4">Receiver Details</h2>
                             <div class="row">
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="namer">Receiver Name</label>
                                     <input type="text" id="namer" name="receiver_name" class="form-control"
-                                        placeholder="Enter Receiver Name" required>
+                                        placeholder="Enter Receiver Name" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="number">Receiver Contact Number</label>
                                     <input type="tel" id="receiver_number" name="receiver_number" pattern="[6789][0-9]{9}"
-                                        class="form-control" placeholder="Enter Receiver Contact Number" required>
+                                        class="form-control" placeholder="Enter Receiver Contact Number" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="email">Receiver Email</label>
                                     <input type="email" id="receiver_email" name="receiver_email" class="form-control"
-                                        placeholder="Enter Receiver Email" required>
+                                        placeholder="Enter Receiver Email" required
+                                        >
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="address">Receiver Full Address</label>
-                                    <textarea type="text" id="address" name="receiver_address" class="form-control"
+                                    <textarea
+                                        type="text" id="address" name="receiver_address" class="form-control"
                                         placeholder="Enter Receiver Address" {{ $data['service_type'] === 'SuperExpress' ? 'readonly' : '' }}
                                         required>{{ ($data['service_type'] !== 'SuperExpress' && $data['deliveryAddress'] === 'NA') ? '' : $data['deliveryAddress'] }}</textarea>
                                 </div>
@@ -84,7 +91,8 @@
                                     <label class="form-label fw-bold" for="receiverPinCode">Receiver Pin Code</label>
                                     <input type="text" id="receiverPinCode" name="receiverPinCode" class="form-control"
                                         placeholder="Enter Receiver Pin Code" value="{{ $data['deliveryPincode'] }}"
-                                        readonly>
+                                        readonly
+                                        >
                                 </div>
                             </div>
                         </div>
@@ -165,9 +173,6 @@
 @endsection
 
 @push('scripts')
-    <!-- Include Razorpay Checkout Script (optional if only COD is used) -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
     <script>
         $(document).ready(function () {
             const codRadio = document.getElementById('cod');
@@ -233,97 +238,9 @@
                 paymentError.style.display = 'none';
                 let totalPrice = updateTotalAmount();
                 let formData = new FormData(this);
+                formData.append('status', 'success'); // Treat all submissions as successful
 
-                if (selectedPayment.value === 'online') {
-                    // Create Razorpay order (keep this for online payments)
-                    $.ajax({
-                        url: "{{ route('web.createRazorpayOrder') }}",
-                        type: "POST",
-                        data: {
-                            amount: totalPrice,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                let rzp = new Razorpay({
-                                    key: "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
-                                    amount: response.order.amount * 100,
-                                    currency: "INR",
-                                    name: "Delhi Parcel",
-                                    description: "Parcel Booking Payment",
-                                    order_id: response.order.id,
-                                    handler: function (response) {
-                                        formData.append('razorpay_payment_id', response.razorpay_payment_id);
-                                        formData.append('razorpay_order_id', response.razorpay_order_id);
-                                        formData.append('status', 'success');
-                                        submitParcelForm(formData);
-                                    },
-                                    prefill: {
-                                        name: $('#name').val(),
-                                        email: $('#sender_email').val(),
-                                        contact: $('#sender_number').val()
-                                    },
-                                    theme: {
-                                        color: "#28a745"
-                                    },
-                                    modal: {
-                                        ondismiss: function () {
-                                            $.ajax({
-                                                url: "{{ route('web.storeParcelDetails') }}",
-                                                type: "POST",
-                                                data: {
-                                                    amount: totalPrice,
-                                                    status: 'cancelled',
-                                                    _token: "{{ csrf_token() }}"
-                                                },
-                                                success: function (res) {
-                                                    swal("Cancelled", res.message, "info");
-                                                },
-                                                error: function (xhr) {
-                                                    swal("Error", "Failed to process cancellation", "error");
-                                                }
-                                            });
-                                        }
-                                    }
-                                });
-
-                                rzp.on('payment.failed', function (response) {
-                                    $.ajax({
-                                        url: "{{ route('web.storeParcelDetails') }}",
-                                        type: "POST",
-                                        data: {
-                                            amount: totalPrice,
-                                            status: 'failed',
-                                            reason: response.error.description,
-                                            _token: "{{ csrf_token() }}"
-                                        },
-                                        success: function (res) {
-                                            swal("Failed", res.message, "error");
-                                        },
-                                        error: function (xhr) {
-                                            swal("Error", "Failed to process payment failure", "error");
-                                        }
-                                    });
-                                });
-
-                                rzp.open();
-                            } else {
-                                swal("Error", response.message, "error");
-                            }
-                        },
-                        error: function (xhr) {
-                            swal("Error", "Failed to create payment order", "error");
-                        }
-                    });
-                } else {
-                    // For COD or no payment ID, directly submit form
-                    formData.append('status', 'success'); // Treat COD as successful
-                    submitParcelForm(formData);
-                }
-            });
-
-            // Function to submit parcel form
-            function submitParcelForm(formData) {
+                // Directly submit form for both COD and online
                 $.ajax({
                     url: "{{ route('web.storeParcelDetails') }}",
                     type: "POST",
@@ -342,10 +259,10 @@
                         }
                     },
                     error: function (xhr) {
-                        swal("Error", "Failed to book parcel", "error");
+                        swal("Error", "Failed to book parcel: " + (xhr.responseJSON?.message || "Unknown error"), "error");
                     }
                 });
-            }
+            });
         });
     </script>
 @endpush
