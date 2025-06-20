@@ -221,7 +221,6 @@ class SellerController extends Controller
             return back()->with('error', 'An error occurred while initiating payment.');
         }
     }
-
     public function walletPaymentCallback(Request $request)
     {
         Log::info('Wallet Payment Callback Request:', $request->all());

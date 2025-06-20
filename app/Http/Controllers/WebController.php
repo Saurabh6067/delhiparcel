@@ -23,16 +23,16 @@ use Illuminate\Support\Facades\DB;
 
 class WebController extends Controller
 {
-    
+
     protected $date;
     public function __construct()
     {
-        $kolkataDateTime  = Carbon::now('Asia/Kolkata');
-        $this->date       = $kolkataDateTime->format('Y-m-d H:i:s');
+        $kolkataDateTime = Carbon::now('Asia/Kolkata');
+        $this->date = $kolkataDateTime->format('Y-m-d H:i:s');
     }
-    
-    
-      public function index()
+
+
+    public function index()
     {
         $se = Service::where('type', 'se')->where('status', 'active')->orderBy('id', 'asc')->get();
         $ex = Service::where('type', 'ex')->where('status', 'active')->orderBy('id', 'asc')->get();
@@ -40,7 +40,7 @@ class WebController extends Controller
         $service_time = EstimatedService::orderBy('id', 'Desc')->get();
         return view('web.welcome', compact('ex', 'ss', 'se', 'service_time'));
     }
-    
+
     // public function index()
     // {
     //     // Fetch and sort 'ex' services
@@ -53,7 +53,7 @@ class WebController extends Controller
     //             }
     //             return 0;
     //         })->values();
-    
+
     //     // Fetch and sort 'ss' services
     //     $ss = Service::where('type', 'ss')
     //         ->where('status', 'active')
@@ -64,7 +64,7 @@ class WebController extends Controller
     //             }
     //             return 0;
     //         })->values();
-    
+
     //     // Fetch and sort 'se' services
     //     $se = Service::where('type', 'se')
     //         ->where('status', 'active')
@@ -75,7 +75,7 @@ class WebController extends Controller
     //             }
     //             return 0;
     //         })->values();
-    
+
     //     return view('web.welcome', compact('ex', 'ss', 'se'));
     // }
 
@@ -88,7 +88,7 @@ class WebController extends Controller
         $ex = Service::where('type', 'ex')->where('status', 'active')->orderBy('id', 'asc')->get();
         $ss = Service::where('type', 'ss')->where('status', 'active')->orderBy('id', 'asc')->get();
         $service_time = EstimatedService::orderBy('id', 'Desc')->get();
-        return view('web.bookparcel', compact('ex', 'ss', 'se','service_time'));
+        return view('web.bookparcel', compact('ex', 'ss', 'se', 'service_time'));
     }
 
     public function service()
@@ -128,9 +128,9 @@ class WebController extends Controller
             ]);
         }
     }
-    
-    
-    
+
+
+
     // Delivery Boy Enq
     public function DeliveryBoyEnq()
     {
@@ -191,11 +191,11 @@ class WebController extends Controller
             return redirect()->back()->with('success', 'Franchise Enquiry sent successfully!');
         }
     }
-    
-    
-    
-    
-    
+
+
+
+
+
 
     public function about()
     {
@@ -227,15 +227,15 @@ class WebController extends Controller
             ?? Order::where('order_id', $id)->first();
 
         $orderDetails = OrderHistory::where('tracking_id', $id)->get();
-        
+
         // it is for Not Delivered Case 
         $orders = Order::where('orders.order_id', $id)
-                        ->leftJoin('order_histories', function ($join) {
-                            $join->on('orders.order_id', '=', 'order_histories.tracking_id')
-                                 ->where('order_histories.status', '=', 'Not Delivered');
-                        })->first();
-        
-        return view('web.trackOrder', compact('order', 'orderDetails','orders'));
+            ->leftJoin('order_histories', function ($join) {
+                $join->on('orders.order_id', '=', 'order_histories.tracking_id')
+                    ->where('order_histories.status', '=', 'Not Delivered');
+            })->first();
+
+        return view('web.trackOrder', compact('order', 'orderDetails', 'orders'));
     }
 
     public function trackOrderDetails(Request $request)
@@ -362,7 +362,7 @@ class WebController extends Controller
     //         ]);
     //     }
     // }
-    
+
     // 31 may delay max 5 second delay order booking time 
     // public function storeParcelDetails(Request $request)
     // {
@@ -451,7 +451,7 @@ class WebController extends Controller
     //         ]);
     //     }
     // }
-    
+
 
     // storeParcelDetails it is for quick order booking with mail 31 may latest code 
     // public function storeParcelDetails(Request $request)
@@ -461,26 +461,26 @@ class WebController extends Controller
     //                     ->where('type', 'Delivery')->first();
     //     $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
     //                     ->where(['status' => 'active'])->first();
-    
+
     //     $order = new Order();
     //     $order_history = new OrderHistory();
     //     $order->pickupAddress = $request->pickupAddress;
     //     $order->deliveryAddress = $request->deliveryAddress;
-    
+
     //     $order->receiver_name = $request->receiver_name;
     //     $order->receiver_cnumber = $request->receiver_number;
     //     $order->receiver_email = $request->receiver_email;
     //     $order->receiver_add = $request->receiver_address;
     //     $order->receiver_pincode = $request->receiverPinCode;
-    
+
     //     $order->sender_name = $request->sender_name;
     //     $order->sender_number = $request->sender_number;
     //     $order->sender_email = $request->sender_email;
     //     $order->sender_address = $request->sender_address;
     //     $order->sender_pincode = $request->senderPinCode;
-    
+
     //     $new_order_id = 'DL' . $this->generateRandomCode();
-    
+
     //     $order->service_type = $request->service_type;
     //     $order->service_title = $service->title ?? $request->service_id;
     //     $order->service_price = trim(str_replace('₹', '', $request->price));
@@ -497,15 +497,15 @@ class WebController extends Controller
     //     $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
     //     $order->created_at = $this->date;
     //     $order->updated_at = $this->date;
-    
+
     //     $order_history->tracking_id = $new_order_id;
     //     $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
     //     $order_history->status = 'Booked';
     //     $order_history->save();
-    
+
     //     $order->save();
     //     $orderId = $order->order_id;
-    
+
     //     // Mail data preparation (before response)
     //     $mailData = null;
     //     if ($order->sender_email) {
@@ -528,7 +528,7 @@ class WebController extends Controller
     //             'datetime' => $order->datetime,
     //         ];
     //     }
-    
+
     //     if ($request->ajax()) {
     //         if ($order->sender_email && $mailData) {
     //             register_shutdown_function(function () use ($order, $mailData, $orderId) {
@@ -547,7 +547,7 @@ class WebController extends Controller
     //         ]);
     //     }
     // }
-    
+
     // 16 june 
     // public function storeParcelDetails(Request $request)
     // {
@@ -556,26 +556,26 @@ class WebController extends Controller
     //                     ->where('type', 'Delivery')->first();
     //     $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
     //                     ->where(['status' => 'active'])->first();
-    
+
     //     $order = new Order();
     //     $order_history = new OrderHistory();
     //     $order->pickupAddress = $request->pickupAddress;
     //     $order->deliveryAddress = $request->deliveryAddress;
-    
+
     //     $order->receiver_name = $request->receiver_name;
     //     $order->receiver_cnumber = $request->receiver_number;
     //     $order->receiver_email = $request->receiver_email;
     //     $order->receiver_add = $request->receiver_address;
     //     $order->receiver_pincode = $request->receiverPinCode;
-    
+
     //     $order->sender_name = $request->sender_name;
     //     $order->sender_number = $request->sender_number;
     //     $order->sender_email = $request->sender_email;
     //     $order->sender_address = $request->sender_address;
     //     $order->sender_pincode = $request->senderPinCode;
-    
+
     //     $new_order_id = 'DL' . $this->generateRandomCode();
-    
+
     //     $order->service_type = $request->service_type;
     //     $order->service_title = $service->title ?? $request->service_id;
     //     $order->service_price = trim(str_replace('₹', '', $request->price));
@@ -592,15 +592,15 @@ class WebController extends Controller
     //     $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
     //     $order->created_at = $this->date;
     //     $order->updated_at = $this->date;
-    
+
     //     $order_history->tracking_id = $new_order_id;
     //     $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
     //     $order_history->status = 'Booked';
     //     $order_history->save();
-    
+
     //     $order->save();
     //     $orderId = $order->order_id;
-    
+
     //     // Mail data preparation
     //     $mailData = null;
     //     if ($order->sender_email || $order->receiver_email) {
@@ -623,7 +623,7 @@ class WebController extends Controller
     //             'datetime' => $order->datetime,
     //         ];
     //     }
-    
+
     //     if ($request->ajax()) {
     //         if ($mailData) {
     //             register_shutdown_function(function () use ($order, $mailData, $orderId) {
@@ -635,7 +635,7 @@ class WebController extends Controller
     //                     if ($order->receiver_email) {
     //                         $recipients[] = $order->receiver_email;
     //                     }
-    
+
     //                     if (!empty($recipients)) {
     //                         Mail::to($recipients)->send(new BookingOtp($mailData));
     //                         \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
@@ -657,38 +657,169 @@ class WebController extends Controller
 
 
     // new code with order id sequence change 
+    // public function storeParcelDetails(Request $request)
+    // {
+    //     $service = Service::where('id', $request->service_id)->first();
+    //     $branch = Branch::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
+    //         ->where('type', 'Delivery')->first();
+    //     $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
+    //         ->where(['status' => 'active'])->first();
+
+    //     $order = new Order();
+    //     $order_history = new OrderHistory();
+
+    //     $order->pickupAddress = $request->pickupAddress;
+    //     $order->deliveryAddress = $request->deliveryAddress;
+
+    //     $order->receiver_name = $request->receiver_name;
+    //     $order->receiver_cnumber = $request->receiver_number;
+    //     $order->receiver_email = $request->receiver_email;
+    //     $order->receiver_add = $request->receiver_address;
+    //     $order->receiver_pincode = $request->receiverPinCode;
+
+    //     $order->sender_name = $request->sender_name;
+    //     $order->sender_number = $request->sender_number;
+    //     $order->sender_email = $request->sender_email;
+    //     $order->sender_address = $request->sender_address;
+    //     $order->sender_pincode = $request->senderPinCode;
+
+    //     $fixedPrefix = 'DP1516800'; // Fixed order ID prefix
+
+    //     $order->service_type = $request->service_type;
+    //     $order->service_title = $service->title ?? $request->service_id;
+    //     $order->service_price = trim(str_replace('₹', '', $request->price));
+    //     $order->order_id = ''; // Temporary, will be updated after save
+    //     $order->seller_id = $branch->id ?? null;
+    //     $order->price = trim(str_replace('₹', '', $request->price));
+    //     $order->payment_mode = $request->payment_methods;
+    //     $order->codAmount = $request->codAmount;
+    //     $order->insurance = $request->insurance;
+    //     $order->order_status = 'Booked';
+    //     $order->assign_to = $DlyBoy->id ?? null;
+    //     $order->assign_by = $branch->id ?? null;
+    //     $order->parcel_type = 'Direct';
+    //     $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+    //     $order->created_at = $this->date;
+    //     $order->updated_at = $this->date;
+
+    //     $order->save(); // Save to get auto-increment ID
+    //     $lastInsertId = $order->id;
+
+    //     $generatedOrderId = $fixedPrefix . '' . $lastInsertId;
+    //     $order->order_id = $generatedOrderId;
+    //     $order->save(); // Update order_id
+
+    //     $orderId = $generatedOrderId;
+
+    //     // Order history
+    //     $order_history->tracking_id = $orderId;
+    //     $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+    //     $order_history->status = 'Booked';
+    //     $order_history->save();
+
+    //     // Mail data preparation
+    //     $mailData = null;
+    //     if ($order->sender_email || $order->receiver_email) {
+    //         $mailData = [
+    //             'title' => 'Order Booking Confirmation',
+    //             'order_id' => $orderId,
+    //             'service_type' => $order->service_type,
+    //             'price' => $order->price,
+    //             'payment_mode' => $order->payment_mode,
+    //             'sender_name' => $order->sender_name,
+    //             'sender_number' => $order->sender_number,
+    //             'sender_email' => $order->sender_email,
+    //             'sender_address' => $order->sender_address,
+    //             'sender_pincode' => $order->sender_pincode,
+    //             'receiver_name' => $order->receiver_name,
+    //             'receiver_cnumber' => $order->receiver_cnumber,
+    //             'receiver_email' => $order->receiver_email,
+    //             'receiver_add' => $order->receiver_add,
+    //             'receiver_pincode' => $order->receiver_pincode,
+    //             'datetime' => $order->datetime,
+    //         ];
+    //     }
+
+    //     if ($request->ajax()) {
+    //         if ($mailData) {
+    //             register_shutdown_function(function () use ($order, $mailData, $orderId) {
+    //                 try {
+    //                     $recipients = [];
+    //                     if ($order->sender_email) {
+    //                         $recipients[] = $order->sender_email;
+    //                     }
+    //                     if ($order->receiver_email) {
+    //                         $recipients[] = $order->receiver_email;
+    //                     }
+
+    //                     if (!empty($recipients)) {
+    //                         Mail::to($recipients)->queue(new BookingOtp($mailData));
+    //                         \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
+    //                     } else {
+    //                         \Log::warning("No valid email addresses provided for order ID: {$orderId}");
+    //                     }
+    //                 } catch (\Exception $e) {
+    //                     \Log::error("Failed to send booking confirmation email: " . $e->getMessage());
+    //                 }
+    //             });
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'msg' => 'Order Booked Successfully!',
+    //             'data' => $orderId,
+    //         ]);
+    //     }
+    // }
+
+
     public function storeParcelDetails(Request $request)
     {
+        // Validate request data (add your validation rules as needed)
+        $request->validate([
+            'service_id' => 'required|exists:services,id',
+            'senderPinCode' => 'required|string',
+            'receiverPinCode' => 'required|string',
+            'pickupAddress' => 'required|string',
+            'deliveryAddress' => 'required|string',
+            'receiver_name' => 'required|string',
+            'receiver_number' => 'required|string',
+            'receiver_address' => 'required|string',
+            'sender_name' => 'required|string',
+            'sender_number' => 'required|string',
+            'sender_address' => 'required|string',
+            'price' => 'required|string',
+            'payment_methods' => 'required|in:Prepaid,COD',
+            'codAmount' => 'nullable|numeric',
+            'insurance' => 'nullable|string',
+        ]);
+
         $service = Service::where('id', $request->service_id)->first();
         $branch = Branch::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
-                        ->where('type', 'Delivery')->first();
+            ->where('type', 'Delivery')->first();
         $DlyBoy = DlyBoy::where('pincode', 'LIKE', "%{$request->senderPinCode}%")
-                        ->where(['status' => 'active'])->first();
+            ->where(['status' => 'active'])->first();
 
         $order = new Order();
         $order_history = new OrderHistory();
 
+        // Assign order details
         $order->pickupAddress = $request->pickupAddress;
         $order->deliveryAddress = $request->deliveryAddress;
-
         $order->receiver_name = $request->receiver_name;
         $order->receiver_cnumber = $request->receiver_number;
         $order->receiver_email = $request->receiver_email;
         $order->receiver_add = $request->receiver_address;
         $order->receiver_pincode = $request->receiverPinCode;
-
         $order->sender_name = $request->sender_name;
         $order->sender_number = $request->sender_number;
         $order->sender_email = $request->sender_email;
         $order->sender_address = $request->sender_address;
         $order->sender_pincode = $request->senderPinCode;
-
-        $fixedPrefix = 'DP1516800'; // Fixed order ID prefix
-
+        $fixedPrefix = 'DP1516800';
         $order->service_type = $request->service_type;
         $order->service_title = $service->title ?? $request->service_id;
         $order->service_price = trim(str_replace('₹', '', $request->price));
-        $order->order_id = ''; // Temporary, will be updated after save
         $order->seller_id = $branch->id ?? null;
         $order->price = trim(str_replace('₹', '', $request->price));
         $order->payment_mode = $request->payment_methods;
@@ -702,73 +833,101 @@ class WebController extends Controller
         $order->created_at = $this->date;
         $order->updated_at = $this->date;
 
-        $order->save(); // Save to get auto-increment ID
-        $lastInsertId = $order->id;
+        if ($request->payment_methods === 'Prepaid') {
+            // Initialize Razorpay
+            $api = new Api(config('services.razorpay.key'), config('services.razorpay.secret'));
 
-        $generatedOrderId = $fixedPrefix . '' . $lastInsertId;
-        $order->order_id = $generatedOrderId;
-        $order->save(); // Update order_id
+            try {
+                // Create Razorpay order
+                $razorpayOrder = $api->order->create([
+                    'amount' => (int) (floatval($order->price) * 100), // Convert to paise
+                    'currency' => 'INR',
+                    'receipt' => 'order_rcptid_' . time(),
+                ]);
 
-        $orderId = $generatedOrderId;
+                // Store Razorpay order ID temporarily
+                $order->razorpay_order_id = $razorpayOrder['id'];
 
-        // Order history
-        $order_history->tracking_id = $orderId;
-        $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $order_history->status = 'Booked';
-        $order_history->save();
+                // If this is an AJAX request, return Razorpay order details for client-side payment
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => true,
+                        'msg' => 'Initiating payment...',
+                        'razorpay_order_id' => $razorpayOrder['id'],
+                        'amount' => $razorpayOrder['amount'],
+                        'key' => config('services.razorpay.key'),
+                        'order_data' => $order->toArray(), // Send order data to verify later
+                    ]);
+                }
+            } catch (\Exception $e) {
+                Log::error("Razorpay order creation failed: " . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'msg' => 'Payment initiation failed. Please try again.',
+                ], 500);
+            }
+        } else {
+            // For COD, save order directly
+            $order->save();
+            $lastInsertId = $order->id;
+            $generatedOrderId = $fixedPrefix . $lastInsertId;
+            $order->order_id = $generatedOrderId;
+            $order->save();
 
-        // Mail data preparation
-        $mailData = null;
-        if ($order->sender_email || $order->receiver_email) {
-            $mailData = [
-                'title' => 'Order Booking Confirmation',
-                'order_id' => $orderId,
-                'service_type' => $order->service_type,
-                'price' => $order->price,
-                'payment_mode' => $order->payment_mode,
-                'sender_name' => $order->sender_name,
-                'sender_number' => $order->sender_number,
-                'sender_email' => $order->sender_email,
-                'sender_address' => $order->sender_address,
-                'sender_pincode' => $order->sender_pincode,
-                'receiver_name' => $order->receiver_name,
-                'receiver_cnumber' => $order->receiver_cnumber,
-                'receiver_email' => $order->receiver_email,
-                'receiver_add' => $order->receiver_add,
-                'receiver_pincode' => $order->receiver_pincode,
-                'datetime' => $order->datetime,
-            ];
-        }
+            $orderId = $generatedOrderId;
 
-        if ($request->ajax()) {
-            if ($mailData) {
-                register_shutdown_function(function () use ($order, $mailData, $orderId) {
-                    try {
-                        $recipients = [];
-                        if ($order->sender_email) {
-                            $recipients[] = $order->sender_email;
-                        }
-                        if ($order->receiver_email) {
-                            $recipients[] = $order->receiver_email;
-                        }
+            // Order history
+            $order_history->tracking_id = $orderId;
+            $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $order_history->status = 'Booked';
+            $order_history->save();
 
-                        if (!empty($recipients)) {
-                            Mail::to($recipients)->queue(new BookingOtp($mailData));
-                            \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
-                        } else {
-                            \Log::warning("No valid email addresses provided for order ID: {$orderId}");
-                        }
-                    } catch (\Exception $e) {
-                        \Log::error("Failed to send booking confirmation email: " . $e->getMessage());
-                    }
-                });
+            // Mail data preparation
+            $mailData = null;
+            if ($order->sender_email || $order->receiver_email) {
+                $mailData = [
+                    'title' => 'Order Booking Confirmation',
+                    'order_id' => $orderId,
+                    'service_type' => $order->service_type,
+                    'price' => $order->price,
+                    'payment_mode' => $order->payment_mode,
+                    'sender_name' => $order->sender_name,
+                    'sender_number' => $order->sender_number,
+                    'sender_email' => $order->sender_email,
+                    'sender_address' => $order->sender_address,
+                    'sender_pincode' => $order->sender_pincode,
+                    'receiver_name' => $order->receiver_name,
+                    'receiver_cnumber' => $order->receiver_cnumber,
+                    'receiver_email' => $order->receiver_email,
+                    'receiver_add' => $order->receiver_add,
+                    'receiver_pincode' => $order->receiver_pincode,
+                    'datetime' => $order->datetime,
+                ];
             }
 
-            return response()->json([
-                'success' => true,
-                'msg' => 'Order Booked Successfully!',
-                'data' => $orderId,
-            ]);
+            if ($request->ajax()) {
+                if ($mailData) {
+                    register_shutdown_function(function () use ($order, $mailData, $orderId) {
+                        try {
+                            $recipients = array_filter([$order->sender_email, $order->receiver_email]);
+                            if (!empty($recipients)) {
+                                Mail::to($recipients)->queue(new BookingOtp($mailData));
+                                Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
+                            } else {
+                                Log::warning("No valid email addresses provided for order ID: {$orderId}");
+                            }
+                        } catch (\Exception $e) {
+                            Log::error("Failed to send booking confirmation email: " . $e->getMessage());
+                        }
+                    });
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'msg' => 'Order Booked Successfully!',
+                    'data' => $orderId,
+                ]);
+            }
         }
     }
 
@@ -825,17 +984,17 @@ class WebController extends Controller
             return view('web.label1', compact('data'));
         }
     }
-    
-     public function orderLabelviaEmailCod($id)
-     {
+
+    public function orderLabelviaEmailCod($id)
+    {
         $data = Order::where('order_id', $id)->first() ?? WebOrder::where('order_id', $id)->first();
         return view('web.label', compact('data'));
-   
+
     }
-     public function orderLabelviaEmailOnline($id)
-     {
+    public function orderLabelviaEmailOnline($id)
+    {
         $data = Order::where('order_id', $id)->first() ?? WebOrder::where('order_id', $id)->first();
         return view('web.label1', compact('data'));
-    
+
     }
 }

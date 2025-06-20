@@ -97,7 +97,7 @@
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" name="amount" placeholder="0.0" required>
                             <div class="input-group-append">
-                                <button type="submit" class="btn btn-success">Pay Now</button>
+                                <button type="submit"  class="btn btn-success">Pay Now</button>
                             </div>
                         </div>
                     </form>
