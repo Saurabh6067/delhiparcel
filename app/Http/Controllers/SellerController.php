@@ -223,89 +223,100 @@ class SellerController extends Controller
     // }
 
     public function addWalletAmount(Request $request)
-    {
-        $request->validate([
-            'amount' => 'required|numeric|min:1',
-        ]);
+{
+    // Validate the request
+    $request->validate([
+        'amount' => 'required|numeric|min:1',
+    ]);
 
-        $user = Session::get('sid');
-        if (!$user) {
-            \Log::error('User session not found');
-            return back()->with('error', 'Session expired. Please log in again.');
-        }
-
-        $amount = $request->amount;
-
-        $merchantId = 'M1SMOAY31YWH';
-        $saltKey = '06df03a2-65b9-42f8-b7b9-26590674bc29';
-        $saltIndex = 1;
-
-        $transactionId = uniqid('TXN_');
-        $redirectUrl = route('wallet.payment.callback');
-        $callbackUrl = $redirectUrl;
-
-        $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
-        $currentTotal = $latestWallet ? $latestWallet->total : 0;
-        $newTotal = $currentTotal + $amount;
-
-        $wallet = new Wallet();
-        $wallet->userid = $user;
-        $wallet->c_amount = $amount;
-        $wallet->d_amount = 0;
-        $wallet->total = $newTotal;
-        $wallet->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $wallet->status = 'pending';
-        $wallet->adminid = null;
-        $wallet->refno = $transactionId;
-        $wallet->msg = 'credit';
-        $wallet->save();
-
-        $amountInPaise = (int) ($amount * 100);
-        $payload = [
-            'merchantId' => $merchantId,
-            'merchantTransactionId' => $transactionId,
-            'merchantUserId' => 'user_' . $user,
-            'amount' => $amountInPaise,
-            'redirectUrl' => $redirectUrl,
-            'redirectMode' => 'POST',
-            'callbackUrl' => $callbackUrl,
-            'paymentInstrument' => [
-                'type' => 'PAY_PAGE',
-            ],
-        ];
-
-        $jsonPayload = json_encode($payload);
-        $base64Payload = base64_encode($jsonPayload);
-        $stringToSign = $base64Payload . "/pg/v1/pay" . $saltKey;
-        $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
-
-        // Re-login the user before redirecting to payment URL
-        Auth::loginUsingId($user);
-        Session::put('sid', $user);
-
-        try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'X-VERIFY' => $xVerify,
-                'X-MERCHANT-ID' => $merchantId,
-            ])->withBody(json_encode(['request' => $base64Payload]), 'application/json')
-                ->post('https://api.phonepe.com/apis/hermes/pg/v1/pay');
-
-            $res = $response->json();
-            \Log::info('PhonePe Payment Initiation Response:', $res);
-
-            if (isset($res['success']) && $res['success']) {
-                $paymentUrl = $res['data']['instrumentResponse']['redirectInfo']['url'];
-                return redirect()->away($paymentUrl);
-            } else {
-                \Log::error('Payment initiation failed:', $res);
-                return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
-            }
-        } catch (\Exception $e) {
-            \Log::error('Error initiating payment: ' . $e->getMessage());
-            return back()->with('error', 'An error occurred while initiating payment.');
-        }
+    // Get user ID from session
+    $user = Session::get('sid');
+    if (!$user) {
+        \Log::error('User session not found');
+        return back()->with('error', 'Session expired. Please log in again.');
     }
+
+    // Re-validate user existence in Branch model
+    $branch = Branch::find($user);
+    if (!$branch) {
+        \Log::error('User not found in Branch model for ID: ' . $user);
+        return back()->with('error', 'User not found. Please log in again.');
+    }
+
+    $amount = $request->amount;
+
+    $merchantId = 'M1SMOAY31YWH';
+    $saltKey = '06df03a2-65b9-42f8-b7b9-26590674bc29';
+    $saltIndex = 1;
+
+    $transactionId = uniqid('TXN_');
+    $redirectUrl = route('wallet.payment.callback');
+    $callbackUrl = $redirectUrl;
+
+    // Calculate new wallet total
+    $latestWallet = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
+    $currentTotal = $latestWallet ? $latestWallet->total : 0;
+    $newTotal = $currentTotal + $amount;
+
+    // Create wallet entry
+    $wallet = new Wallet();
+    $wallet->userid = $user;
+    $wallet->c_amount = $amount;
+    $wallet->d_amount = 0;
+    $wallet->total = $newTotal;
+    $wallet->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+    $wallet->status = 'pending';
+    $wallet->adminid = null;
+    $wallet->refno = $transactionId;
+    $wallet->msg = 'credit';
+    $wallet->save();
+
+    $amountInPaise = (int) ($amount * 100);
+    $payload = [
+        'merchantId' => $merchantId,
+        'merchantTransactionId' => $transactionId,
+        'merchantUserId' => 'user_' . $user,
+        'amount' => $amountInPaise,
+        'redirectUrl' => $redirectUrl,
+        'redirectMode' => 'POST',
+        'callbackUrl' => $callbackUrl,
+        'paymentInstrument' => [
+            'type' => 'PAY_PAGE',
+        ],
+    ];
+
+    $jsonPayload = json_encode($payload);
+    $base64Payload = base64_encode($jsonPayload);
+    $stringToSign = $base64Payload . "/pg/v1/pay" . $saltKey;
+    $xVerify = hash('sha256', $stringToSign) . "###" . $saltIndex;
+
+    // Re-establish session to ensure it persists
+    Session::put('sid', $user);
+    Session::save(); // Explicitly save the session to ensure persistence
+
+    try {
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'X-VERIFY' => $xVerify,
+            'X-MERCHANT-ID' => $merchantId,
+        ])->withBody(json_encode(['request' => $base64Payload]), 'application/json')
+            ->post('https://api.phonepe.com/apis/hermes/pg/v1/pay');
+
+        $res = $response->json();
+        \Log::info('PhonePe Payment Initiation Response:', $res);
+
+        if (isset($res['success']) && $res['success']) {
+            $paymentUrl = $res['data']['instrumentResponse']['redirectInfo']['url'];
+            return redirect()->away($paymentUrl);
+        } else {
+            \Log::error('Payment initiation failed:', $res);
+            return back()->with('error', 'Payment failed: ' . ($res['code'] ?? 'Unknown Error'));
+        }
+    } catch (\Exception $e) {
+        \Log::error('Error initiating payment: ' . $e->getMessage());
+        return back()->with('error', 'An error occurred while initiating payment.');
+    }
+}
     public function walletPaymentCallback(Request $request)
     {
         Log::info('Wallet Payment Callback Request:', $request->all());
