@@ -156,7 +156,7 @@
                                     alert(res.message);
                                     // Refresh wallet data without full page reload
                                     $.ajax({
-                                        url: "{{ route('seller.walletData') }}", // Create a route to fetch wallet data
+                                        url: "{{ route('seller.wallet') }}", // Create a route to fetch wallet data
                                         method: "GET",
                                         success: function (data) {
                                             $('#bodyData').html(data); // Update table body
@@ -186,7 +186,7 @@
                         ondismiss: function () {
                             // Payment cancelled
                             $.ajax({
-                                url: "{{ route('seller.addWalletAmount') }}",
+                                url: "{{ route('seller.wallet') }}",
                                 method: "POST",
                                 data: {
                                     amount: amount,
