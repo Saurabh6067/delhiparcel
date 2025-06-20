@@ -235,6 +235,9 @@ class SellerController extends Controller
             ->orderBy('id', 'desc')
             ->first();
 
+        
+
+
         $total = $data ? $data->total + $request->amount : $request->amount;
 
         $wlt = new Wallet();

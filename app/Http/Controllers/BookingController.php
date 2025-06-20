@@ -28,12 +28,12 @@ use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
-    
+
     protected $date;
     public function __construct()
     {
-        $kolkataDateTime  = Carbon::now('Asia/Kolkata');
-        $this->date       = $kolkataDateTime->format('Y-m-d H:i:s');
+        $kolkataDateTime = Carbon::now('Asia/Kolkata');
+        $this->date = $kolkataDateTime->format('Y-m-d H:i:s');
     }
 
 
@@ -45,8 +45,8 @@ class BookingController extends Controller
         $amount = $data->first();
         return view('booking.CodBookingAmount', compact('data', 'amount'));
     }
-    
-    
+
+
 
     public function bookingLogin(Request $request)
     {
@@ -80,20 +80,20 @@ class BookingController extends Controller
         $toDayOrderPicUp = (clone $ordersQuery)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
         $toDayCompleteOrder = (clone $ordersQuery)->where('order_status', 'Delivered')->count();
         $toDayCancelledOrder = (clone $ordersQuery)->where('order_status', 'Cancelled')->count();
-    
+
         // totalOrder details
         $totalOrder = Order::where('seller_primary_id', $id)->count();
         $totalPendingOrder = Order::where('seller_primary_id', $id)->where('order_status', 'Booked')->count();
         $totalOrderPicUp = Order::where('seller_primary_id', $id)->whereNotIn('order_status', ['Booked', 'Delivered', 'Cancelled'])->count();
         $totalCompleteOrder = Order::where('seller_primary_id', $id)->where('order_status', 'Delivered')->count();
         $totalCanceledOrder = Order::where('seller_primary_id', $id)->where('order_status', 'Cancelled')->count();
-    
+
         $BranchtotalCod = Wallet::where('userid', $id)
-                            ->orderBy('id', 'desc')
-                            ->first();
-             $branchcodamount = $BranchtotalCod->total ?? null;
-    
-            return view('booking.dashboard', compact('branch', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder','branchcodamount'));
+            ->orderBy('id', 'desc')
+            ->first();
+        $branchcodamount = $BranchtotalCod->total ?? null;
+
+        return view('booking.dashboard', compact('branch', 'toDayOrder', 'toDayPendingOrder', 'toDayOrderPicUp', 'toDayCompleteOrder', 'toDayCancelledOrder', 'totalOrder', 'totalPendingOrder', 'totalOrderPicUp', 'totalCompleteOrder', 'totalCanceledOrder', 'branchcodamount'));
     }
 
     public function bookingLogout(Request $request)
@@ -242,21 +242,18 @@ class BookingController extends Controller
     public function addWalletAmount(Request $request)
     {
         $user = Session::get('bid');
-        $data = Wallet::where('userid', $user)
-            ->orderBy('id', 'desc')
-            ->first();
-        if ($data) {
-            $total = $data->total + $request->amount;
-        } else {
-            $total = $request->amount;
-        }
+
+        $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->first();
+        $total = $data ? $data->total + $request->amount : $request->amount;
+
+        // ✅ Get mobile number of the branch user
+        $branch = Branch::where('id', $user)->first();
+        $mobile = $branch ? $branch->phoneno : '9999999999'; // fallback number
 
         $wlt = new Wallet();
         $wlt->userid = $user;
         $wlt->c_amount = $request->amount;
-
         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-
         $wlt->total = $total;
         $wlt->msg = 'credit';
         $wlt->save();
@@ -265,10 +262,12 @@ class BookingController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Amount added successfully!',
+                'mobile' => $mobile, // ✅ Return mobile number for Razorpay use
                 'html' => view('booking.inc.wallet', compact('data'))->render(),
             ]);
         }
     }
+
 
     public function addDeliveryOrder()
     {
@@ -303,9 +302,9 @@ class BookingController extends Controller
         return view('booking.addPickupOrder', compact('stdOrder', 'expOrder', 'seOrder'));
     }
 
-  
-    
-//   public function addOrderParcel(Request $request)
+
+
+    //   public function addOrderParcel(Request $request)
 // {
 //     // Validate request inputs
 //     $request->validate([
@@ -316,21 +315,21 @@ class BookingController extends Controller
 //         'price' => 'required|numeric|min:0',
 //     ]);
 
-//     $userId = Session::get('bid');
+    //     $userId = Session::get('bid');
 //     $branchDetails = Branch::where('id', $userId)->first();
 
-//     // Check if branch details exist
+    //     // Check if branch details exist
 //     if (!$branchDetails || empty($branchDetails->pincode)) {
 //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
 //             : redirect()->back()->with('message', 'Invalid branch or pincode data');
 //     }
 
-//     $wallet = Wallet::where('userid', $userId)
+    //     $wallet = Wallet::where('userid', $userId)
 //         ->orderBy('id', 'desc')
 //         ->first();
 
-//     if ($wallet && $wallet->total >= $request->price) {
+    //     if ($wallet && $wallet->total >= $request->price) {
 //         $wlt = new Wallet();
 //         $wlt->userid = $userId;
 //         $wlt->d_amount = $request->price;
@@ -340,10 +339,10 @@ class BookingController extends Controller
 //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //         $wlt->save();
 
-//         $order = new Order();
+    //         $order = new Order();
 //         $new_order_id = 'DL' . $this->generateRandomCode();
 
-//         // Set sender and receiver details based on parcel_type
+    //         // Set sender and receiver details based on parcel_type
 //         if ($request->parcel_type === 'delivery') {
 //             $order->sender_pincode = $branchDetails->pincode;
 //             $order->sender_name = $branchDetails->fullname;
@@ -351,7 +350,7 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
@@ -363,7 +362,7 @@ class BookingController extends Controller
 //             $order->sender_email = $request->receiver_email ?? '';
 //             $order->sender_address = $request->receiver_address ?? '';
 
-//             $order->receiver_pincode = $branchDetails->pincode;
+    //             $order->receiver_pincode = $branchDetails->pincode;
 //             $order->receiver_name = $branchDetails->fullname;
 //             $order->receiver_cnumber = $branchDetails->phoneno;
 //             $order->receiver_email = $branchDetails->email;
@@ -375,19 +374,19 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
 //             $order->receiver_add = $request->receiver_address ?? '';
 //         }
 
-//         // Find branch for seller_id based on sender_pincode
+    //         // Find branch for seller_id based on sender_pincode
 //         $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
 //             ->where('type', 'Delivery')
 //             ->first();
 
-//         $order->service_type = $request->service_type ?? null;
+    //         $order->service_type = $request->service_type ?? null;
 //         $order->service_title = $request->service_title ?? null;
 //         $order->service_price = $request->service_price ?? null;
 //         $order->order_id = $new_order_id;
@@ -404,21 +403,21 @@ class BookingController extends Controller
 //         $order->created_at = $this->date;
 //         $order->updated_at = $this->date;
 
-//         // GET THE DELIVERY BOY based on parcel_type
+    //         // GET THE DELIVERY BOY based on parcel_type
 //         $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
 //         $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
 //             $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
 //                   ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
 //         })->first();
 
-//         // Ensure delivery boy is assigned for delivery
+    //         // Ensure delivery boy is assigned for delivery
 //         if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
 //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => 'No delivery boy available for branch pincode'], 400)
 //                 : redirect()->back()->with('message', 'No delivery boy available for branch pincode');
 //         }
 
-//         // Assign delivery boy to order if found
+    //         // Assign delivery boy to order if found
 //         if ($deliveryBoy) {
 //             $order->assign_to = $deliveryBoy->id;
 //             // // Set assign_by based on parcel_type
@@ -433,9 +432,9 @@ class BookingController extends Controller
 //             // }
 //         }
 
-//         $order->save();
+    //         $order->save();
 
-//         // Create order history entry
+    //         // Create order history entry
 //         $order_history = new OrderHistory();
 //         $order_history->tracking_id = $new_order_id;
 //         $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
@@ -443,24 +442,24 @@ class BookingController extends Controller
 //         $order_history->order_id = $order->id;
 //         $order_history->save();
 
-//         $status = true;
+    //         $status = true;
 //         $msg = 'Order created successfully!';
 //     } else {
 //         $status = false;
 //         $msg = 'Insufficient Balance';
 //     }
 
-//     if ($request->ajax()) {
+    //     if ($request->ajax()) {
 //         return response()->json([
 //             'success' => $status,
 //             'message' => $msg,
 //         ]);
 //     }
 
-//     return redirect()->back()->with('message', $msg);
+    //     return redirect()->back()->with('message', $msg);
 // }
 
-//     public function addOrderParcel(Request $request)
+    //     public function addOrderParcel(Request $request)
 //     {
 //     // Validate request inputs
 //     $request->validate([
@@ -471,21 +470,21 @@ class BookingController extends Controller
 //         'price' => 'required|numeric|min:/mail0',
 //     ]);
 
-//     $userId = Session::get('bid');
+    //     $userId = Session::get('bid');
 //     $branchDetails = Branch::where('id', $userId)->first();
 
-//     // Check if branch details exist
+    //     // Check if branch details exist
 //     if (!$branchDetails || empty($branchDetails->pincode)) {
 //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
 //             : redirect()->back()->with('message', 'Invalid branch or pincode data');
 //     }
 
-//     $wallet = Wallet::where('userid', $userId)
+    //     $wallet = Wallet::where('userid', $userId)
 //         ->orderBy('id', 'desc')
 //         ->first();
 
-//     if ($wallet && $wallet->total >= $request->price) {
+    //     if ($wallet && $wallet->total >= $request->price) {
 //         $wlt = new Wallet();
 //         $wlt->userid = $userId;
 //         $wlt->d_amount = $request->price;
@@ -495,10 +494,10 @@ class BookingController extends Controller
 //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //         $wlt->save();
 
-//         $order = new Order();
+    //         $order = new Order();
 //         $new_order_id = 'DL' . $this->generateRandomCode();
 
-//         // Set sender and receiver details based on parcel_type
+    //         // Set sender and receiver details based on parcel_type
 //         if ($request->parcel_type === 'delivery') {
 //             $order->sender_pincode = $branchDetails->pincode;
 //             $order->sender_name = $branchDetails->fullname;
@@ -506,7 +505,7 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
@@ -518,7 +517,7 @@ class BookingController extends Controller
 //             $order->sender_email = $request->receiver_email ?? '';
 //             $order->sender_address = $request->receiver_address ?? '';
 
-//             $order->receiver_pincode = $branchDetails->pincode;
+    //             $order->receiver_pincode = $branchDetails->pincode;
 //             $order->receiver_name = $branchDetails->fullname;
 //             $order->receiver_cnumber = $branchDetails->phoneno;
 //             $order->receiver_email = $branchDetails->email;
@@ -530,19 +529,19 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
 //             $order->receiver_add = $request->receiver_address ?? '';
 //         }
 
-//         // Find branch for seller_id based on sender_pincode
+    //         // Find branch for seller_id based on sender_pincode
 //         $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
 //             ->where('type', 'Delivery')
 //             ->first();
 
-//         $order->service_type = $request->service_type ?? null;
+    //         $order->service_type = $request->service_type ?? null;
 //         $order->service_title = $request->service_title ?? null;
 //         $order->service_price = $request->service_price ?? null;
 //         $order->order_id = $new_order_id;
@@ -559,36 +558,36 @@ class BookingController extends Controller
 //         $order->created_at = $this->date;
 //         $order->updated_at = $this->date;
 
-//         // GET THE DELIVERY BOY based on parcel_type
+    //         // GET THE DELIVERY BOY based on parcel_type
 //         $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
 //         $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
 //             $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
 //                   ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
 //         })->first();
 
-//         // Ensure delivery boy is assigned for delivery
+    //         // Ensure delivery boy is assigned for delivery
 //         if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
 //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => 'No delivery boy available for branch pincode'], 400)
 //                 : redirect()->back()->with('message', 'No delivery boy available for branch pincode');
 //         }
 
-//         // Assign delivery boy to order if found
+    //         // Assign delivery boy to order if found
 //         if ($deliveryBoy) {
 //             $order->assign_to = $deliveryBoy->id;
 //         }
 
-//         $order->save();
+    //         $order->save();
 
-//         // Create order history entry
+    //         // Create order history entry
 //         $order_history = new OrderHistory();
 //         $order_history->tracking_id = $new_order_id;
 //         $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //         $order_history->status = 'Booked';
 //         $order_history->order_id = $order->id;
 //         $order_history->save();
-        
-//         // Prepare and send email
+
+    //         // Prepare and send email
 //         if ($order->sender_email || $order->receiver_email) {
 //             $mailData = [
 //                 'title' => 'Order Booking Confirmation',
@@ -609,13 +608,13 @@ class BookingController extends Controller
 //                 'datetime' => $order->datetime,
 //             ];
 
-//             try {
+    //             try {
 //                 $recipients = array_filter([
 //                     $order->sender_email,
 //                     $order->receiver_email
 //                 ], fn($email) => !empty($email));
 
-//                 if (!empty($recipients)) {
+    //                 if (!empty($recipients)) {
 //                     // Use queue for better performance
 //                     Mail::to($recipients)->queue(new SellerBookingConfirmation($mailData));
 //                     \Log::info("Booking confirmation email queued for " . implode(', ', $recipients) . " for order ID: {$new_order_id}");
@@ -628,24 +627,24 @@ class BookingController extends Controller
 //             }
 //         }
 
-//         $status = true;
+    //         $status = true;
 //         $msg = 'Order created successfully!';
 //     } else {
 //         $status = false;
 //         $msg = 'Insufficient Balance';
 //     }
 
-//     if ($request->ajax()) {
+    //     if ($request->ajax()) {
 //         return response()->json([
 //             'success' => $status,
 //             'message' => $msg,
 //         ]);
 //     }
 
-//     return redirect()->back()->with('message', $msg);
+    //     return redirect()->back()->with('message', $msg);
 // }
 
-//     public function addOrderParcel(Request $request)
+    //     public function addOrderParcel(Request $request)
 //     {
 //     // Validate request inputs
 //     $request->validate([
@@ -656,21 +655,21 @@ class BookingController extends Controller
 //         'price' => 'required|numeric|min:0',
 //     ]);
 
-//     $userId = Session::get('bid');
+    //     $userId = Session::get('bid');
 //     $branchDetails = Branch::where('id', $userId)->first();
 
-//     // Check if branch details exist
+    //     // Check if branch details exist
 //     if (!$branchDetails || empty($branchDetails->pincode)) {
 //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
 //             : redirect()->back()->with('message', 'Invalid branch or pincode data');
 //     }
 
-//     $wallet = Wallet::where('userid', $userId)
+    //     $wallet = Wallet::where('userid', $userId)
 //         ->orderBy('id', 'desc')
 //         ->first();
 
-//     if ($wallet && $wallet->total >= $request->price) {
+    //     if ($wallet && $wallet->total >= $request->price) {
 //         $wlt = new Wallet();
 //         $wlt->userid = $userId;
 //         $wlt->d_amount = $request->price;
@@ -680,10 +679,10 @@ class BookingController extends Controller
 //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //         $wlt->save();
 
-//         $order = new Order();
+    //         $order = new Order();
 //         $new_order_id = 'DL' . $this->generateRandomCode();
 
-//         // Set sender and receiver details based on parcel_type
+    //         // Set sender and receiver details based on parcel_type
 //         if ($request->parcel_type === 'delivery') {
 //             $order->sender_pincode = $branchDetails->pincode;
 //             $order->sender_name = $branchDetails->fullname;
@@ -691,7 +690,7 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
@@ -703,7 +702,7 @@ class BookingController extends Controller
 //             $order->sender_email = $request->receiver_email ?? '';
 //             $order->sender_address = $request->receiver_address ?? '';
 
-//             $order->receiver_pincode = $branchDetails->pincode;
+    //             $order->receiver_pincode = $branchDetails->pincode;
 //             $order->receiver_name = $branchDetails->fullname;
 //             $order->receiver_cnumber = $branchDetails->phoneno;
 //             $order->receiver_email = $branchDetails->email;
@@ -715,19 +714,19 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
 //             $order->receiver_add = $request->receiver_address ?? '';
 //         }
 
-//         // Find branch for seller_id based on sender_pincode
+    //         // Find branch for seller_id based on sender_pincode
 //         $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
 //             ->where('type', 'Delivery')
 //             ->first();
 
-//         $order->service_type = $request->service_type ?? null;
+    //         $order->service_type = $request->service_type ?? null;
 //         $order->service_title = $request->service_title ?? null;
 //         $order->service_price = $request->service_price ?? null;
 //         $order->order_id = $new_order_id;
@@ -744,28 +743,28 @@ class BookingController extends Controller
 //         $order->created_at = $this->date;
 //         $order->updated_at = $this->date;
 
-//         // GET THE DELIVERY BOY based on parcel_type
+    //         // GET THE DELIVERY BOY based on parcel_type
 //         $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
 //         $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
 //             $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
 //                   ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
 //         })->first();
 
-//         // Ensure delivery boy is assigned for delivery
+    //         // Ensure delivery boy is assigned for delivery
 //         if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
 //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => 'No delivery boy available for branch pincode'], 400)
 //                 : redirect()->back()->with('message', 'No delivery boy available for branch pincode');
 //         }
 
-//         // Assign delivery boy to order if found
+    //         // Assign delivery boy to order if found
 //         if ($deliveryBoy) {
 //             $order->assign_to = $deliveryBoy->id;
 //         }
 
-//         $order->save();
+    //         $order->save();
 
-//         // Create order history entry
+    //         // Create order history entry
 //         $order_history = new OrderHistory();
 //         $order_history->tracking_id = $new_order_id;
 //         $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
@@ -773,7 +772,7 @@ class BookingController extends Controller
 //         $order_history->order_id = $order->id;
 //         $order_history->save();
 
-//         // Prepare mail data
+    //         // Prepare mail data
 //         $mailData = null;
 //         if ($order->sender_email || $order->receiver_email) {
 //             $mailData = [
@@ -796,7 +795,7 @@ class BookingController extends Controller
 //             ];
 //         }
 
-//         // Send email using shutdown function
+    //         // Send email using shutdown function
 //         if ($mailData) {
 //             register_shutdown_function(function () use ($order, $mailData, $new_order_id) {
 //                 try {
@@ -808,7 +807,7 @@ class BookingController extends Controller
 //                         $recipients[] = $order->receiver_email;
 //                     }
 
-//                     if (!empty($recipients)) {
+    //                     if (!empty($recipients)) {
 //                         Mail::to($recipients)->send(new SellerBookingConfirmation($mailData));
 //                         \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$new_order_id}");
 //                     } else {
@@ -820,14 +819,14 @@ class BookingController extends Controller
 //             });
 //         }
 
-//         $status = true;
+    //         $status = true;
 //         $msg = 'Order created successfully!';
 //     } else {
 //         $status = false;
 //         $msg = 'Insufficient Balance';
 //     }
 
-//     if ($request->ajax()) {
+    //     if ($request->ajax()) {
 //         return response()->json([
 //             'success' => $status,
 //             'message' => $msg,
@@ -835,10 +834,10 @@ class BookingController extends Controller
 //         ]);
 //     }
 
-//     return redirect()->back()->with('message', $msg);
+    //     return redirect()->back()->with('message', $msg);
 // }
 
-// 16 june 
+    // 16 june 
 //     public function addOrderParcel(Request $request)
 // {
 //     // Validate request inputs
@@ -850,34 +849,34 @@ class BookingController extends Controller
 //         'price' => 'required|numeric|min:0',
 //     ]);
 
-//     $userId = Session::get('bid');
+    //     $userId = Session::get('bid');
 //     $branchDetails = Branch::where('id', $userId)->first();
 
-//     // Check if branch details exist
+    //     // Check if branch details exist
 //     if (!$branchDetails || empty($branchDetails->pincode)) {
 //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
 //             : redirect()->back()->with('message', 'Invalid branch or pincode data');
 //     }
 
-//     $wallet = Wallet::where('userid', $userId)
+    //     $wallet = Wallet::where('userid', $userId)
 //         ->orderBy('id', 'desc')
 //         ->first();
 
-//     if (!$wallet || $wallet->total < $request->price) {
+    //     if (!$wallet || $wallet->total < $request->price) {
 //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => 'Insufficient Balance'], 400)
 //             : redirect()->back()->with('message', 'Insufficient Balance');
 //     }
 
-//     // Start a database transaction
+    //     // Start a database transaction
 //     DB::beginTransaction();
 
-//     try {
+    //     try {
 //         $order = new Order();
 //         $new_order_id = 'DL' . $this->generateRandomCode();
 
-//         // Set sender and receiver details based on parcel_type
+    //         // Set sender and receiver details based on parcel_type
 //         if ($request->parcel_type === 'delivery') {
 //             $order->sender_pincode = $branchDetails->pincode;
 //             $order->sender_name = $branchDetails->fullname;
@@ -885,7 +884,7 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
@@ -897,7 +896,7 @@ class BookingController extends Controller
 //             $order->sender_email = $request->receiver_email ?? '';
 //             $order->sender_address = $request->receiver_address ?? '';
 
-//             $order->receiver_pincode = $branchDetails->pincode;
+    //             $order->receiver_pincode = $branchDetails->pincode;
 //             $order->receiver_name = $branchDetails->fullname;
 //             $order->receiver_cnumber = $branchDetails->phoneno;
 //             $order->receiver_email = $branchDetails->email;
@@ -909,19 +908,19 @@ class BookingController extends Controller
 //             $order->sender_email = $branchDetails->email;
 //             $order->sender_address = $branchDetails->fulladdress;
 
-//             $order->receiver_pincode = $request->receiverPincode;
+    //             $order->receiver_pincode = $request->receiverPincode;
 //             $order->receiver_name = $request->receiver_name;
 //             $order->receiver_cnumber = $request->receiver_number;
 //             $order->receiver_email = $request->receiver_email ?? '';
 //             $order->receiver_add = $request->receiver_address ?? '';
 //         }
 
-//         // Find branch for seller_id based on sender_pincode
+    //         // Find branch for seller_id based on sender_pincode
 //         $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
 //             ->where('type', 'Delivery')
 //             ->first();
 
-//         $order->service_type = $request->service_type ?? null;
+    //         $order->service_type = $request->service_type ?? null;
 //         $order->service_title = $request->service_title ?? null;
 //         $order->service_price = $request->service_price ?? null;
 //         $order->order_id = $new_order_id;
@@ -938,24 +937,24 @@ class BookingController extends Controller
 //         $order->created_at = $this->date;
 //         $order->updated_at = $this->date;
 
-//         // GET THE DELIVERY BOY based on parcel_type
+    //         // GET THE DELIVERY BOY based on parcel_type
 //         $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
 //         $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
 //             $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
 //                   ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
 //         })->first();
 
-//         // Ensure delivery boy is assigned for delivery
+    //         // Ensure delivery boy is assigned for delivery
 //         if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
 //             throw new \Exception('No delivery boy available for branch pincode');
 //         }
 
-//         // Assign delivery boy to order if found
+    //         // Assign delivery boy to order if found
 //         if ($deliveryBoy) {
 //             $order->assign_to = $deliveryBoy->id;
 //         }
 
-//         // Deduct wallet amount
+    //         // Deduct wallet amount
 //         $wlt = new Wallet();
 //         $wlt->userid = $userId;
 //         $wlt->d_amount = $request->price;
@@ -964,10 +963,10 @@ class BookingController extends Controller
 //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //         $wlt->save();
 
-//         // Save the order
+    //         // Save the order
 //         $order->save();
 
-//         // Create order history entry
+    //         // Create order history entry
 //         $order_history = new OrderHistory();
 //         $order_history->tracking_id = $new_order_id;
 //         $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
@@ -975,7 +974,7 @@ class BookingController extends Controller
 //         $order_history->order_id = $order->id;
 //         $order_history->save();
 
-//         // Prepare mail data
+    //         // Prepare mail data
 //         $mailData = null;
 //         if ($order->sender_email || $order->receiver_email) {
 //             $mailData = [
@@ -998,10 +997,10 @@ class BookingController extends Controller
 //             ];
 //         }
 
-//         // Commit the transaction
+    //         // Commit the transaction
 //         DB::commit();
 
-//         // Send email using shutdown function
+    //         // Send email using shutdown function
 //         if ($mailData) {
 //             register_shutdown_function(function () use ($order, $mailData, $new_order_id) {
 //                 try {
@@ -1018,16 +1017,16 @@ class BookingController extends Controller
 //             });
 //         }
 
-//         return $request->ajax()
+    //         return $request->ajax()
 //             ? response()->json(['success' => true, 'message' => 'Order created successfully!', 'data' => $new_order_id])
 //             : redirect()->back()->with('message', 'Order created successfully!');
 //     } catch (\Exception $e) {
 //         // Rollback the transaction on any error
 //         DB::rollBack();
 
-//         \Log::error("Order creation failed: " . $e->getMessage());
+    //         \Log::error("Order creation failed: " . $e->getMessage());
 
-//         return $request->ajax()
+    //         return $request->ajax()
 //             ? response()->json(['success' => false, 'message' => $e->getMessage()], 400)
 //             : redirect()->back()->with('message', $e->getMessage());
 //     }
@@ -1044,39 +1043,39 @@ class BookingController extends Controller
 //             'receiver_number' => 'required',
 //             'price' => 'required|numeric|min:0',
 //         ]);
-    
-//         $userId = Session::get('bid');
+
+    //         $userId = Session::get('bid');
 //         $branchDetails = Branch::where('id', $userId)->first();
-    
-//         if (!$branchDetails || empty($branchDetails->pincode)) {
+
+    //         if (!$branchDetails || empty($branchDetails->pincode)) {
 //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
 //                 : redirect()->back()->with('message', 'Invalid branch or pincode data');
 //         }
-    
-//         $wallet = Wallet::where('userid', $userId)
+
+    //         $wallet = Wallet::where('userid', $userId)
 //             ->orderBy('id', 'desc')
 //             ->first();
-    
-//         if (!$wallet || $wallet->total < $request->price) {
+
+    //         if (!$wallet || $wallet->total < $request->price) {
 //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => 'Insufficient Balance'], 400)
 //                 : redirect()->back()->with('message', 'Insufficient Balance');
 //         }
-    
-//         DB::beginTransaction();
-    
-//         try {
+
+    //         DB::beginTransaction();
+
+    //         try {
 //             $order = new Order();
-    
-//             if ($request->parcel_type === 'delivery') {
+
+    //             if ($request->parcel_type === 'delivery') {
 //                 $order->sender_pincode = $branchDetails->pincode;
 //                 $order->sender_name = $branchDetails->fullname;
 //                 $order->sender_number = $branchDetails->phoneno;
 //                 $order->sender_email = $branchDetails->email;
 //                 $order->sender_address = $branchDetails->fulladdress;
-    
-//                 $order->receiver_pincode = $request->receiverPincode;
+
+    //                 $order->receiver_pincode = $request->receiverPincode;
 //                 $order->receiver_name = $request->receiver_name;
 //                 $order->receiver_cnumber = $request->receiver_number;
 //                 $order->receiver_email = $request->receiver_email ?? '';
@@ -1087,8 +1086,8 @@ class BookingController extends Controller
 //                 $order->sender_number = $request->receiver_number;
 //                 $order->sender_email = $request->receiver_email ?? '';
 //                 $order->sender_address = $request->receiver_address ?? '';
-    
-//                 $order->receiver_pincode = $branchDetails->pincode;
+
+    //                 $order->receiver_pincode = $branchDetails->pincode;
 //                 $order->receiver_name = $branchDetails->fullname;
 //                 $order->receiver_cnumber = $branchDetails->phoneno;
 //                 $order->receiver_email = $branchDetails->email;
@@ -1099,19 +1098,19 @@ class BookingController extends Controller
 //                 $order->sender_number = $branchDetails->phoneno;
 //                 $order->sender_email = $branchDetails->email;
 //                 $order->sender_address = $branchDetails->fulladdress;
-    
-//                 $order->receiver_pincode = $request->receiverPincode;
+
+    //                 $order->receiver_pincode = $request->receiverPincode;
 //                 $order->receiver_name = $request->receiver_name;
 //                 $order->receiver_cnumber = $request->receiver_number;
 //                 $order->receiver_email = $request->receiver_email ?? '';
 //                 $order->receiver_add = $request->receiver_address ?? '';
 //             }
-    
-//             $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
+
+    //             $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
 //                 ->where('type', 'Delivery')
 //                 ->first();
-    
-//             $order->service_type = $request->service_type ?? null;
+
+    //             $order->service_type = $request->service_type ?? null;
 //             $order->service_title = $request->service_title ?? null;
 //             $order->service_price = $request->service_price ?? null;
 //             $order->order_id = ''; // Placeholder
@@ -1127,22 +1126,22 @@ class BookingController extends Controller
 //             $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //             $order->created_at = $this->date;
 //             $order->updated_at = $this->date;
-    
-//             $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
+
+    //             $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
 //             $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
 //                 $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
 //                       ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
 //             })->first();
-    
-//             if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
+
+    //             if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
 //                 throw new \Exception('No delivery boy available for branch pincode');
 //             }
-    
-//             if ($deliveryBoy) {
+
+    //             if ($deliveryBoy) {
 //                 $order->assign_to = $deliveryBoy->id;
 //             }
-    
-//             // Debit wallet
+
+    //             // Debit wallet
 //             $wlt = new Wallet();
 //             $wlt->userid = $userId;
 //             $wlt->d_amount = $request->price;
@@ -1150,24 +1149,24 @@ class BookingController extends Controller
 //             $wlt->msg = 'debit';
 //             $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //             $wlt->save();
-    
-//             // Save order first to get ID
+
+    //             // Save order first to get ID
 //             $order->save();
-    
-//             // Generate final order ID after saving
+
+    //             // Generate final order ID after saving
 //             $finalOrderId = 'DP1516800' . $order->id;
 //             $order->order_id = $finalOrderId;
 //             $order->save();
-    
-//             // Order history
+
+    //             // Order history
 //             $order_history = new OrderHistory();
 //             $order_history->tracking_id = $finalOrderId;
 //             $order_history->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
 //             $order_history->status = 'Booked';
 //             $order_history->order_id = $order->id;
 //             $order_history->save();
-    
-//             $mailData = null;
+
+    //             $mailData = null;
 //             if ($order->sender_email || $order->receiver_email) {
 //                 $mailData = [
 //                     'title' => 'Order Booking Confirmation',
@@ -1188,10 +1187,10 @@ class BookingController extends Controller
 //                     'datetime' => $order->datetime,
 //                 ];
 //             }
-    
-//             DB::commit();
-    
-//             if ($mailData) {
+
+    //             DB::commit();
+
+    //             if ($mailData) {
 //                 register_shutdown_function(function () use ($order, $mailData, $finalOrderId) {
 //                     try {
 //                         $recipients = array_filter([$order->sender_email, $order->receiver_email]);
@@ -1206,15 +1205,15 @@ class BookingController extends Controller
 //                     }
 //                 });
 //             }
-    
-//             return $request->ajax()
+
+    //             return $request->ajax()
 //                 ? response()->json(['success' => true, 'message' => 'Order created successfully!', 'data' => $finalOrderId])
 //                 : redirect()->back()->with('message', 'Order created successfully!');
 //         } catch (\Exception $e) {
 //             DB::rollBack();
 //             \Log::error("Order creation failed: " . $e->getMessage());
-    
-//             return $request->ajax()
+
+    //             return $request->ajax()
 //                 ? response()->json(['success' => false, 'message' => $e->getMessage()], 400)
 //                 : redirect()->back()->with('message', $e->getMessage());
 //         }
@@ -1230,38 +1229,38 @@ class BookingController extends Controller
             'receiver_number' => 'required',
             'price' => 'required|numeric|min:0',
         ]);
-    
+
         $userId = Session::get('bid');
         $branchDetails = Branch::where('id', $userId)->first();
-    
+
         if (!$branchDetails || empty($branchDetails->pincode)) {
             return $request->ajax()
                 ? response()->json(['success' => false, 'message' => 'Invalid branch or pincode data'], 400)
                 : redirect()->back()->with('message', 'Invalid branch or pincode data');
         }
-    
+
         $wallet = Wallet::where('userid', $userId)
             ->orderBy('id', 'desc')
             ->first();
-    
+
         if (!$wallet || $wallet->total < $request->price) {
             return $request->ajax()
                 ? response()->json(['success' => false, 'message' => 'Insufficient Balance'], 400)
                 : redirect()->back()->with('message', 'Insufficient Balance');
         }
-    
+
         DB::beginTransaction();
-    
+
         try {
             $order = new Order();
-    
+
             if ($request->parcel_type === 'delivery') {
                 $order->sender_pincode = $branchDetails->pincode;
                 $order->sender_name = $branchDetails->fullname;
                 $order->sender_number = $branchDetails->phoneno;
                 $order->sender_email = $branchDetails->email;
                 $order->sender_address = $branchDetails->fulladdress;
-    
+
                 $order->receiver_pincode = $request->receiverPincode;
                 $order->receiver_name = $request->receiver_name;
                 $order->receiver_cnumber = $request->receiver_number;
@@ -1273,7 +1272,7 @@ class BookingController extends Controller
                 $order->sender_number = $request->receiver_number;
                 $order->sender_email = $request->receiver_email ?? '';
                 $order->sender_address = $request->receiver_address ?? '';
-    
+
                 $order->receiver_pincode = $branchDetails->pincode;
                 $order->receiver_name = $branchDetails->fullname;
                 $order->receiver_cnumber = $branchDetails->phoneno;
@@ -1285,18 +1284,18 @@ class BookingController extends Controller
                 $order->sender_number = $branchDetails->phoneno;
                 $order->sender_email = $branchDetails->email;
                 $order->sender_address = $branchDetails->fulladdress;
-    
+
                 $order->receiver_pincode = $request->receiverPincode;
                 $order->receiver_name = $request->receiver_name;
                 $order->receiver_cnumber = $request->receiver_number;
                 $order->receiver_email = $request->receiver_email ?? '';
                 $order->receiver_add = $request->receiver_address ?? '';
             }
-    
+
             $branch = Branch::where('pincode', 'LIKE', "%{$order->sender_pincode}%")
                 ->where('type', 'Delivery')
                 ->first();
-    
+
             $order->service_type = $request->service_type ?? null;
             $order->service_title = $request->service_title ?? null;
             $order->service_price = $request->service_price ?? null;
@@ -1313,21 +1312,21 @@ class BookingController extends Controller
             $order->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
             $order->created_at = $this->date;
             $order->updated_at = $this->date;
-    
+
             $searchPincode = ($request->parcel_type === 'Pickup') ? $order->sender_pincode : $branchDetails->pincode;
             $deliveryBoy = DlyBoy::where(function ($query) use ($searchPincode) {
                 $query->whereRaw("FIND_IN_SET(?, pincode)", [$searchPincode])
-                      ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
+                    ->orWhere('pincode', 'LIKE', '%' . $searchPincode . '%');
             })->first();
-    
+
             if ($request->parcel_type === 'delivery' && !$deliveryBoy) {
                 throw new \Exception('No delivery boy available for branch pincode');
             }
-    
+
             if ($deliveryBoy) {
                 $order->assign_to = $deliveryBoy->id;
             }
-    
+
             // Debit wallet
             $wlt = new Wallet();
             $wlt->userid = $userId;
@@ -1336,15 +1335,15 @@ class BookingController extends Controller
             $wlt->msg = 'debit';
             $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
             $wlt->save();
-    
+
             // Save order first to get ID
             $order->save();
-    
+
             // Generate final order ID after saving
             $finalOrderId = 'DP1516800' . $order->id;
             $order->order_id = $finalOrderId;
             $order->save();
-    
+
             // Order history
             $order_history = new OrderHistory();
             $order_history->tracking_id = $finalOrderId;
@@ -1352,7 +1351,7 @@ class BookingController extends Controller
             $order_history->status = 'Booked';
             $order_history->order_id = $order->id;
             $order_history->save();
-    
+
             $mailData = null;
             if ($order->sender_email || $order->receiver_email) {
                 $mailData = [
@@ -1374,7 +1373,7 @@ class BookingController extends Controller
                     'datetime' => $order->datetime,
                 ];
             }
-    
+
             // DB::commit();
             // if ($mailData) {
             //     register_shutdown_function(function () use ($order, $mailData, $finalOrderId) {
@@ -1391,49 +1390,49 @@ class BookingController extends Controller
             //         }
             //     });
             // }
-            
-            if ($mailData) {
-                    $orderId = $finalOrderId;
-                
-                    register_shutdown_function(function () use ($order, $mailData, $orderId) {
-                        try {
-                            $recipients = [];
-                
-                            if (!empty($order->sender_email)) {
-                                $recipients[] = $order->sender_email;
-                            }
-                
-                            if (!empty($order->receiver_email)) {
-                                $recipients[] = $order->receiver_email;
-                            }
-                
-                            if (!empty($recipients)) {
-                                Mail::to($recipients)->queue(new SellerBookingConfirmation($mailData));
-                                \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
-                            } else {
-                                \Log::warning("No valid email addresses provided for order ID: {$orderId}");
-                            }
-                        } catch (\Exception $e) {
-                            \Log::error("Failed to send booking confirmation email for order ID {$orderId}: " . $e->getMessage());
-                        }
-                    });
-                }
-                
-                DB::commit();
 
-    
+            if ($mailData) {
+                $orderId = $finalOrderId;
+
+                register_shutdown_function(function () use ($order, $mailData, $orderId) {
+                    try {
+                        $recipients = [];
+
+                        if (!empty($order->sender_email)) {
+                            $recipients[] = $order->sender_email;
+                        }
+
+                        if (!empty($order->receiver_email)) {
+                            $recipients[] = $order->receiver_email;
+                        }
+
+                        if (!empty($recipients)) {
+                            Mail::to($recipients)->queue(new SellerBookingConfirmation($mailData));
+                            \Log::info("Booking confirmation email sent to " . implode(', ', $recipients) . " for order ID: {$orderId}");
+                        } else {
+                            \Log::warning("No valid email addresses provided for order ID: {$orderId}");
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error("Failed to send booking confirmation email for order ID {$orderId}: " . $e->getMessage());
+                    }
+                });
+            }
+
+            DB::commit();
+
+
             return $request->ajax()
                 ? response()->json(['success' => true, 'message' => 'Order created successfully!', 'data' => $finalOrderId])
                 : redirect()->back()->with('message', 'Order created successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error("Order creation failed: " . $e->getMessage());
-    
+
             return $request->ajax()
                 ? response()->json(['success' => false, 'message' => $e->getMessage()], 400)
                 : redirect()->back()->with('message', $e->getMessage());
         }
-}
+    }
 
 
     /**
@@ -1517,7 +1516,7 @@ class BookingController extends Controller
         $data = Order::where('order_id', $id)->first();
         return view('booking.invoice', compact('data'));
     }
-    
+
     // public function MonthlyBookingInvoices()
     // {
     //     // Get the logged-in user's branch ID from session
@@ -1555,47 +1554,47 @@ class BookingController extends Controller
     //     // Render the view
     //     return view('booking.montlyinvoice', compact('data'));
     // }
-    
+
     public function MonthlyBookingInvoices()
     {
-    // Get the logged-in user's branch ID from session
-    $userId = Session::get('bid');
+        // Get the logged-in user's branch ID from session
+        $userId = Session::get('bid');
 
-    // Fetch branch data
-    $branch = Branch::where('id', $userId)->first();
+        // Fetch branch data
+        $branch = Branch::where('id', $userId)->first();
 
-    // Initialize data object
-    $data = new \stdClass();
-    $data->gstno = $branch->gst_panno ?? null;
-    $data->branch_fullname = $branch->fullname ?? null;
-    $data->branch_fulladdress = $branch->fulladdress ?? null;
-    $data->branch_phoneno = $branch->phoneno ?? null;
-    $data->branch_pincode = $branch->pincode ?? null;
+        // Initialize data object
+        $data = new \stdClass();
+        $data->gstno = $branch->gst_panno ?? null;
+        $data->branch_fullname = $branch->fullname ?? null;
+        $data->branch_fulladdress = $branch->fulladdress ?? null;
+        $data->branch_phoneno = $branch->phoneno ?? null;
+        $data->branch_pincode = $branch->pincode ?? null;
 
-    // Get year and month from GET parameters (default to current year and month)
-    $year = request()->input('year', date('Y'));
-    $month = request()->input('month', date('F')); // e.g., January, February
+        // Get year and month from GET parameters (default to current year and month)
+        $year = request()->input('year', date('Y'));
+        $month = request()->input('month', date('F')); // e.g., January, February
 
-    // Convert month name to month number (e.g., January -> 01)
-    $monthNumber = date('m', strtotime($year . '-' . $month . '-01'));
+        // Convert month name to month number (e.g., January -> 01)
+        $monthNumber = date('m', strtotime($year . '-' . $month . '-01'));
 
-    // Generate invoice number (e.g., DP202506-123)
-    $data->invoice_number = 'DP' . $year . $monthNumber . '-' . $userId;
+        // Generate invoice number (e.g., DP202506-123)
+        $data->invoice_number = 'DP' . $year . $monthNumber . '-' . $userId;
 
-    // Query to sum the price of all delivered orders for the selected year, month, and branch
-    $totalPrice = Order::where('seller_primary_id', $userId)
-                      ->where('order_status', 'Delivered')
-                      ->whereRaw("SUBSTRING_INDEX(datetime, ' | ', 1) LIKE ?", ["%-$monthNumber-$year"])
-                      ->sum('price');
+        // Query to sum the price of all delivered orders for the selected year, month, and branch
+        $totalPrice = Order::where('seller_primary_id', $userId)
+            ->where('order_status', 'Delivered')
+            ->whereRaw("SUBSTRING_INDEX(datetime, ' | ', 1) LIKE ?", ["%-$monthNumber-$year"])
+            ->sum('price');
 
-    // Add total price and selected year/month to $data
-    $data->total_price = $totalPrice;
-    $data->selected_year = $year;
-    $data->selected_month = $month;
+        // Add total price and selected year/month to $data
+        $data->total_price = $totalPrice;
+        $data->selected_year = $year;
+        $data->selected_month = $month;
 
-    // Render the view
-    return view('booking.montlyinvoice', compact('data'));
-}
+        // Render the view
+        return view('booking.montlyinvoice', compact('data'));
+    }
 
     public function bookingLabel($id)
     {
@@ -1618,14 +1617,14 @@ class BookingController extends Controller
         }
     }
 
- 
+
     // public function allCodHistory()
     // {
     // $userId = Session::get('bid');
     // $data = Order::where('seller_primary_id', $userId)->where('order_status' , 'Delivered')->where('payment_mode','COD')->orderBy('id', 'desc')->get();
     // return view('booking.allCodHistory', compact('data'));
     // }
-    
+
     public function allCodHistory(Request $request)
     {
         $userId = Session::get('bid');
@@ -1754,7 +1753,7 @@ class BookingController extends Controller
     //         ]);
     //     }
     // }
-    
+
     public function bookingEditUpdate(Request $request)
     {
         // Validate the incoming request data
@@ -1818,7 +1817,7 @@ class BookingController extends Controller
         }
     }
 
-//   public function cancelledOrder($id)
+    //   public function cancelledOrder($id)
 //   {
 //     $order = Order::where('id', $id)->first();
 //     $order->order_status = 'Cancelled';
@@ -1827,12 +1826,12 @@ class BookingController extends Controller
 //         $amount = $order->price;
 //         $userId = $order->seller_primary_id;
 
-//         $wallet = Wallet::where('userid', $userId)
+    //         $wallet = Wallet::where('userid', $userId)
 //             ->orderBy('id', 'desc')
 //             ->first();
 //         $total = $wallet->total + $amount;
 
-//         $wlt = new Wallet();
+    //         $wlt = new Wallet();
 //         $wlt->userid = $userId;
 //         $wlt->c_amount = $amount;
 //         $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
@@ -1843,37 +1842,37 @@ class BookingController extends Controller
 //     return back();
 // }
 
-public function cancelledOrder($id)
-{
-    $order = Order::where('id', $id)->first();
-    if (!$order) {
-        return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+    public function cancelledOrder($id)
+    {
+        $order = Order::where('id', $id)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found.'], 404);
+        }
+
+        $order->order_status = 'Cancelled';
+        $order->updated_at = $this->date ?? now('Asia/Kolkata'); // Fallback to now() if $this->date is not set
+        if ($order->save()) {
+            $amount = $order->price;
+            $userId = $order->seller_primary_id;
+
+            $wallet = Wallet::where('userid', $userId)
+                ->orderBy('id', 'desc')
+                ->first();
+            $total = $wallet ? ($wallet->total + $amount) : $amount; // Fallback to $amount if no wallet exists
+
+            $wlt = new Wallet();
+            $wlt->userid = $userId;
+            $wlt->c_amount = $amount;
+            $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
+            $wlt->total = $total;
+            $wlt->msg = 'Order Cancelled';
+            $wlt->save();
+
+            return response()->json(['success' => true, 'message' => 'Order cancelled successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Failed to cancel the order.']);
     }
-
-    $order->order_status = 'Cancelled';
-    $order->updated_at = $this->date ?? now('Asia/Kolkata'); // Fallback to now() if $this->date is not set
-    if ($order->save()) {
-        $amount = $order->price;
-        $userId = $order->seller_primary_id;
-
-        $wallet = Wallet::where('userid', $userId)
-            ->orderBy('id', 'desc')
-            ->first();
-        $total = $wallet ? ($wallet->total + $amount) : $amount; // Fallback to $amount if no wallet exists
-
-        $wlt = new Wallet();
-        $wlt->userid = $userId;
-        $wlt->c_amount = $amount;
-        $wlt->datetime = now('Asia/Kolkata')->format('d-m-Y | h:i:s A');
-        $wlt->total = $total;
-        $wlt->msg = 'Order Cancelled';
-        $wlt->save();
-
-        return response()->json(['success' => true, 'message' => 'Order cancelled successfully.']);
-    }
-
-    return response()->json(['success' => false, 'message' => 'Failed to cancel the order.']);
-}
 
 
 
