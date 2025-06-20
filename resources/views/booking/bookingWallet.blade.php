@@ -123,46 +123,58 @@
             let amountInPaise = amount * 100;
 
             let rzp = new Razorpay({
-                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
-                "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}", 
+                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}",
+                "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
                 "amount": amountInPaise,
                 "currency": "INR",
-                "name": "Delhi Parcel",
+                "name": "Delhi oikein
+
+    System: Delhi Parcel",
                 "description": "Add to Wallet",
                 "handler": function (response) {
                     // ✅ On success
                     $.ajax({
                         url: "{{ route('booking.addWalletAmount') }}",
                         type: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
                         data: {
                             amount: amount,
                             razorpay_payment_id: response.razorpay_payment_id,
-                            status: 'success',
-                            _token: "{{ csrf_token() }}"
+                            status: 'success'
                         },
                         success: function (res) {
                             if (res.success) {
-                                $('#exampleModal').modal('hide'); // Close modal
-                                alert(res.message); // Show success message
+                                $('#exampleModal').modal('hide');
+                                alert(res.message);
                                 // Update DataTable dynamically
-                                $('#bodyData').html(res.html); // Update table body with new data
-                                $('#example1').DataTable().destroy(); // Destroy existing DataTable
-                                $('#example1').DataTable({ // Reinitialize DataTable
+                                $('#bodyData').html(res.html);
+                                $('#example1').DataTable().destroy();
+                                $('#example1').DataTable({
                                     "responsive": true,
                                     "lengthChange": false,
                                     "autoWidth": false,
                                     "buttons": ["copy", "excel", "pdf", "print"]
                                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
                                 // Update wallet balance display
-                                $('.wallet-amount').text('₹ ' + res.data.total.toFixed(2));
+                                $('.wallet-amount').text('₹ ' + (res.data?.total || '0.00'));
                             } else {
-                                alert(res.message); // Show server error message
-                                console.error('Error:', res);
+                                alert(res.message || 'An unexpected error occurred.');
+                                console.error('Server Response:', res);
                             }
                         },
-                        error: function (xhr) {
-                            alert('An error occurred while processing your request.');
-                            console.error('AJAX Error:', xhr);
+                        error: function (xhr, status, error) {
+                            let errorMessage = 'An error occurred while processing your request.';
+                            if (xhr.status === 419) {
+                                errorMessage = 'Session expired. Please refresh the page.';
+                            } else if (xhr.status === 422) {
+                                errorMessage = 'Invalid input data.';
+                            } else if (xhr.responseJSON?.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            alert(errorMessage);
+                            console.error('AJAX Error:', { status, error, response: xhr.responseJSON });
                         }
                     });
                 },
@@ -180,13 +192,15 @@
                         $.ajax({
                             url: "{{ route('booking.addWalletAmount') }}",
                             type: "POST",
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
                             data: {
                                 amount: amount,
-                                status: 'cancelled',
-                                _token: "{{ csrf_token() }}"
+                                status: 'cancelled'
                             },
                             success: function (res) {
-                                alert(res.message); // Show cancellation message
+                                alert(res.message || 'Payment was cancelled.');
                                 console.log('Cancellation Response:', res);
                             },
                             error: function (xhr) {
@@ -203,14 +217,16 @@
                 $.ajax({
                     url: "{{ route('booking.addWalletAmount') }}",
                     type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
                     data: {
                         amount: amount,
                         status: 'failed',
-                        reason: response.error.description,
-                        _token: "{{ csrf_token() }}"
+                        reason: response.error.description
                     },
                     success: function (res) {
-                        alert('Payment failed: ' + res.message); // Show failure message
+                        alert(res.message || 'Payment failed: ' + response.error.description);
                         console.log('Failure Response:', res);
                     },
                     error: function (xhr) {
