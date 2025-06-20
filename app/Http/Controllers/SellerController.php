@@ -52,7 +52,8 @@ class SellerController extends Controller
 
     public function sellerWallet()
     {
-        $user = Session::get('sid');
+        // $user = Session::get('sid');
+        $user = '4';
         $data = Wallet::where('userid', $user)->orderBy('id', 'desc')->get();
         $amount = $data->first();
         return view('seller.sellerWallet', compact('data', 'amount'));
@@ -147,7 +148,8 @@ class SellerController extends Controller
             'amount' => 'required|numeric|min:1',
         ]);
 
-        $user = Session::get('sid');
+        // $user = Session::get('sid');
+        $user = '4';
         if (!$user) {
             \Log::error('User session not found');
             return back()->with('error', 'Session expired. Please log in again.');
