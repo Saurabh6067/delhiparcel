@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Razorpay payment flow
                 let totalAmount = parseFloat($('#amount').val().replace(/[^0-9.]/g, '')) * 100; // Convert to paise
                 let options = {
-                    "key": "rzp_test_BCqQIjZcNVZHVw",
+                    "key": "rzp_live_swdLQ9ocZUoa9F",
                     "amount": totalAmount,
                     "currency": "INR",
                     "name": "Parcel Service",

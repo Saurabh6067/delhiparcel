@@ -121,8 +121,8 @@
             let amountInPaise = amount * 100;
 
             let rzp = new Razorpay({
-                // "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
-                "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
+                "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
+                // "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
                 "amount": amountInPaise,
                 "currency": "INR",
                 "name": "Delhi Parcel",
