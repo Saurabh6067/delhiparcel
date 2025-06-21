@@ -7,8 +7,6 @@
                     <div class="col-lg-8 col-md-8 ">
                         <div class="sec-title">
                             <h2><span>Parcel Details</span></h2>
-                            {{-- <img src="{{ asset('web/images/logo.png') }}" class="whychoose">
-                            <p class="text-center"></p> --}}
                         </div>
                     </div>
                 </div>
@@ -31,7 +29,7 @@
                                     <label class="form-label fw-bold" for="name">Sender Name</label>
                                     <input type="text" id="name" name="sender_name" class="form-control"
                                         placeholder="Enter Sender Name" required>
-                                </div>
+                                </div>   
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="number">Sender Contact Number</label>
                                     <input type="tel" id="number" name="sender_number" pattern="[6789][0-9]{9}"
@@ -44,17 +42,13 @@
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="address">Sender Full Address</label>
-                                    <!--<textarea type="text" id="address" name="sender_address" class="form-control" placeholder="Enter Sender Address"-->
-                                    <!--    required>{{ $data['pickupAddress'] }} </textarea>-->
-
-                                    <!--<textarea type="text" id="address" name="sender_address" class="form-control" placeholder="Enter Sender Address"-->
-                                    <!--  {{ $data['service_type'] === 'SuperExpress' ? 'disabled' : '' }}-->
-                                    <!--  required>{{ $data['pickupAddress'] }}</textarea>-->
-
-                                    <textarea type="text" id="address" name="sender_address" class="form-control"
-                                        placeholder="Enter Sender Address" {{ $data['service_type'] === 'SuperExpress' ? 'readonly' : '' }}
-                                        required>{{ ($data['service_type'] !== 'SuperExpress' && $data['pickupAddress'] === 'NA') ? '' : $data['pickupAddress'] }}</textarea>
-
+                                    <textarea type="text" 
+                                      id="address" 
+                                      name="sender_address" 
+                                      class="form-control" 
+                                      placeholder="Enter Sender Address"
+                                      {{ $data['service_type'] === 'SuperExpress' ? 'readonly' : '' }}
+                                      required>{{ ($data['service_type'] !== 'SuperExpress' && $data['pickupAddress'] === 'NA') ? '' : $data['pickupAddress'] }}</textarea>
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="senderPinCode">Sender Pin Code</label>
@@ -84,80 +78,48 @@
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="address">Receiver Full Address</label>
-                                    <!--<textarea type="text" id="address" name="receiver_address" class="form-control"-->
-                                    <!--    placeholder="Enter Receiver Address" required>{{ $data['deliveryAddress'] }} </textarea>-->
-                                    <textarea type="text" id="address" name="receiver_address" class="form-control"
-                                        placeholder="Enter Receiver Address" {{ $data['service_type'] === 'SuperExpress' ? 'readonly' : '' }}
-                                        required>{{ ($data['service_type'] !== 'SuperExpress' && $data['deliveryAddress'] === 'NA') ? '' : $data['deliveryAddress'] }}</textarea>
+                                    <textarea type="text" 
+                                      id="address" 
+                                      name="receiver_address" 
+                                      class="form-control" 
+                                      placeholder="Enter Receiver Address"
+                                      {{ $data['service_type'] === 'SuperExpress' ? 'readonly' : '' }}
+                                      required>{{ ($data['service_type'] !== 'SuperExpress' && $data['deliveryAddress'] === 'NA') ? '' : $data['deliveryAddress'] }}</textarea>
                                 </div>
                                 <div class="col-lg-12 mb-3">
                                     <label class="form-label fw-bold" for="receiverPinCode">Receiver Pin Code</label>
-                                    <input type="text" id="receiverPinCode" name="receiverPinCode" class="form-control"
-                                        placeholder="Enter Receiver Pin Code" value="{{ $data['deliveryPincode'] }}"
-                                        readonly>
+                                    <input type="text" id="receiverPinCode" name="receiverPinCode"
+                                        class="form-control" placeholder="Enter Receiver Pin Code"
+                                        value="{{ $data['deliveryPincode'] }}" readonly>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Payment options and total cost -->
-                    <!--<div class="row mt-3">-->
-                    <!--    <div class="col-12 col-lg-6 d-flex ">-->
-                    <!--        <div class="form-check">-->
-                    <!--            <input class="form-check-input" type="radio" id="cod" name="payment_methods"-->
-                    <!--                value="COD">-->
-                    <!--            <label class="form-check-label" for="cod">Cash On Delivery <em-->
-                    <!--                    class="text-success text-center justify-content-center "-->
-                    <!--                    style="font-size: 12px;">(COD charges ₹ 30 or 2 % which ever is-->
-                    <!--                    higher)</em></label>-->
-                    <!--            <div class="input-group input-group-sm d-none" id="codInputGroup">-->
-                    <!--                <input type="number" name="codAmount" id="codInput" class="form-control"-->
-                    <!--                    aria-describedby="codChargeValue" placeholder="Enter COD ₹ 0">-->
-                    <!--                <span class="input-group-text" id="codChargeValue">0</span>-->
-                    <!--            </div>-->
-                    <!--        </div>-->
-                    <!--    </div>-->
-
-                    <!--    <div class="col-12 col-lg-6 d-flex">-->
-                    <!--        <div class="form-check">-->
-                    <!--            <input class="form-check-input" type="radio" id="online" name="payment_methods"-->
-                    <!--                value="online">-->
-                    <!--            <label class="form-check-label" for="online">Prepaid Order</label>-->
-                    <!--        </div>-->
-                    <!--    </div>-->
-                    <!--</div>-->
-
                     <div class="row mt-3">
                         <div class="col-12 col-sm-12 d-flex justify-content-center">
-                            <h2 class="text-danger">Payment Method</h2>
-                        </div>
-
+                           <h2 class="text-danger">Payment Method</h2>
+                        </div> 
                     </div>
-
+                        
                     <div class="row mt-3">
                         <div class="col-12 col-lg-6 d-flex">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" id="cod" name="payment_methods" value="COD">
-                                <label class="form-check-label" for="cod">Cash On Delivery <em
-                                        class="text-success text-center justify-content-center"
-                                        style="font-size: 12px;">(COD charges ₹ 30 or 2 % whichever is higher)</em></label>
+                                <label class="form-check-label" for="cod">Cash On Delivery <em class="text-success text-center justify-content-center" style="font-size: 12px;">(COD charges ₹ 30 or 2 % whichever is higher)</em></label>
                                 <div class="input-group input-group-sm d-none" id="codInputGroup">
-                                    <input type="number" name="codAmount" id="codInput" class="form-control"
-                                        aria-describedby="codChargeValue" placeholder="Enter COD ₹ 0">
+                                    <input type="number" name="codAmount" id="codInput" class="form-control" aria-describedby="codChargeValue" placeholder="Enter COD ₹ 0">
                                     <span class="input-group-text" id="codChargeValue">0</span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-12 col-lg-6 d-flex">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" id="online" name="payment_methods"
-                                    value="online">
+                                <input class="form-check-input" type="radio" id="online" name="payment_methods" value="online">
                                 <label class="form-check-label" for="online">Prepaid Order</label>
                             </div>
                         </div>
                     </div>
-
-
+                    
                     <div class="row mb-3">
                         <div class="col-12 d-flex">
                             <div class="mb-3 form-check">
@@ -172,13 +134,10 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <div class="row">
                         <div class="col-sm-12">
-                            <!-- Error message span -->
-                            <span id="paymentError" class="text-danger"
-                                style="display: none; font-size: 20px;text-align:center;margin-bottom:10px">Please choose a
-                                payment method.</span>
+                            <span id="paymentError" class="text-danger" style="display: none; font-size: 20px;text-align:center;margin-bottom:10px">Please choose a payment method.</span>
                         </div>
                     </div>
 
@@ -190,7 +149,7 @@
                                     id="amounts">{{ !empty($data['price']) ? $data['price'] : '₹ 0.0' }}</span></h4>
                         </div>
                         <div class="col-lg-6">
-                            <button class="btn rainbow-hover mb-3 w-100">
+                            <button class="btn rainbow-hover mb-3 w-100" type="submit">
                                 <span class="sp">Submit</span>
                             </button>
                         </div>
@@ -201,91 +160,129 @@
     </div>
 @endsection
 @push('scripts')
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const codRadio = document.getElementById('cod');
+    const onlineRadio = document.getElementById('online');
+    const codInputGroup = document.getElementById('codInputGroup');
+    const codInput = document.getElementById('codInput');
+    const paymentError = document.getElementById('paymentError');
 
-    <!-- Start Here Coose anyone -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const codRadio = document.getElementById('cod');
-            const onlineRadio = document.getElementById('online');
-            const codInputGroup = document.getElementById('codInputGroup');
-            const codInput = document.getElementById('codInput');
-            const paymentError = document.getElementById('paymentError');
+    // Show/hide COD input
+    codRadio.addEventListener('change', function () {
+        codInputGroup.classList.remove('d-none');
+        codInput.setAttribute('required', 'required');
+        paymentError.style.display = 'none';
+    });
 
-            // Show/hide COD input
-            codRadio.addEventListener('change', function () {
-                codInputGroup.classList.remove('d-none');
-                codInput.setAttribute('required', 'required');
-                paymentError.style.display = 'none'; // Hide error when a payment method is selected
-            });
+    onlineRadio.addEventListener('change', function () {
+        codInputGroup.classList.add('d-none');
+        codInput.removeAttribute('required');
+        codInput.value = '';
+        paymentError.style.display = 'none';
+    });
 
-            onlineRadio.addEventListener('change', function () {
-                codInputGroup.classList.add('d-none');
-                codInput.removeAttribute('required');
-                codInput.value = '';
-                paymentError.style.display = 'none'; // Hide error when a payment method is selected
-            });
-
-            // Payment required check on form submit
-            const form = document.querySelector('form');
-
-            form.addEventListener('submit', function (e) {
-                const selectedPayment = document.querySelector('input[name="payment_methods"]:checked');
-                if (!selectedPayment) {
-                    e.preventDefault();
-                    paymentError.style.display = 'block'; // Show error message
-                } else {
-                    paymentError.style.display = 'none'; // Ensure error is hidden if a method is selected
-                }
-            });
+    // jQuery code
+    $(document).ready(function() {
+        $('input[name="payment_methods"]').on('change', function() {
+            if ($('#cod').is(':checked')) {
+                $('#codInputGroup').removeClass('d-none');
+            } else {
+                $('#codInputGroup').addClass('d-none');
+                $('#codChargeValue').text('0.00');
+                $('#codInput').val('');
+            }
+            updateTotalAmount();
         });
-    </script>
 
+        $('#codInput').on('change', function() {
+            let price = parseFloat($('#amount').data('amount').replace(/[^0-9.]/g, '')) || 0;
+            let amount = parseFloat($(this).val()) || 0;
+            let charge = Math.max(30, amount * 0.02);
 
+            $('#codChargeValue').text(charge.toFixed(2));
+            updateTotalAmount();
+        });
 
-    <script>
-        $(document).ready(function () {
-            $('input[name="payment_methods"]').on('change', function () {
-                if ($('#cod').is(':checked')) {
-                    $('#codInputGroup').removeClass('d-none');
-                } else {
-                    $('#codInputGroup').addClass('d-none');
-                    $('#codChargeValue').text('0.00'); // Reset COD charge
-                    $('#codInput').val(''); // Clear COD input field
-                }
-                updateTotalAmount();
-            });
+        $('#insurance').on('change', function() {
+            updateTotalAmount();
+        });
 
-            $('#codInput').on('change', function () {
-                let price = parseFloat($('#amount').data('amount').replace(/[^0-9.]/g, '')) || 0;
-                let amount = parseFloat($(this).val()) || 0;
-                let charge = Math.max(30, amount * 0.02);
+        function updateTotalAmount() {
+            let basePrice = parseFloat($('#amount').data('amount').replace(/[^0-9.]/g, '')) || 0;
+            let codCharge = parseFloat($('#codChargeValue').text()) || 0;
+            let insuranceCharge = $('#insurance').is(':checked') ? Math.max(50, basePrice * 0.01) : 0;
 
-                $('#codChargeValue').text(charge.toFixed(2));
-                updateTotalAmount();
-            });
+            let totalPrice = basePrice + codCharge + insuranceCharge;
 
-            $('#insurance').on('change', function () {
-                updateTotalAmount();
-            });
+            $('#amount').val('₹ ' + totalPrice.toFixed(2));
+            $('#amounts').text('₹ ' + totalPrice.toFixed(2));
+        }
 
-            function updateTotalAmount() {
-                let basePrice = parseFloat($('#amount').data('amount').replace(/[^0-9.]/g, '')) || 0;
-                let codCharge = parseFloat($('#codChargeValue').text()) || 0;
-                let insuranceCharge = $('#insurance').is(':checked') ? Math.max(50, basePrice * 0.01) : 0;
+        // Initialize the total price
+        updateTotalAmount();
 
-                let totalPrice = basePrice + codCharge + insuranceCharge;
-
-                $('#amount').val('₹ ' + totalPrice.toFixed(2));
-                $('#amounts').text('₹ ' + totalPrice.toFixed(2));
+        // Form submission handling
+        $('#parcelForm').on('submit', function(e) {
+            e.preventDefault();
+            const selectedPayment = document.querySelector('input[name="payment_methods"]:checked');
+            
+            if (!selectedPayment) {
+                paymentError.style.display = 'block';
+                return;
+            } else {
+                paymentError.style.display = 'none';
             }
 
-            // Initialize the total price
-            updateTotalAmount();
+            let formData = new FormData(this);
 
-            // store details
-            $('#parcelForm').on('submit', function (e) {
-                e.preventDefault();
-                let formData = new FormData(this);
+            if (selectedPayment.value === 'online') {
+                // Razorpay payment flow
+                let totalAmount = parseFloat($('#amount').val().replace(/[^0-9.]/g, '')) * 100; // Convert to paise
+                let options = {
+                    "key": "rzp_test_BCqQIjZcNVZHVw",
+                    "amount": totalAmount,
+                    "currency": "INR",
+                    "name": "Parcel Service",
+                    "description": "Order Payment",
+                    "handler": function (response) {
+                        // Add Razorpay payment ID to form data
+                        formData.append('razorpay_payment_id', response.razorpay_payment_id);
+
+                        // Proceed with storing parcel details
+                        $.ajax({
+                            type: "POST",
+                            url: "{{ route('web.storeParcelDetails') }}",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            dataType: "json",
+                            success: function(response) {
+                                $('#parcelForm')[0].reset();
+                                swal(response.msg, "Order ID: " + response.data, "success");
+                                setTimeout(() => {
+                                    window.location.href = "{{ url('order-Label') }}" + '/' + response.data;
+                                }, 1500);
+                            },
+                            error: function(xhr) {
+                                swal("Error", "Failed to process order. Please try again.", "error");
+                            }
+                        });
+                    },
+                    "prefill": {
+                        "name": $('#name').val(),
+                        "email": $('#email').val(),
+                        "contact": $('#number').val()
+                    },
+                    "theme": {
+                        "color": "#3399cc"
+                    }
+                };
+                let rzp = new Razorpay(options);
+                rzp.open();
+            } else {
+                // COD flow - directly store parcel details
                 $.ajax({
                     type: "POST",
                     url: "{{ route('web.storeParcelDetails') }}",
@@ -293,16 +290,20 @@
                     processData: false,
                     contentType: false,
                     dataType: "json",
-                    success: function (response) {
+                    success: function(response) {
                         $('#parcelForm')[0].reset();
                         swal(response.msg, "Order ID: " + response.data, "success");
                         setTimeout(() => {
-                            window.location.href = "{{ url('order-Label') }}" + '/' +
-                                response.data;
+                            window.location.href = "{{ url('order-Label') }}" + '/' + response.data;
                         }, 1500);
+                    },
+                    error: function(xhr) {
+                        swal("Error", "Failed to process order. Please try again.", "error");
                     }
                 });
-            });
+            }
         });
-    </script>
+    });
+});
+</script>
 @endpush
