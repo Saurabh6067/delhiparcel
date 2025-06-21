@@ -167,11 +167,7 @@
                         }
                     });
                 },
-                "prefill": {
-                    "contact": "{{ $mobile ?? '9999999999' }}",
-                    "name": "User",
-                    "email": "user@example.com"
-                },
+              
                 "theme": {
                     "color": "#28a745"
                 },
