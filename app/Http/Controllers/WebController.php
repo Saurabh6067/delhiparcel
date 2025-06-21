@@ -317,7 +317,7 @@ class WebController extends Controller
             'receiver_address' => 'required|string',
             'receiverPinCode' => 'required|string|max:10',
             'service_type' => 'required|string',
-            'service_id' => 'required|integer',
+            // 'service_id' => 'required|integer',
             'pickupAddress' => 'required|string',
             'deliveryAddress' => 'required|string',
             // 'price' => 'required|numeric',

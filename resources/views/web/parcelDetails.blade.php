@@ -237,7 +237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let formData = new FormData(this);
 
-            if (selectedPayment.value === 'online') {
+            if (selectedPayment.value === 'online' || selectedPayment.value === 'COD') {
                 // Razorpay payment flow
                 let totalAmount = parseFloat($('#amount').val().replace(/[^0-9.]/g, '')) * 100; // Convert to paise
                 let options = {
@@ -283,24 +283,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 rzp.open();
             } else {
                 // COD flow - directly store parcel details
-                $.ajax({
-                    type: "POST",
-                    url: "{{ route('web.storeParcelDetails') }}",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    dataType: "json",
-                    success: function(response) {
-                        $('#parcelForm')[0].reset();
-                        swal(response.msg, "Order ID: " + response.data, "success");
-                        setTimeout(() => {
-                            window.location.href = "{{ url('order-Label') }}" + '/' + response.data;
-                        }, 1500);
-                    },
-                    error: function(xhr) {
-                        swal("Error", "Failed to process order. Please try again.", "error");
-                    }
-                });
+                // $.ajax({
+                //     type: "POST",
+                //     url: "{{ route('web.storeParcelDetails') }}",
+                //     data: formData,
+                //     processData: false,
+                //     contentType: false,
+                //     dataType: "json",
+                //     success: function(response) {
+                //         $('#parcelForm')[0].reset();
+                //         swal(response.msg, "Order ID: " + response.data, "success");
+                //         setTimeout(() => {
+                //             window.location.href = "{{ url('order-Label') }}" + '/' + response.data;
+                //         }, 1500);
+                //     },
+                //     error: function(xhr) {
+                //         swal("Error", "Failed to process order. Please try again.", "error");
+                //     }
+                // });
             }
         });
     });
