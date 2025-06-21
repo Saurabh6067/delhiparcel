@@ -122,7 +122,6 @@
 
             let rzp = new Razorpay({
                 "key": "{{ env('RAZORPAY_KEY', 'rzp_live_swdLQ9ocZUoa9F') }}", 
-                // "key": "{{ env('RAZORPAY_KEY', 'rzp_test_BCqQIjZcNVZHVw') }}",
                 "amount": amountInPaise,
                 "currency": "INR",
                 "name": "Delhi Parcel",
@@ -164,11 +163,6 @@
                             console.error('AJAX Error:', xhr);
                         }
                     });
-                },
-                "prefill": {
-                    "contact": "{{ $mobile ?? '9999999999' }}",
-                    "name": "User",
-                    "email": "user@example.com"
                 },
                 "theme": {
                     "color": "#28a745"
